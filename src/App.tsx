@@ -133,16 +133,20 @@ function AppContent() {
       {/* Main Content - no padding needed with sticky header */}
       <main>
         <AnimatePresence mode="wait">
-          {/* Allow admin/owner/auth/quiz routes to bypass level selector */}
+          {/* Allow admin/owner/auth/quiz/analytics routes to bypass level selector */}
           {location.pathname.startsWith('/admin') || 
            location.pathname.startsWith('/owner') ||
            location.pathname.startsWith('/login') ||
            location.pathname.startsWith('/register') ||
-           location.pathname.startsWith('/quiz') ? (
+           location.pathname.startsWith('/quiz') ||
+           location.pathname.startsWith('/analytics') ? (
             <Routes location={location} key={location.pathname}>
               {/* User Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              
+              {/* Analytics Routes */}
+              <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
               
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />

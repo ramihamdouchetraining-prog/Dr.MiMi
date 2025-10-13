@@ -60,17 +60,61 @@ const StudentAnalyticsDashboard: React.FC = () => {
     );
   }
 
+  // Si pas authentifié, afficher message de connexion
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50">
+        <div className="text-center bg-white rounded-2xl shadow-2xl p-12 max-w-md">
+          <div className="mb-6">
+            <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Activity className="w-10 h-10 text-teal-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              📊 Analytics Personnel
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Connectez-vous pour accéder à votre tableau de bord analytique et suivre votre progression
+            </p>
+          </div>
+          
+          <a
+            href="/login"
+            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white font-semibold rounded-xl hover:from-teal-600 hover:to-blue-600 transition-all transform hover:scale-105 shadow-lg"
+          >
+            Se connecter
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+          
+          <p className="mt-6 text-sm text-gray-500">
+            Pas encore de compte ?{' '}
+            <a href="/register" className="text-teal-600 hover:text-teal-700 font-medium">
+              S'inscrire gratuitement
+            </a>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!data || !data.analytics) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50">
+        <div className="text-center bg-white rounded-2xl shadow-2xl p-12 max-w-md">
           <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             {t('analytics.noData', 'Pas encore de données')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-6">
             {t('analytics.startLearning', 'Commencez à apprendre pour voir vos statistiques')}
           </p>
+          <a
+            href="/quiz"
+            className="inline-flex items-center justify-center px-6 py-3 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-700 transition"
+          >
+            Commencer un quiz
+          </a>
         </div>
       </div>
     );
