@@ -44,7 +44,7 @@ import StudentAnalyticsDashboard from './pages/StudentAnalyticsDashboard'
 import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
 
 // Import XXL Components
-import { AdminDashboardXXL } from './components/dashboard/AdminDashboardXXL'
+import { AdminDashboardAdvanced } from './components/dashboard/AdminDashboardAdvanced'
 import { VirtualLab3DWrapper } from './components/VirtualLab3DWrapper'
 import { CollaborativePlatform } from './components/CollaborativePlatform'
 import { EducationalMarketplace } from './components/marketplace/EducationalMarketplace'
@@ -187,7 +187,7 @@ function AppContent() {
               
               {/* Routes XXL */}
               <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
-              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Dashboard Admin XXL"><AdminDashboardXXL /></ErrorBoundary>} />
+              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
               <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
@@ -221,7 +221,7 @@ function AppContent() {
               
               {/* Routes XXL */}
               <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
-              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Dashboard Admin XXL"><AdminDashboardXXL /></ErrorBoundary>} />
+              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
               <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
