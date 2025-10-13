@@ -1,5 +1,6 @@
 import { QuizQuestion } from '../components/QuizComponent';
 import { MedicalImage } from '../components/MedicalImageViewer';
+import { Heart, Brain, Bone, Activity, Eye, Pill, FileText, Baby, Shield, Stethoscope, FlaskConical } from 'lucide-react';
 
 // Comprehensive QCM Data for Medical Education
 export const cardiologyQuiz: QuizQuestion[] = [
@@ -237,7 +238,7 @@ export const medicalModules = [
   {
     id: 'cardiologie',
     name: 'Cardiologie',
-    icon: '🫀',
+    icon: Heart,
     description: 'Étude du système cardiovasculaire, des pathologies cardiaques et de leur traitement',
     category: 'Clinical',
     difficulty: 'moyen',
@@ -250,7 +251,7 @@ export const medicalModules = [
   {
     id: 'neurologie',
     name: 'Neurologie',
-    icon: '🧠',
+    icon: Brain,
     description: 'Exploration du système nerveux central et périphérique, neuroanatomie et pathologies',
     category: 'Clinical',
     difficulty: 'difficile',
@@ -263,7 +264,7 @@ export const medicalModules = [
   {
     id: 'anatomie',
     name: 'Anatomie',
-    icon: '🦴',
+    icon: Bone,
     description: 'Structure et organisation du corps humain, de la cellule aux systèmes d\'organes',
     category: 'Preclinical',
     difficulty: 'moyen',
@@ -276,7 +277,7 @@ export const medicalModules = [
   {
     id: 'pharmacologie',
     name: 'Pharmacologie',
-    icon: '💊',
+    icon: Pill,
     description: 'Mécanismes d\'action des médicaments, pharmacocinétique et pharmacodynamie',
     category: 'Preclinical',
     difficulty: 'difficile',
@@ -289,7 +290,7 @@ export const medicalModules = [
   {
     id: 'dermatologie',
     name: 'Dermatologie',
-    icon: '🔬',
+    icon: FlaskConical,
     description: 'Pathologies cutanées, diagnostic dermatologique et thérapeutiques spécialisées',
     category: 'Clinical',
     difficulty: 'moyen',
@@ -302,7 +303,7 @@ export const medicalModules = [
   {
     id: 'pneumologie',
     name: 'Pneumologie',
-    icon: '🫁',
+    icon: Activity,
     description: 'Système respiratoire, pathologies pulmonaires et explorations fonctionnelles',
     category: 'Clinical',
     difficulty: 'moyen',
