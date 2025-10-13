@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, Video, VideoOff, Mic, MicOff, Screen, 
+  Users, Video, VideoOff, Mic, MicOff, MonitorUp as Screen, 
   MessageSquare, Phone, PhoneOff, Settings,
   UserPlus, Copy, Check, ChevronRight,
   Grid, Presentation, BookOpen, Brain,

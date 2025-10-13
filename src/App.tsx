@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Sparkles, Heart, BookOpen, FileText, CheckCircle, Activity } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -20,7 +20,6 @@ import MedicalLibraryPage from './pages/MedicalLibraryPage'
 import MimiLibrary from './pages/MimiLibrary'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminArticles from './pages/AdminArticles'
-import AdminAnalytics from './pages/AdminAnalytics'
 import AdminLayout from './pages/Admin/AdminLayout'
 import AdminUsers from './pages/Admin/AdminUsers'
 import AdminSettings from './pages/Admin/AdminSettings'
@@ -43,6 +42,14 @@ import PaymentDZD from './pages/PaymentDZD'
 import AITutor from './components/AITutor'
 import StudentAnalyticsDashboard from './pages/StudentAnalyticsDashboard'
 import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
+
+// Import XXL Components
+import { AdminDashboardXXL } from './components/dashboard/AdminDashboardXXL'
+import { VirtualLab3D } from './components/VirtualLab3D'
+import { CollaborativePlatform } from './components/CollaborativePlatform'
+import { EducationalMarketplace } from './components/marketplace/EducationalMarketplace'
+import { AdvancedGamification } from './components/gamification/AdvancedGamification'
+import FeaturesXXLPage from './pages/FeaturesXXLPage'
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -197,6 +204,14 @@ function AppContent() {
               <Route path="/payment-dzd" element={<PaymentDZD />} />
               <Route path="/ai-tutor" element={<AITutor />} />
               <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
+              
+              {/* Routes XXL */}
+              <Route path="/features-xxl" element={<FeaturesXXLPage />} />
+              <Route path="/admin/dashboard-xxl" element={<AdminDashboardXXL />} />
+              <Route path="/lab-3d" element={<VirtualLab3D />} />
+              <Route path="/collaboration" element={<CollaborativePlatform />} />
+              <Route path="/marketplace" element={<EducationalMarketplace />} />
+              <Route path="/gamification" element={<AdvancedGamification />} />
             </Routes>
           )}
         </AnimatePresence>
@@ -287,7 +302,7 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             </motion.p>
             
             <motion.div 
-              className="flex gap-6 justify-center"
+              className="flex gap-6 justify-center flex-wrap"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -310,13 +325,31 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
                 </motion.button>
               </Link>
               
+              <Link to="/features-xxl">
+                <motion.button 
+                  className="px-10 py-5 text-lg font-bold rounded-2xl shadow-2xl glow-hover"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white'
+                  }}
+                  whileHover={{ scale: 1.05, rotate: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring" }}
+                >
+                  <span className="flex items-center space-x-2">
+                    <Sparkles size={24} />
+                    <span>Fonctionnalités XXL 🚀</span>
+                  </span>
+                </motion.button>
+              </Link>
+              
               <motion.button 
                 className="px-10 py-5 text-lg font-bold rounded-2xl glass glow-hover"
                 style={{ 
                   color: 'white',
                   border: '2px solid rgba(255, 255, 255, 0.5)'
                 }}
-                whileHover={{ scale: 1.05, rotate: -2 }}
+                whileHover={{ scale: 1.05, rotate: 2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="flex items-center space-x-2">
