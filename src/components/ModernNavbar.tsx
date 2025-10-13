@@ -67,7 +67,7 @@ export const ModernNavbar: React.FC = () => {
 
   const specialItems: NavItem[] = [
     { icon: User, label: t('nav.profile'), href: '/profile', color: 'from-indigo-500 to-blue-500' },
-    { icon: Sparkles, label: 'XXL', href: '/features-xxl', highlight: true, color: 'from-purple-500 to-pink-500' },
+    { icon: Sparkles, label: 'Premium', href: '/features-xxl', highlight: true, color: 'from-purple-500 to-pink-500' },
     { icon: Heart, label: t('nav.about'), href: '/a-propos-de-mimi', highlight: true, color: 'from-pink-500 to-rose-500' },
   ];
 

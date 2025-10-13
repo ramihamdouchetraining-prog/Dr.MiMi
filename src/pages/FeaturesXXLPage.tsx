@@ -16,7 +16,7 @@ import {
 const FeaturesXXLPage: React.FC = () => {
   const features = [
     {
-      title: "Dashboard Admin XXL",
+      title: "Tableau de Bord Analytique Avancé",
       description: "Analytics temps réel avec graphiques interactifs et métriques avancées",
       icon: BarChart3,
       color: "from-purple-500 to-indigo-500",
@@ -84,7 +84,7 @@ const FeaturesXXLPage: React.FC = () => {
               backgroundClip: 'text',
             }}
           >
-            Fonctionnalités XXL
+            Centre des Fonctionnalités Premium
           </motion.h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Découvrez les nouvelles fonctionnalités avancées de Dr.MiMi pour une expérience d'apprentissage révolutionnaire
