@@ -92,6 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const communicationsRoutes = await import('./routes-communications');
   const adminDashboardRoutes = await import('./routes/admin-dashboard');
   const oauthRoutes = await import('./routes/oauth');
+  const notificationsRoutes = await import('./routes/notifications');
   
   // Import user authentication routes (for students/regular users)
   const userAuthRoutes = await import('./routes/auth');
@@ -115,6 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/communications', communicationsRoutes.default); // Communications system (emails, notifications)
   app.use('/api/admin', adminDashboardRoutes.default); // Admin dashboard routes
   app.use('/api/oauth', oauthRoutes.default); // OAuth routes
+  app.use('/api/notifications', notificationsRoutes.default); // Notification system routes
 
   // ===== AUTH ROUTES =====
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
