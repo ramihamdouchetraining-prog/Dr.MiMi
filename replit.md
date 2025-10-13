@@ -35,8 +35,17 @@ Dr.MiMi is a comprehensive medical education platform for French-speaking medica
 - **Owner Dashboard**: Dedicated login, centralized authentication, with tabs for Overview, Financial Analytics (real-time, multi-currency, revenue sharing), Contracts (e-signatures, PDF export), Approvals, Users (role management, blacklist, badges), and Settings. Includes advanced user management features.
 - **"La Bib de mimi" (مكتبة ميمي) - Digital Library System**: A 3-section collaborative digital library for Islamic, Diverse, and Palestine-focused content. Features advanced search, community ratings, collaborative submission with moderation, and multi-themed UI/UX.
 - **User Tracking & Statistics System**: Tracks course enrollments, quiz attempts, case completions, summary downloads, and user badges. Provides real-time performance metrics on user profiles, including progress tracking and an achievement system.
+- **AI Tutor System (NEW - Oct 2025)**: Advanced medical education AI powered by OpenAI GPT-5 via Replit AI Integrations. Features:
+  - **5 Teaching Modes**: Tutor (empathetic), Socratic (reflective questions), Exam (QCM format), Clinical (case-based), Mnemonics (memory aids)
+  - **Adaptive Quiz Generator**: Creates personalized medical quizzes with difficulty scaling based on performance
+  - **Learning Path Analysis**: Analyzes student progress and provides personalized study recommendations
+  - **Visual Explanations**: Generates Mermaid diagrams for complex medical concepts (flowcharts, anatomy, pathways)
+  - **Text-to-Speech**: Voice responses for enhanced accessibility
+  - **Multi-language Support**: FR/EN/AR with context-aware medical terminology
+  - **Smart Conversation History**: Maintains context across interactions for coherent learning sessions
 
 ## External Dependencies
 - **PostgreSQL**: Primary database.
 - **Stripe**: For EUR payments (planned).
 - **Google Gemini API**: For Dr.MiMi AI chatbot (gemini-2.0-flash model - stable, FREE tier with 1M tokens/min), including advanced system prompts with specific character traits and multi-language support.
+- **OpenAI GPT-5**: For AI Tutor system via Replit AI Integrations (max_completion_tokens required, no temperature/penalties for gpt-5 model).

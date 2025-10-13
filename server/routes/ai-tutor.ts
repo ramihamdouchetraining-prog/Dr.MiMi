@@ -7,7 +7,7 @@ import {
   type TutorRequest
 } from '../ai-tutor';
 import { db } from '../db';
-import { quizAttempts, enrollments, users } from '../../shared/schema';
+import { quizAttempts, courseEnrollments, users } from '../../shared/schema';
 import { eq, desc } from 'drizzle-orm';
 
 const router = Router();
@@ -93,8 +93,8 @@ router.post('/learning-path', requireAuth, async (req, res) => {
     // Récupérer l'historique de l'utilisateur
     const progress = await db
       .select()
-      .from(enrollments)
-      .where(eq(enrollments.userId, userId));
+      .from(courseEnrollments)
+      .where(eq(courseEnrollments.userId, userId));
 
     const attempts = await db
       .select()
@@ -165,8 +165,8 @@ router.get('/stats', requireAuth, async (req, res) => {
     // Pour l'instant, retourner des stats basiques
     const progress = await db
       .select()
-      .from(enrollments)
-      .where(eq(enrollments.userId, userId));
+      .from(courseEnrollments)
+      .where(eq(courseEnrollments.userId, userId));
 
     const attempts = await db
       .select()
