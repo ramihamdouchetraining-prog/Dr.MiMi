@@ -334,12 +334,11 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                           }`}>
                             {message.sender === 'bot' ? (
-                              <ReactMarkdown 
-                                className="prose dark:prose-invert prose-sm max-w-none"
-                                remarkPlugins={[remarkGfm]}
-                              >
-                                {message.content}
-                              </ReactMarkdown>
+                              <div className="prose dark:prose-invert prose-sm max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                  {message.content}
+                                </ReactMarkdown>
+                              </div>
                             ) : (
                               <p>{message.content}</p>
                             )}
