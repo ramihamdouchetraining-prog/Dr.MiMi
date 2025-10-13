@@ -39,6 +39,7 @@ import RegisterPage from './pages/RegisterPage'
 // import AboutMimi from './pages/AboutMimi'
 import AboutMimiDonation from './pages/AboutMimiDonation'
 import PaymentDZD from './pages/PaymentDZD'
+import AITutor from './components/AITutor'
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -187,6 +188,7 @@ function AppContent() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/a-propos-de-mimi" element={<AboutMimiDonation />} />
               <Route path="/payment-dzd" element={<PaymentDZD />} />
+              <Route path="/ai-tutor" element={<AITutor />} />
             </Routes>
           )}
         </AnimatePresence>

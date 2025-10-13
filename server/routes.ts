@@ -88,6 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const libraryRoutes = await import('./routes/library');
   const ownerRoutes = await import('./routes/owner');
   const gamesRoutes = await import('./routes/games');
+  const aiTutorRoutes = await import('./routes/ai-tutor');
   
   // Import user authentication routes (for students/regular users)
   const userAuthRoutes = await import('./routes/auth');
@@ -107,6 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/library', libraryRoutes.default); // Mimi Library routes
   app.use('/api', ownerRoutes.default); // Owner-specific routes
   app.use('/api/chat', chatRoutes.default); // Chat routes for admin messaging system
+  app.use('/api/ai-tutor', aiTutorRoutes.default); // AI Tutor routes
 
   // ===== AUTH ROUTES =====
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
