@@ -3,14 +3,17 @@ import "dotenv/config"; // Load environment variables
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { seedModules } from "./seed";
 import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
 import { seedAdmin } from "./seed-admin";
+import WebSocketManager from "./websocket";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+const httpServer = createServer(app);
 
 // Security middleware
 app.use(
@@ -124,13 +127,18 @@ async function startServer() {
     await seedOwner();
     await seedAdmin();
 
-    const httpServer = await registerRoutes(app);
+    // Register routes and get HTTP server
+    await registerRoutes(app);
+
+    // Initialize WebSocket server for messaging
+    const wsManager = new WebSocketManager(httpServer);
 
     httpServer.listen(PORT, () => {
       console.log(`🚀 MediMimi backend server running on port ${PORT}`);
       console.log(`📊 Database: Connected to PostgreSQL`);
       console.log(`🔐 Authentication: Replit Auth enabled`);
       console.log(`🌱 Database seeded with medical modules and content`);
+      console.log(`🔌 WebSocket server ready for real-time messaging`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
