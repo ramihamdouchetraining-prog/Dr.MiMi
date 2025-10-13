@@ -11,8 +11,7 @@ import { CelebrationEffect } from './components/Confetti'
 import { CustomCursor, useCustomCursor } from './components/CustomCursor'
 import { StudyLevelSelector } from './components/StudyLevelSelector'
 import { EnhancedDrMimiAvatar, FloatingDrMimi } from './components/EnhancedDrMimiAvatar'
-import { AdvancedChatbot } from './components/AdvancedChatbot'
-import { MobileChatbot } from './components/MobileChatbot'
+import { SimpleMimiButton } from './components/SimpleMimiButton'
 import { FeaturedAvatarCarousel } from './components/AvatarCarousel'
 import { InteractiveMimi } from './components/MimiAnimated'
 import EnhancedQuizPage from './pages/EnhancedQuizPage'
@@ -134,8 +133,8 @@ function AppContent() {
       {/* Celebration Effects */}
       <CelebrationEffect trigger={showConfetti} />
       
-      {/* Advanced Dr.Mimi AI Chatbot - Desktop ou Mobile selon l'écran */}
-      {window.innerWidth > 768 ? <AdvancedChatbot /> : <MobileChatbot />}
+      {/* Advanced Dr.Mimi AI Chatbot - Bouton simple toujours visible */}
+      <SimpleMimiButton />
 
       {/* Modern Navbar */}
       <ModernNavbar />
