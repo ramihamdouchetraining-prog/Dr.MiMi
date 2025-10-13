@@ -81,9 +81,9 @@ const StudentAnalyticsDashboard: React.FC = () => {
   // Prepare chart data from real API data
   const weeklyProgressData = recentActivity && recentActivity.length > 0 
     ? recentActivity.slice(0, 7).reverse().map((activity: any, i: number) => ({
-        day: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][new Date(activity.date || Date.now()).getDay()],
+        day: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][new Date(activity.createdAt || Date.now()).getDay()],
         score: Number(activity.score) || 0,
-        time: Number(activity.timeSpent) || 0
+        time: Math.round((Number(activity.timeTaken) || 0) / 60)
       }))
     : [
         { day: 'Lun', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },

@@ -209,7 +209,7 @@ async function calculateStudyPatterns(userId: string) {
   if (existing) {
     const [updated] = await db.update(studyPatterns)
       .set(patternsData)
-      .where(eq(studyPatterns.userId, existing.id))
+      .where(eq(studyPatterns.userId, userId))
       .returning();
     return updated;
   } else {
