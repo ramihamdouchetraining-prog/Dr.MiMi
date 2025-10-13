@@ -34,6 +34,13 @@ export class WebRTCSignalingServer {
 
   private setupWebSocketServer() {
     this.wss.on('connection', (ws: WebSocket, req) => {
+      // Extract user authentication from cookies/session
+      const cookies = req.headers.cookie;
+      if (!cookies || !cookies.includes('connect.sid')) {
+        ws.close(1008, 'Authentication required');
+        return;
+      }
+      
       const userId = this.generateUserId();
       this.clients.set(ws, { userId });
 

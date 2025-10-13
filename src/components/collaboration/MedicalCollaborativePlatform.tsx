@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Peer from 'peerjs';
+import { useWebRTCSignaling } from '../../hooks/useWebRTCSignaling';
 import { 
   Video, 
   VideoOff, 
@@ -36,7 +37,7 @@ interface ChatMessage {
 
 export const MedicalCollaborativePlatform: React.FC = () => {
   // State management
-  const [isConnected, setIsConnected] = useState(false);
+  const [isInRoom, setIsInRoom] = useState(false);
   const [roomId, setRoomId] = useState('');
   const [userName, setUserName] = useState('');
   const [participants, setParticipants] = useState<Map<string, Participant>>(new Map());
@@ -49,10 +50,27 @@ export const MedicalCollaborativePlatform: React.FC = () => {
   const [showChat, setShowChat] = useState(true);
   const [currentMessage, setCurrentMessage] = useState('');
 
+  // WebRTC Signaling Hook
+  const {
+    isConnected,
+    userId,
+    currentRoom,
+    joinRoom: signalingJoinRoom,
+    leaveRoom: signalingLeaveRoom,
+    sendOffer,
+    sendAnswer,
+    sendIceCandidate,
+    sendMessage: sendSignalingMessage
+  } = useWebRTCSignaling({
+    onMessage: handleSignalingMessage,
+    onUserJoined: handleUserJoined,
+    onUserLeft: handleUserLeft
+  });
+
   // Refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<Peer | null>(null);
-  const connectionsRef = useRef<Map<string, any>>(new Map());
+  const peersRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const screenStreamRef = useRef<MediaStream | null>(null);
 
   // Initialize Peer connection
