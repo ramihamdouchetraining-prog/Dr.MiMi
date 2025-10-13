@@ -45,7 +45,7 @@ import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
 
 // Import XXL Components
 import { AdminDashboardXXL } from './components/dashboard/AdminDashboardXXL'
-import { VirtualLab3D } from './components/VirtualLab3D'
+import { VirtualLab3DWrapper } from './components/VirtualLab3DWrapper'
 import { CollaborativePlatform } from './components/CollaborativePlatform'
 import { EducationalMarketplace } from './components/marketplace/EducationalMarketplace'
 import { AdvancedGamification } from './components/gamification/AdvancedGamification'
@@ -209,7 +209,7 @@ function AppContent() {
               {/* Routes XXL */}
               <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
               <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Dashboard Admin XXL"><AdminDashboardXXL /></ErrorBoundary>} />
-              <Route path="/lab-3d" element={<ErrorBoundary componentName="Laboratoire 3D"><VirtualLab3D /></ErrorBoundary>} />
+              <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
               <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
