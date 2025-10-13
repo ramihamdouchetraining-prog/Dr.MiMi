@@ -18,6 +18,7 @@ import { InteractiveMimi } from './components/MimiAnimated'
 import EnhancedQuizPage from './pages/EnhancedQuizPage'
 import MedicalLibraryPage from './pages/MedicalLibraryPage'
 import MimiLibrary from './pages/MimiLibrary'
+import ChatbotPage from './pages/ChatbotPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminArticles from './pages/AdminArticles'
 import AdminLayout from './pages/Admin/AdminLayout'
@@ -214,6 +215,7 @@ function AppContent() {
               <Route path="/cases" element={<CasesPage />} />
               <Route path="/news" element={<NewsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/chatbot" element={<ChatbotPage />} />
               <Route path="/a-propos-de-mimi" element={<AboutMimiDonation />} />
               <Route path="/payment-dzd" element={<PaymentDZD />} />
               <Route path="/ai-tutor" element={<AITutor />} />
@@ -352,25 +354,27 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
                 >
                   <span className="flex items-center space-x-2">
                     <Sparkles size={24} />
-                    <span>Fonctionnalités XXL 🚀</span>
+                    <span>Découvrir autres fonctionnalités !</span>
                   </span>
                 </motion.button>
               </Link>
               
-              <motion.button 
-                className="px-10 py-5 text-lg font-bold rounded-2xl glass glow-hover"
-                style={{ 
-                  color: 'white',
-                  border: '2px solid rgba(255, 255, 255, 0.5)'
-                }}
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="flex items-center space-x-2">
-                  <Heart size={24} />
-                  <span>{t('home.chat')}</span>
-                </span>
-              </motion.button>
+              <Link to="/chatbot">
+                <motion.button 
+                  className="px-10 py-5 text-lg font-bold rounded-2xl glass glow-hover"
+                  style={{ 
+                    color: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.5)'
+                  }}
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="flex items-center space-x-2">
+                    <Heart size={24} />
+                    <span>{t('home.chat')}</span>
+                  </span>
+                </motion.button>
+              </Link>
             </motion.div>
 
             {/* Animated scroll indicator */}
