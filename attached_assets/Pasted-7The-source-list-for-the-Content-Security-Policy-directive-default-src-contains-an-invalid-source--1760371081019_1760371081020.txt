@@ -1,0 +1,227 @@
+7The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+7The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+7The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+_app-fa0a851b6cca31bc.js:28 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+DrMiMiAnalysis:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+DrMiMiAnalysis:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+DrMiMiAnalysis:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1760370988341&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1760370988341&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2513&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+ingest.app.coframe.com/ingest/v2/batched_monitoring/68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+ingest.app.coframe.com/ingest/v2/session_result/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370988440&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+cdn.segment.com/next-integrations/actions/tiktok-pixel/1526190d7b84ef9800b4.js:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28 Failed to create PluginFactory Object
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28 Failed to load Remote Plugin Error: Failed to load https://cdn.segment.com/next-integrations/actions/tiktok-pixel/1526190d7b84ef9800b4.js
+    at HTMLScriptElement.<anonymous> (load-script.ts:53:24)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28 [LaunchDarkly] LaunchDarkly client initialized
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370989113&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2513&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370989116&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370989117&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+framework-784666143a765a4e.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'battery'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-784666143a765a4e.js:1
+framework-784666143a765a4e.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-784666143a765a4e.js:1
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'battery'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html?initialPath=%2F&id=%3Ar1g%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370991261&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2513&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370991262&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370991262&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+2297217c-ef6d-40fd-a31f-b14a3ef35d26-00-1sa7c0mavzx1d.worf.replit.dev/src/pages/ChatbotPage.tsx?t=1760370958399:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+/public/js/beacon.js:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+client:536 WebSocket connection to 'ws://localhost:5000/?token=6dKW4NEiigFY' failed: 
+setupWebSocket @ client:536
+injected.js:27 [vite] server connection lost. Polling for restart...
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995764&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2513&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995764&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2513&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-fa0a851b6cca31bc.js:28:9046
+    at a.<anonymous> (6609-250878958f4cf122.js:1:90452)
+    at Generator.next (<anonymous>)
+    at 6609-250878958f4cf122.js:1:88045
+    at new Promise (<anonymous>)
+    at i (6609-250878958f4cf122.js:1:87794)
+    at a._sendRequest (6609-250878958f4cf122.js:1:89675)
+    at 6609-250878958f4cf122.js:1:57974
+    at l._capture (6609-250878958f4cf122.js:1:58272)
+    at e.<computed> [as _sendRequest] (6609-250878958f4cf122.js:1:57943)
+    at a.<anonymous> (6609-250878958f4cf122.js:1:91623)
+    at Generator.next (<anonymous>)
+    at a (6609-250878958f4cf122.js:1:87850)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995765&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995765&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-fa0a851b6cca31bc.js:28:9046
+    at a.<anonymous> (6609-250878958f4cf122.js:1:90452)
+    at Generator.next (<anonymous>)
+    at 6609-250878958f4cf122.js:1:88045
+    at new Promise (<anonymous>)
+    at i (6609-250878958f4cf122.js:1:87794)
+    at a._sendRequest (6609-250878958f4cf122.js:1:89675)
+    at 6609-250878958f4cf122.js:1:57974
+    at l._capture (6609-250878958f4cf122.js:1:58272)
+    at e.<computed> [as _sendRequest] (6609-250878958f4cf122.js:1:57943)
+    at a.<anonymous> (6609-250878958f4cf122.js:1:91623)
+    at Generator.next (<anonymous>)
+    at a (6609-250878958f4cf122.js:1:87850)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995766&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370995766&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=1&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-fa0a851b6cca31bc.js:28:9046
+    at a.<anonymous> (6609-250878958f4cf122.js:1:90452)
+    at Generator.next (<anonymous>)
+    at 6609-250878958f4cf122.js:1:88045
+    at new Promise (<anonymous>)
+    at i (6609-250878958f4cf122.js:1:87794)
+    at a._sendRequest (6609-250878958f4cf122.js:1:89675)
+    at 6609-250878958f4cf122.js:1:57974
+    at l._capture (6609-250878958f4cf122.js:1:58272)
+    at e.<computed> [as _sendRequest] (6609-250878958f4cf122.js:1:57943)
+    at a.<anonymous> (6609-250878958f4cf122.js:1:91623)
+    at Generator.next (<anonymous>)
+    at a (6609-250878958f4cf122.js:1:87850)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370998292&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=3&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760370998793&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=3&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371000798&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=3&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371005308&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=3&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371005308&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=3&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-fa0a851b6cca31bc.js:28:9046
+    at a.<anonymous> (6609-250878958f4cf122.js:1:90452)
+    at Generator.next (<anonymous>)
+    at 6609-250878958f4cf122.js:1:88045
+    at new Promise (<anonymous>)
+    at i (6609-250878958f4cf122.js:1:87794)
+    at a._sendRequest (6609-250878958f4cf122.js:1:89675)
+    at 6609-250878958f4cf122.js:1:57974
+    at l._capture (6609-250878958f4cf122.js:1:58272)
+    at e.<computed> [as _sendRequest] (6609-250878958f4cf122.js:1:57943)
+    at a.<anonymous> (6609-250878958f4cf122.js:1:91623)
+    at Generator.next (<anonymous>)
+    at a (6609-250878958f4cf122.js:1:87850)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371018287&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371018793&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371020798&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371025312&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2&gz=1:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+_app-fa0a851b6cca31bc.js:28  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client-react&sv=3.26.0&t=1760371025312&sid=3cf56d26-79ab-4647-b164-e2d698ad857a&ec=2&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-fa0a851b6cca31bc.js:28:9046
+    at a.<anonymous> (6609-250878958f4cf122.js:1:90452)
+    at Generator.next (<anonymous>)
+    at 6609-250878958f4cf122.js:1:88045
+    at new Promise (<anonymous>)
+    at i (6609-250878958f4cf122.js:1:87794)
+    at a._sendRequest (6609-250878958f4cf122.js:1:89675)
+    at 6609-250878958f4cf122.js:1:57974
+    at l._capture (6609-250878958f4cf122.js:1:58272)
+    at e.<computed> [as _sendRequest] (6609-250878958f4cf122.js:1:57943)
+    at a.<anonymous> (6609-250878958f4cf122.js:1:91623)
+    at Generator.next (<anonymous>)
+    at a (6609-250878958f4cf122.js:1:87850)
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+_app-fa0a851b6cca31bc.js:28   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-fa0a851b6cca31bc.js:28
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+localhost:5000/:1  Failed to load resource: net::ERR_CONNECTION_REFUSED
+injected.js:204  GET http://localhost:5000/ net::ERR_CONNECTION_REFUSED
+apply @ injected.js:204
+ping @ client:736
+waitForSuccessfulPing @ client:755
+injected.js:204  GET http://localhost:5000/ net::ERR_CONNECTION_REFUSED
+apply @ injected.js:204
+ping @ client:736
+waitForSuccessfulPing @ client:755
+injected.js:204  GET http://localhost:5000/ net::ERR_CONNECTION_REFUSED
+apply @ injected.js:204
+ping @ client:736
+waitForSuccessfulPing @ client:755

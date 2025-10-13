@@ -12,6 +12,7 @@ import {
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Types
 interface Message {
@@ -88,103 +89,82 @@ export function ChatbotPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Simuler une réponse du bot
-  const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('cœur') || lowerMessage.includes('coeur') || lowerMessage.includes('cardiaque')) {
-      return `## Anatomie du Cœur 🫀
+  // Appeler l'API Gemini réelle
+  const fetchBotResponse = async (userMessage: string): Promise<string> => {
+    try {
+      // Préparer le contexte de conversation
+      const conversationHistory = messages.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }));
 
-Le cœur est un organe musculaire vital composé de quatre chambres:
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...conversationHistory, { role: 'user', content: userMessage }]
+        }),
+      });
 
-### Chambres supérieures (Oreillettes)
-- **Oreillette droite**: Reçoit le sang désoxygéné du corps
-- **Oreillette gauche**: Reçoit le sang oxygéné des poumons
+      if (!response.ok) {
+        throw new Error('Erreur de communication avec le serveur');
+      }
 
-### Chambres inférieures (Ventricules)
-- **Ventricule droit**: Pompe le sang vers les poumons
-- **Ventricule gauche**: Pompe le sang oxygéné vers tout le corps
+      // Lire le stream de réponse
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullResponse = '';
 
-### Valves cardiaques
-1. **Valve tricuspide**: Entre oreillette et ventricule droits
-2. **Valve pulmonaire**: À la sortie du ventricule droit
-3. **Valve mitrale**: Entre oreillette et ventricule gauches
-4. **Valve aortique**: À la sortie du ventricule gauche
+      if (!reader) {
+        throw new Error('Impossible de lire la réponse');
+      }
 
-💡 **Le saviez-vous?** Le cœur bat environ 100 000 fois par jour!`;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                fullResponse += parsed.content;
+              }
+            } catch (e) {
+              // Ignorer les erreurs de parsing
+            }
+          }
+        }
+      }
+
+      return fullResponse || "Je suis désolée, je n'ai pas pu traiter votre demande. Veuillez réessayer.";
+    } catch (error) {
+      console.error('Erreur API:', error);
+      // Réponse de secours en cas d'erreur
+      return `Je suis temporairement indisponible. Voici une réponse de base:
+
+## 💫 Assistance Médicale Dr. MiMi
+
+Je suis votre assistante médicale virtuelle. Je peux vous aider avec:
+
+- 📚 **Concepts médicaux**: Anatomie, physiologie, pathologie
+- 🩺 **Diagnostics**: Comprendre les symptômes et examens
+- 💊 **Pharmacologie**: Médicaments et traitements
+- 🔬 **Analyses**: Interprétation des résultats
+- 🚨 **Urgences**: Conseils de premiers secours
+
+⚠️ **Note importante**: En cas d'urgence médicale réelle, contactez immédiatement les services d'urgence (15 ou 112).
+
+Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
     }
-    
-    if (lowerMessage.includes('hypertension') || lowerMessage.includes('tension')) {
-      return `## Hypertension Artérielle 🩺
-
-### Définition
-L'hypertension est une pression artérielle ≥ 140/90 mmHg
-
-### Symptômes courants
-⚠️ Souvent asymptomatique ("tueur silencieux")
-- Maux de tête matinaux
-- Vertiges
-- Bourdonnements d'oreilles
-- Saignements de nez
-- Fatigue
-
-### Facteurs de risque
-- Âge > 45 ans
-- Surpoids/Obésité
-- Sédentarité
-- Tabagisme
-- Stress chronique
-- Alimentation riche en sel
-
-### Complications possibles
-- AVC
-- Infarctus du myocarde
-- Insuffisance cardiaque
-- Insuffisance rénale
-
-⚠️ **Important**: Consultez un médecin pour un diagnostic et traitement appropriés.`;
-    }
-    
-    if (lowerMessage.includes('système immunitaire') || lowerMessage.includes('immunité')) {
-      return `## Le Système Immunitaire 🛡️
-
-### Composants principaux
-
-#### Immunité innée (Non spécifique)
-- **Barrières physiques**: Peau, muqueuses
-- **Cellules**: Neutrophiles, macrophages, cellules NK
-- **Réponse**: Rapide mais non spécifique
-
-#### Immunité adaptative (Spécifique)
-- **Lymphocytes B**: Production d'anticorps
-- **Lymphocytes T**: 
-  - T CD4+ (helpers)
-  - T CD8+ (cytotoxiques)
-- **Mémoire immunologique**: Protection à long terme
-
-### Organes lymphoïdes
-- **Primaires**: Moelle osseuse, thymus
-- **Secondaires**: Rate, ganglions lymphatiques, amygdales
-
-### Mécanismes de défense
-1. Reconnaissance du pathogène
-2. Activation de la réponse immunitaire
-3. Élimination du pathogène
-4. Mémoire immunologique
-
-🔬 **Fait intéressant**: Votre corps produit environ 1 milliard de lymphocytes par jour!`;
-    }
-    
-    return `Je comprends votre question sur "${userMessage}". En médecine, il est important d'avoir des informations précises et fiables. 
-
-Je peux vous aider avec:
-- 📚 Concepts anatomiques et physiologiques
-- 🩺 Informations sur les pathologies courantes
-- 💊 Pharmacologie de base
-- 🔬 Examens et analyses médicales
-- 🚨 Premiers secours (non urgents)
-
-N'hésitez pas à me poser des questions plus spécifiques!`;
   };
 
   // Envoyer un message
@@ -202,11 +182,13 @@ N'hésitez pas à me poser des questions plus spécifiques!`;
     setInputMessage('');
     setIsTyping(true);
 
-    // Simuler le temps de réflexion du bot
-    setTimeout(() => {
+    // Appeler l'API Gemini
+    try {
+      const responseContent = await fetchBotResponse(inputMessage);
+      
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: generateBotResponse(inputMessage),
+        content: responseContent,
         sender: 'bot',
         timestamp: new Date(),
         medicalInfo: {
@@ -216,8 +198,11 @@ N'hésitez pas à me poser des questions plus spécifiques!`;
       };
       
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du message:', error);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   // Gérer les suggestions
@@ -349,7 +334,10 @@ N'hésitez pas à me poser des questions plus spécifiques!`;
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                           }`}>
                             {message.sender === 'bot' ? (
-                              <ReactMarkdown className="prose dark:prose-invert prose-sm max-w-none">
+                              <ReactMarkdown 
+                                className="prose dark:prose-invert prose-sm max-w-none"
+                                remarkPlugins={[remarkGfm]}
+                              >
                                 {message.content}
                               </ReactMarkdown>
                             ) : (
