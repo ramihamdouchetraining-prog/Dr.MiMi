@@ -42,7 +42,7 @@ const upload = multer({
 });
 
 // Chat endpoint with streaming support
-router.post('/api/chat', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { messages, language = 'en' } = req.body;
 
@@ -147,7 +147,7 @@ router.post('/api/chat', async (req: Request, res: Response) => {
 });
 
 // File upload endpoint
-router.post('/api/chat/upload', upload.single('file'), async (req: Request, res: Response) => {
+router.post('/upload', upload.single('file'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Aucun fichier fourni' });
@@ -201,7 +201,7 @@ router.post('/api/chat/upload', upload.single('file'), async (req: Request, res:
 });
 
 // Delete uploaded file
-router.delete('/api/chat/upload/:filename', async (req: Request, res: Response) => {
+router.delete('/upload/:filename', async (req: Request, res: Response) => {
   try {
     const { filename } = req.params;
     

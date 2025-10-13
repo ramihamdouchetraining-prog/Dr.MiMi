@@ -18,7 +18,6 @@ import {
   BookOpen
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useLanguage } from '../../contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { getApiUrl } from '../../config/api';
 
