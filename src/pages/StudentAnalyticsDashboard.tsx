@@ -10,6 +10,7 @@ import {
   Calendar, Zap, BookOpen, Activity, AlertCircle, Lightbulb 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../hooks/useAuth';
 
 interface AnalyticsData {
   analytics: any;
@@ -21,20 +22,27 @@ interface AnalyticsData {
 
 const StudentAnalyticsDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'performance' | 'patterns' | 'recommendations'>('overview');
 
-  // Mock user ID - In real app, get from auth context
-  const userId = 'current-user-id';
-
   useEffect(() => {
-    fetchAnalytics();
-  }, []);
+    if (!authLoading && isAuthenticated && user?.id) {
+      fetchAnalytics();
+    } else if (!authLoading && !isAuthenticated) {
+      setLoading(false);
+    }
+  }, [authLoading, isAuthenticated, user]);
 
   const fetchAnalytics = async () => {
+    if (!user?.id) return;
+    
     try {
-      const response = await fetch(`/api/analytics/student/${userId}`);
+      const response = await fetch(`/api/analytics/student/${user.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch analytics');
+      }
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -44,7 +52,7 @@ const StudentAnalyticsDashboard: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-teal-500"></div>
@@ -68,31 +76,44 @@ const StudentAnalyticsDashboard: React.FC = () => {
     );
   }
 
-  const { analytics, patterns, performance, recommendations } = data;
+  const { analytics, patterns, performance, recommendations, recentActivity } = data;
 
-  // Prepare chart data
-  const weeklyProgressData = [
-    { day: 'Lun', score: 65, time: 120 },
-    { day: 'Mar', score: 72, time: 90 },
-    { day: 'Mer', score: 68, time: 150 },
-    { day: 'Jeu', score: 80, time: 180 },
-    { day: 'Ven', score: 85, time: 200 },
-    { day: 'Sam', score: 78, time: 160 },
-    { day: 'Dim', score: 88, time: 140 },
-  ];
+  // Prepare chart data from real API data
+  const weeklyProgressData = recentActivity && recentActivity.length > 0 
+    ? recentActivity.slice(0, 7).reverse().map((activity: any, i: number) => ({
+        day: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][new Date(activity.date || Date.now()).getDay()],
+        score: Number(activity.score) || 0,
+        time: Number(activity.timeSpent) || 0
+      }))
+    : [
+        { day: 'Lun', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Mar', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Mer', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Jeu', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Ven', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Sam', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+        { day: 'Dim', score: Number(analytics?.overallAverageScore) || 0, time: Math.floor((analytics?.totalStudyTime || 0) / 7) },
+      ];
 
-  const modulePerformanceData = performance.slice(0, 6).map(p => ({
-    module: p.moduleId || 'Unknown',
-    score: Number(p.averageScore) || 0,
-    attempts: p.totalAttempts || 0
-  }));
+  const modulePerformanceData = performance && performance.length > 0
+    ? performance.slice(0, 6).map(p => ({
+        module: p.moduleId || 'Unknown',
+        score: Number(p.averageScore) || 0,
+        attempts: p.totalAttempts || 0
+      }))
+    : [];
 
   const learningStyleData = patterns ? [
-    { skill: 'Visuel', score: patterns.visualLearnerScore || 0 },
-    { skill: 'Pratique', score: patterns.practicalLearnerScore || 0 },
-    { skill: 'Théorique', score: patterns.theoreticalLearnerScore || 0 },
-    { skill: 'Consistance', score: patterns.consistentLearnerScore || 0 },
-  ] : [];
+    { skill: 'Visuel', score: patterns.visualLearnerScore || 50 },
+    { skill: 'Pratique', score: patterns.practicalLearnerScore || 50 },
+    { skill: 'Théorique', score: patterns.theoreticalLearnerScore || 50 },
+    { skill: 'Consistance', score: patterns.consistentLearnerScore || 50 },
+  ] : [
+    { skill: 'Visuel', score: 50 },
+    { skill: 'Pratique', score: 50 },
+    { skill: 'Théorique', score: 50 },
+    { skill: 'Consistance', score: 50 },
+  ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -458,8 +479,10 @@ const StudentAnalyticsDashboard: React.FC = () => {
   );
 
   async function generateRecommendation() {
+    if (!user?.id) return;
+    
     try {
-      const response = await fetch(`/api/analytics/recommendations/${userId}`, {
+      const response = await fetch(`/api/analytics/recommendations/${user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'study_plan', priority: 'high' })

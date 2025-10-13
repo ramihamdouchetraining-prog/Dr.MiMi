@@ -106,7 +106,7 @@ async function calculateLearningAnalytics(userId: string) {
     // Update existing
     const [updated] = await db.update(learningAnalytics)
       .set(analyticsData)
-      .where(eq(learningAnalytics.userId, existing.id))
+      .where(eq(learningAnalytics.userId, userId))
       .returning();
     return updated;
   } else {
