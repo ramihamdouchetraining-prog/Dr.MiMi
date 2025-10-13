@@ -40,6 +40,8 @@ import RegisterPage from './pages/RegisterPage'
 import AboutMimiDonation from './pages/AboutMimiDonation'
 import PaymentDZD from './pages/PaymentDZD'
 import AITutor from './components/AITutor'
+import StudentAnalyticsDashboard from './pages/StudentAnalyticsDashboard'
+import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -150,7 +152,7 @@ function AppContent() {
                 <Route path="articles/new" element={<AdminArticles />} />
                 <Route path="articles/:id/edit" element={<AdminArticles />} />
                 <Route path="cms" element={<AdminCMS />} />
-                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="analytics" element={<AdminAnalyticsDashboard />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
@@ -189,6 +191,7 @@ function AppContent() {
               <Route path="/a-propos-de-mimi" element={<AboutMimiDonation />} />
               <Route path="/payment-dzd" element={<PaymentDZD />} />
               <Route path="/ai-tutor" element={<AITutor />} />
+              <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
             </Routes>
           )}
         </AnimatePresence>
