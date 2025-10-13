@@ -1,6 +1,7 @@
 modules = ["python-3.11", "nodejs-20"]
 [agent]
 expertMode = true
+integrations = ["javascript_openai_ai_integrations:1.0.0"]
 
 [workflows]
 runButton = "Project"
@@ -34,6 +35,5 @@ externalPort = 80
 localPort = 5001
 externalPort = 3001
 
-[[ports]]
-localPort = 43601
-externalPort = 3000
+[nix]
+channel = "stable-25_05"
