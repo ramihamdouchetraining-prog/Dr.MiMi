@@ -18,7 +18,7 @@ import EnhancedQuizPage from './pages/EnhancedQuizPage'
 import MedicalLibraryPage from './pages/MedicalLibraryPage'
 import MimiLibrary from './pages/MimiLibrary'
 import ChatbotPage from './pages/ChatbotPage'
-import AdminDashboard from './pages/AdminDashboard'
+import AdminDashboardOptimized from './pages/AdminDashboardOptimized'
 import AdminArticles from './pages/AdminArticles'
 import AdminLayout from './pages/Admin/AdminLayout'
 import AdminUsers from './pages/Admin/AdminUsers'
@@ -165,7 +165,7 @@ function AppContent() {
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
+                <Route index element={<AdminDashboardOptimized />} />
                 <Route path="articles" element={<AdminArticles />} />
                 <Route path="articles/new" element={<AdminArticles />} />
                 <Route path="articles/:id/edit" element={<AdminArticles />} />
