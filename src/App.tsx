@@ -142,13 +142,18 @@ function AppContent() {
       {/* Main Content - no padding needed with sticky header */}
       <main>
         <AnimatePresence mode="wait">
-          {/* Allow admin/owner/auth/quiz/analytics routes to bypass level selector */}
+          {/* Allow admin/owner/auth/quiz/analytics/XXL routes to bypass level selector */}
           {location.pathname.startsWith('/admin') || 
            location.pathname.startsWith('/owner') ||
            location.pathname.startsWith('/login') ||
            location.pathname.startsWith('/register') ||
            location.pathname.startsWith('/quiz') ||
-           location.pathname.startsWith('/analytics') ? (
+           location.pathname.startsWith('/analytics') ||
+           location.pathname.startsWith('/features-xxl') ||
+           location.pathname.startsWith('/lab-3d') ||
+           location.pathname.startsWith('/collaboration') ||
+           location.pathname.startsWith('/marketplace') ||
+           location.pathname.startsWith('/gamification') ? (
             <Routes location={location} key={location.pathname}>
               {/* User Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />
@@ -179,6 +184,14 @@ function AppContent() {
               {/* Quiz and Games Routes */}
               <Route path="/quiz" element={<AdvancedQuizPage />} />
               {/* Games Routes - redirect to quiz with games tab */}
+              
+              {/* Routes XXL */}
+              <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
+              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Dashboard Admin XXL"><AdminDashboardXXL /></ErrorBoundary>} />
+              <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
+              <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
+              <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
+              <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
             </Routes>
           ) : showLevelSelector ? (
             <motion.div
