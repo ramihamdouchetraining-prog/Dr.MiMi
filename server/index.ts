@@ -3,6 +3,7 @@ import "dotenv/config"; // Load environment variables
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import passport from "passport";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { seedModules } from "./seed";
@@ -10,6 +11,7 @@ import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
 import { seedAdmin } from "./seed-admin";
 import WebSocketManager from "./websocket";
+import { configureOAuth } from "./oauth-config";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -126,6 +128,10 @@ async function startServer() {
     await seedMedicalContent();
     await seedOwner();
     await seedAdmin();
+
+    // Configure OAuth providers
+    configureOAuth();
+    app.use(passport.initialize());
 
     // Register routes and get HTTP server
     await registerRoutes(app);

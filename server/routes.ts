@@ -91,6 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const aiTutorRoutes = await import('./routes/ai-tutor');
   const communicationsRoutes = await import('./routes-communications');
   const adminDashboardRoutes = await import('./routes/admin-dashboard');
+  const oauthRoutes = await import('./routes/oauth');
   
   // Import user authentication routes (for students/regular users)
   const userAuthRoutes = await import('./routes/auth');
@@ -113,6 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/ai-tutor', aiTutorRoutes.default); // AI Tutor routes
   app.use('/api/communications', communicationsRoutes.default); // Communications system (emails, notifications)
   app.use('/api/admin', adminDashboardRoutes.default); // Admin dashboard routes
+  app.use('/api/oauth', oauthRoutes.default); // OAuth routes
 
   // ===== AUTH ROUTES =====
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {

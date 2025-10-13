@@ -52,6 +52,8 @@ export const users = pgTable("users", {
   suspendedReason: text("suspended_reason"),
   password: varchar("password"), // For non-OAuth users like owner
   forcePasswordChange: boolean("force_password_change").default(false),
+  provider: varchar("provider").default("local"), // 'local', 'google', 'facebook', 'microsoft'
+  providerId: varchar("provider_id"), // OAuth provider user ID
   lastLoginAt: timestamp("last_login_at"),
   sessionTimeout: integer("session_timeout").default(3600), // seconds
   createdAt: timestamp("created_at").defaultNow(),
