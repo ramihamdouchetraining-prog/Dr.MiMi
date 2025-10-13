@@ -12,6 +12,7 @@ import { CustomCursor, useCustomCursor } from './components/CustomCursor'
 import { StudyLevelSelector } from './components/StudyLevelSelector'
 import { EnhancedDrMimiAvatar, FloatingDrMimi } from './components/EnhancedDrMimiAvatar'
 import { AdvancedChatbot } from './components/AdvancedChatbot'
+import { MobileChatbot } from './components/MobileChatbot'
 import { FeaturedAvatarCarousel } from './components/AvatarCarousel'
 import { InteractiveMimi } from './components/MimiAnimated'
 import AdvancedQuizPage from './pages/AdvancedQuizPage'
@@ -124,8 +125,8 @@ function AppContent() {
       {/* Celebration Effects */}
       <CelebrationEffect trigger={showConfetti} />
       
-      {/* Advanced Dr.Mimi AI Chatbot */}
-      <AdvancedChatbot />
+      {/* Advanced Dr.Mimi AI Chatbot - Desktop ou Mobile selon l'écran */}
+      {window.innerWidth > 768 ? <AdvancedChatbot /> : <MobileChatbot />}
 
       {/* Modern Navbar */}
       <ModernNavbar />
