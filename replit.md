@@ -43,6 +43,25 @@ Dr.MiMi is a comprehensive medical education platform for French-speaking medica
   - **Text-to-Speech**: Voice responses for enhanced accessibility
   - **Multi-language Support**: FR/EN/AR with context-aware medical terminology
   - **Smart Conversation History**: Maintains context across interactions for coherent learning sessions
+- **Learning Analytics & AI Insights System (NEW - Oct 2025)**: Comprehensive analytics platform with AI-powered personalized recommendations. Features:
+  - **4 Database Tables**: learningAnalytics, studyPatterns, aiRecommendations, performanceMetrics for comprehensive tracking
+  - **Student Analytics Dashboard** (/analytics): Interactive dashboard with Recharts visualizations showing:
+    - Weekly progress tracking (scores & study time)
+    - Learning style radar chart (visual, practical, theoretical, consistency)
+    - Module performance breakdown with weak/strong areas identification
+    - Study pattern insights (preferred time, content type, productivity hours)
+    - Session patterns analysis (short/medium/long sessions)
+  - **Admin Analytics Dashboard** (/admin/analytics): Overview for educators with:
+    - Total students, active students, average performance metrics
+    - Top performers & struggling students identification
+    - Module-level performance statistics
+  - **AI-Powered Recommendations**: OpenAI-based recommendation engine providing:
+    - Personalized study plans based on learning patterns
+    - Success probability predictions using performance metrics
+    - Actionable insights with estimated time requirements
+    - Priority-based recommendations (high/medium/low)
+  - **Real-time Analytics API**: RESTful endpoints for student/admin dashboards, AI recommendations, and performance predictions
+  - **Differentiator**: Combines traditional analytics with AI insights for adaptive, personalized learning experiences
 
 ## External Dependencies
 - **PostgreSQL**: Primary database.
