@@ -90,6 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gamesRoutes = await import('./routes/games');
   const aiTutorRoutes = await import('./routes/ai-tutor');
   const communicationsRoutes = await import('./routes-communications');
+  const adminDashboardRoutes = await import('./routes/admin-dashboard');
   
   // Import user authentication routes (for students/regular users)
   const userAuthRoutes = await import('./routes/auth');
@@ -111,6 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/chat', chatRoutes.default); // Chat routes for admin messaging system
   app.use('/api/ai-tutor', aiTutorRoutes.default); // AI Tutor routes
   app.use('/api/communications', communicationsRoutes.default); // Communications system (emails, notifications)
+  app.use('/api/admin', adminDashboardRoutes.default); // Admin dashboard routes
 
   // ===== AUTH ROUTES =====
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
