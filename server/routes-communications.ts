@@ -2,7 +2,27 @@ import express from 'express';
 import { db } from './db';
 import { users } from '../shared/schema';
 import { eq, sql, and, or, gte, lte } from 'drizzle-orm';
-import { requireAuth, requirePermission } from './middleware';
+// Middleware functions
+const requireAuth = (req: any, res: any, next: any) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+  next();
+};
+
+const requirePermission = (permission: string) => {
+  return (req: any, res: any, next: any) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    // For now, allow admin and owner roles
+    const userRole = req.user.role || 'viewer';
+    if (userRole !== 'admin' && userRole !== 'owner') {
+      return res.status(403).json({ message: 'Insufficient permissions' });
+    }
+    next();
+  };
+};
 
 const router = express.Router();
 
