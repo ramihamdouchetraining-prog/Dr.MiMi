@@ -1,0 +1,11 @@
+# Netlify SPA Redirects for Dr.MiMi Platform
+
+# API routes (when backend is deployed separately)
+/api/*  https://your-backend-url.com/api/:splat  200
+
+# Admin routes
+/admin           /admin/login  301
+/admin/*         /index.html   200
+
+# All other routes to index.html for React Router
+/*               /index.html   200
