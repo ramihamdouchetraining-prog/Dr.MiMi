@@ -50,6 +50,7 @@ import { CollaborativePlatform } from './components/CollaborativePlatform'
 import { EducationalMarketplace } from './components/marketplace/EducationalMarketplace'
 import { AdvancedGamification } from './components/gamification/AdvancedGamification'
 import FeaturesXXLPage from './pages/FeaturesXXLPage'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -206,12 +207,12 @@ function AppContent() {
               <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
               
               {/* Routes XXL */}
-              <Route path="/features-xxl" element={<FeaturesXXLPage />} />
-              <Route path="/admin/dashboard-xxl" element={<AdminDashboardXXL />} />
-              <Route path="/lab-3d" element={<VirtualLab3D />} />
-              <Route path="/collaboration" element={<CollaborativePlatform />} />
-              <Route path="/marketplace" element={<EducationalMarketplace />} />
-              <Route path="/gamification" element={<AdvancedGamification />} />
+              <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
+              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Dashboard Admin XXL"><AdminDashboardXXL /></ErrorBoundary>} />
+              <Route path="/lab-3d" element={<ErrorBoundary componentName="Laboratoire 3D"><VirtualLab3D /></ErrorBoundary>} />
+              <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
+              <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
+              <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
             </Routes>
           )}
         </AnimatePresence>
