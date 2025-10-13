@@ -12,6 +12,7 @@ import { seedOwner } from "./seed-owner";
 import { seedAdmin } from "./seed-admin";
 import WebSocketManager from "./websocket";
 import { configureOAuth } from "./oauth-config";
+import { WebRTCSignalingServer } from "./webrtc-signaling";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -138,6 +139,9 @@ async function startServer() {
 
     // Initialize WebSocket server for messaging
     const wsManager = new WebSocketManager(httpServer);
+    
+    // Initialize WebRTC signaling server
+    const webrtcSignaling = new WebRTCSignalingServer(httpServer);
 
     httpServer.listen(PORT, () => {
       console.log(`🚀 MediMimi backend server running on port ${PORT}`);
@@ -145,6 +149,7 @@ async function startServer() {
       console.log(`🔐 Authentication: Replit Auth enabled`);
       console.log(`🌱 Database seeded with medical modules and content`);
       console.log(`🔌 WebSocket server ready for real-time messaging`);
+      console.log(`📹 WebRTC signaling server ready for collaborative platform`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
