@@ -15,7 +15,7 @@ import { AdvancedChatbot } from './components/AdvancedChatbot'
 import { MobileChatbot } from './components/MobileChatbot'
 import { FeaturedAvatarCarousel } from './components/AvatarCarousel'
 import { InteractiveMimi } from './components/MimiAnimated'
-import AdvancedQuizPage from './pages/AdvancedQuizPage'
+import EnhancedQuizPage from './pages/EnhancedQuizPage'
 import MedicalLibraryPage from './pages/MedicalLibraryPage'
 import MimiLibrary from './pages/MimiLibrary'
 import AdminDashboard from './pages/AdminDashboard'
@@ -182,7 +182,7 @@ function AppContent() {
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
               
               {/* Quiz and Games Routes */}
-              <Route path="/quiz" element={<AdvancedQuizPage />} />
+              <Route path="/quiz" element={<EnhancedQuizPage />} />
               {/* Games Routes - redirect to quiz with games tab */}
               
               {/* Routes XXL */}
@@ -208,7 +208,7 @@ function AppContent() {
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/summaries" element={<SummariesPage />} />
               <Route path="/modules" element={<ModulesPage />} />
-              <Route path="/quiz" element={<AdvancedQuizPage />} />
+              <Route path="/quiz" element={<EnhancedQuizPage />} />
               <Route path="/library" element={<MedicalLibraryPage />} />
               <Route path="/mimi-library" element={<MimiLibrary />} />
               <Route path="/cases" element={<CasesPage />} />
