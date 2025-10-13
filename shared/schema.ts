@@ -1224,6 +1224,202 @@ export const contractSignatures = pgTable("contract_signatures", {
   signedAt: timestamp("signed_at").defaultNow(),
 });
 
+// ============================================
+// LEARNING ANALYTICS SYSTEM - Advanced Analytics & AI Recommendations
+// ============================================
+
+// Learning Analytics - Aggregated metrics per user
+export const learningAnalytics = pgTable("learning_analytics", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  
+  // Overall Performance Metrics
+  totalStudyTime: integer("total_study_time").default(0), // in minutes
+  averageSessionDuration: integer("average_session_duration").default(0), // in minutes
+  totalCoursesEnrolled: integer("total_courses_enrolled").default(0),
+  totalCoursesCompleted: integer("total_courses_completed").default(0),
+  totalQuizzesTaken: integer("total_quizzes_taken").default(0),
+  totalQuizzesPassed: integer("total_quizzes_passed").default(0),
+  totalCasesCompleted: integer("total_cases_completed").default(0),
+  totalSummariesDownloaded: integer("total_summaries_downloaded").default(0),
+  
+  // Performance Indicators
+  overallAverageScore: decimal("overall_average_score", { precision: 5, scale: 2 }).default("0"), // percentage
+  courseCompletionRate: decimal("course_completion_rate", { precision: 5, scale: 2 }).default("0"), // percentage
+  quizSuccessRate: decimal("quiz_success_rate", { precision: 5, scale: 2 }).default("0"), // percentage
+  averageQuizScore: decimal("average_quiz_score", { precision: 5, scale: 2 }).default("0"), // percentage
+  
+  // Engagement Metrics
+  totalLoginDays: integer("total_login_days").default(0),
+  currentStreak: integer("current_streak").default(0), // consecutive days
+  longestStreak: integer("longest_streak").default(0),
+  lastActivityAt: timestamp("last_activity_at"),
+  
+  // Learning Velocity
+  averageCoursesPerWeek: decimal("average_courses_per_week", { precision: 5, scale: 2 }).default("0"),
+  averageQuizzesPerWeek: decimal("average_quizzes_per_week", { precision: 5, scale: 2 }).default("0"),
+  learningVelocityTrend: varchar("learning_velocity_trend", { enum: ["accelerating", "stable", "declining"] }).default("stable"),
+  
+  // Weak Areas (JSON array of module IDs where user struggles)
+  weakModules: jsonb("weak_modules"), // [{ moduleId: "cardiology", score: 45, attempts: 3 }]
+  strongModules: jsonb("strong_modules"), // [{ moduleId: "anatomy", score: 95, attempts: 5 }]
+  
+  // Metadata
+  lastCalculatedAt: timestamp("last_calculated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_learning_analytics_user").on(table.userId),
+  index("idx_learning_analytics_updated").on(table.updatedAt),
+]);
+
+// Study Patterns - Detailed study behavior analysis
+export const studyPatterns = pgTable("study_patterns", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  
+  // Time Patterns
+  preferredStudyTime: varchar("preferred_study_time", { 
+    enum: ["morning", "afternoon", "evening", "night"] 
+  }), // AI-detected preferred time
+  studyDaysPattern: jsonb("study_days_pattern"), // { "monday": 120, "tuesday": 90, ... } in minutes
+  peakProductivityHour: integer("peak_productivity_hour"), // 0-23 hour when most productive
+  
+  // Session Patterns
+  averageSessionsPerDay: decimal("average_sessions_per_day", { precision: 5, scale: 2 }).default("0"),
+  shortSessionsCount: integer("short_sessions_count").default(0), // < 15 min
+  mediumSessionsCount: integer("medium_sessions_count").default(0), // 15-45 min
+  longSessionsCount: integer("long_sessions_count").default(0), // > 45 min
+  
+  // Learning Style Indicators
+  preferredContentType: varchar("preferred_content_type", { 
+    enum: ["courses", "summaries", "quizzes", "cases", "mixed"] 
+  }).default("mixed"),
+  visualLearnerScore: integer("visual_learner_score").default(0), // 0-100
+  practicalLearnerScore: integer("practical_learner_score").default(0), // 0-100
+  theoreticalLearnerScore: integer("theoretical_learner_score").default(0), // 0-100
+  
+  // Engagement Patterns
+  cramStudyDetected: boolean("cram_study_detected").default(false), // Last-minute studying before exams
+  consistentLearnerScore: integer("consistent_learner_score").default(0), // 0-100
+  procrastinationScore: integer("procrastination_score").default(0), // 0-100
+  
+  // Focus & Retention
+  averageRetentionRate: decimal("average_retention_rate", { precision: 5, scale: 2 }), // Based on quiz retakes
+  focusScore: integer("focus_score").default(0), // 0-100 based on completion rates
+  distractionIndicators: jsonb("distraction_indicators"), // Patterns suggesting distractions
+  
+  // Metadata
+  dataPoints: integer("data_points").default(0), // Number of sessions analyzed
+  confidenceScore: integer("confidence_score").default(0), // 0-100, how reliable is this pattern
+  lastAnalyzedAt: timestamp("last_analyzed_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_study_patterns_user").on(table.userId),
+]);
+
+// AI Recommendations - Personalized AI-generated learning recommendations
+export const aiRecommendations = pgTable("ai_recommendations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  
+  // Recommendation Details
+  recommendationType: varchar("recommendation_type", { 
+    enum: ["study_plan", "content_suggestion", "schedule_optimization", "weakness_focus", "exam_prep", "learning_style"] 
+  }).notNull(),
+  priority: varchar("priority", { enum: ["high", "medium", "low"] }).default("medium"),
+  
+  // Content
+  title: varchar("title").notNull(), // e.g., "Focus on Cardiology This Week"
+  description: text("description").notNull(), // Detailed recommendation
+  actionItems: jsonb("action_items"), // [{ action: "Complete Cardiology Quiz 3", link: "/quiz/123" }]
+  
+  // AI Analysis
+  aiReasoning: text("ai_reasoning"), // Why this recommendation was made
+  expectedImpact: varchar("expected_impact", { 
+    enum: ["significant_improvement", "moderate_improvement", "minor_improvement"] 
+  }),
+  basedOnMetrics: jsonb("based_on_metrics"), // Which analytics triggered this
+  
+  // Targeted Improvements
+  targetedModules: jsonb("targeted_modules"), // Module IDs this recommendation addresses
+  targetedSkills: jsonb("targeted_skills"), // Skills to improve
+  estimatedTimeRequired: integer("estimated_time_required"), // minutes
+  
+  // Status & Tracking
+  status: varchar("status", { 
+    enum: ["active", "in_progress", "completed", "dismissed", "expired"] 
+  }).default("active"),
+  userFeedback: varchar("user_feedback", { enum: ["helpful", "not_helpful", "neutral"] }),
+  feedbackComment: text("feedback_comment"),
+  completedAt: timestamp("completed_at"),
+  dismissedAt: timestamp("dismissed_at"),
+  expiresAt: timestamp("expires_at"), // Recommendations can expire if not relevant anymore
+  
+  // AI Model Info
+  aiModel: varchar("ai_model").default("gpt-4"), // Which AI model generated this
+  generatedAt: timestamp("generated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_ai_recommendations_user").on(table.userId),
+  index("idx_ai_recommendations_status").on(table.status),
+  index("idx_ai_recommendations_priority").on(table.priority),
+]);
+
+// Performance Metrics - Detailed performance tracking per module/subject
+export const performanceMetrics = pgTable("performance_metrics", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  moduleId: varchar("module_id").references(() => modules.id),
+  
+  // Performance Data
+  totalAttempts: integer("total_attempts").default(0),
+  successfulAttempts: integer("successful_attempts").default(0),
+  averageScore: decimal("average_score", { precision: 5, scale: 2 }).default("0"),
+  highestScore: decimal("highest_score", { precision: 5, scale: 2 }).default("0"),
+  lowestScore: decimal("lowest_score", { precision: 5, scale: 2 }).default("0"),
+  
+  // Improvement Tracking
+  firstAttemptScore: decimal("first_attempt_score", { precision: 5, scale: 2 }),
+  latestAttemptScore: decimal("latest_attempt_score", { precision: 5, scale: 2 }),
+  improvementRate: decimal("improvement_rate", { precision: 5, scale: 2 }), // percentage improvement
+  trendDirection: varchar("trend_direction", { enum: ["improving", "stable", "declining"] }).default("stable"),
+  
+  // Time Metrics
+  totalTimeSpent: integer("total_time_spent").default(0), // minutes on this module
+  averageTimePerAttempt: integer("average_time_per_attempt").default(0), // minutes
+  
+  // Difficulty Assessment
+  perceivedDifficulty: varchar("perceived_difficulty", { 
+    enum: ["very_easy", "easy", "moderate", "difficult", "very_difficult"] 
+  }),
+  masteryLevel: varchar("mastery_level", { 
+    enum: ["beginner", "intermediate", "advanced", "expert"] 
+  }).default("beginner"),
+  masteryPercentage: decimal("mastery_percentage", { precision: 5, scale: 2 }).default("0"),
+  
+  // Specific Skills within Module
+  skillBreakdown: jsonb("skill_breakdown"), // { "diagnosis": 85, "treatment": 70, "anatomy": 95 }
+  weakTopics: jsonb("weak_topics"), // ["ECG interpretation", "Cardiac medications"]
+  strongTopics: jsonb("strong_topics"), // ["Cardiac anatomy", "Heart sounds"]
+  
+  // Predictive Metrics
+  predictedExamScore: decimal("predicted_exam_score", { precision: 5, scale: 2 }), // AI prediction
+  readinessScore: integer("readiness_score").default(0), // 0-100, ready for exam?
+  recommendedStudyTime: integer("recommended_study_time"), // minutes needed to master
+  
+  // Metadata
+  lastAttemptAt: timestamp("last_attempt_at"),
+  lastUpdatedAt: timestamp("last_updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_performance_metrics_user").on(table.userId),
+  index("idx_performance_metrics_module").on(table.moduleId),
+  index("idx_performance_metrics_user_module").on(table.userId, table.moduleId),
+]);
+
 // Relations for contracts
 export const contractsRelations = relations(contracts, ({ one, many }) => ({
   partyA: one(users, { fields: [contracts.partyAId], references: [users.id] }),
@@ -1415,6 +1611,24 @@ export const libraryDownloadsRelations = relations(libraryDownloads, ({ one }) =
   item: one(libraryItems, { fields: [libraryDownloads.itemId], references: [libraryItems.id] }),
 }));
 
+// Learning Analytics Relations
+export const learningAnalyticsRelations = relations(learningAnalytics, ({ one }) => ({
+  user: one(users, { fields: [learningAnalytics.userId], references: [users.id] }),
+}));
+
+export const studyPatternsRelations = relations(studyPatterns, ({ one }) => ({
+  user: one(users, { fields: [studyPatterns.userId], references: [users.id] }),
+}));
+
+export const aiRecommendationsRelations = relations(aiRecommendations, ({ one }) => ({
+  user: one(users, { fields: [aiRecommendations.userId], references: [users.id] }),
+}));
+
+export const performanceMetricsRelations = relations(performanceMetrics, ({ one }) => ({
+  user: one(users, { fields: [performanceMetrics.userId], references: [users.id] }),
+  module: one(modules, { fields: [performanceMetrics.moduleId], references: [modules.id] }),
+}));
+
 // Type exports
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -1494,3 +1708,13 @@ export type LibraryRating = typeof libraryRatings.$inferSelect;
 export type InsertLibraryRating = typeof libraryRatings.$inferInsert;
 export type LibraryDownload = typeof libraryDownloads.$inferSelect;
 export type InsertLibraryDownload = typeof libraryDownloads.$inferInsert;
+
+// Learning Analytics type exports
+export type LearningAnalytics = typeof learningAnalytics.$inferSelect;
+export type InsertLearningAnalytics = typeof learningAnalytics.$inferInsert;
+export type StudyPattern = typeof studyPatterns.$inferSelect;
+export type InsertStudyPattern = typeof studyPatterns.$inferInsert;
+export type AIRecommendation = typeof aiRecommendations.$inferSelect;
+export type InsertAIRecommendation = typeof aiRecommendations.$inferInsert;
+export type PerformanceMetric = typeof performanceMetrics.$inferSelect;
+export type InsertPerformanceMetric = typeof performanceMetrics.$inferInsert;
