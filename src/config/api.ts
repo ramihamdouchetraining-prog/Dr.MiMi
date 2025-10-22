@@ -1,6 +1,6 @@
 // Configuration de l'API pour développement et production
 
-// En développement: utilise le proxy Vite (/api -> http://localhost:3001)
+// En développement: utilise le proxy Vite (/api -> http://localhost:5001)
 // En production: utilise VITE_API_URL depuis .env.production
 export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -11,8 +11,17 @@ export function getApiUrl(path: string): string {
     return path.startsWith('/api') ? path : `/api${path}`;
   }
   
-  // En production, utilise l'URL complète du backend
-  const baseUrl = API_BASE_URL || window.location.origin;
+  // En production, utilise l'URL complète du backend Render
+  // IMPORTANT: Ne pas utiliser window.location.origin (Vercel) mais le backend (Render)
+  const baseUrl = API_BASE_URL;
+  
+  // Si VITE_API_URL n'est pas défini, afficher une erreur claire
+  if (!baseUrl) {
+    console.error('❌ VITE_API_URL not configured! Please set it in Vercel environment variables.');
+    console.error('Expected: https://drmimi-replit.onrender.com');
+    throw new Error('API URL not configured. Please contact administrator.');
+  }
+  
   const cleanPath = path.startsWith('/api') ? path : `/api${path}`;
   return `${baseUrl}${cleanPath}`;
 }

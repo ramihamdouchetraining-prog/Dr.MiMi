@@ -26,15 +26,29 @@ export function setupFetchProxy() {
 
     // Si l'URL commence par /api, utiliser getApiUrl pour la transformer
     if (url.startsWith('/api')) {
-      const fullUrl = getApiUrl(url);
-      console.log('🔄 Fetch Proxy:', url, '→', fullUrl);
-      
-      // Créer une nouvelle requête avec l'URL complète
-      if (typeof input === 'string') {
-        return originalFetch(fullUrl, init);
-      } else if (input instanceof Request) {
-        // Cloner la requête avec la nouvelle URL
-        return originalFetch(new Request(fullUrl, input), init);
+      try {
+        const fullUrl = getApiUrl(url);
+        console.log('🔄 Fetch Proxy:', url, '→', fullUrl);
+        
+        // S'assurer que credentials sont inclus pour les cookies de session
+        const fetchInit = {
+          ...init,
+          credentials: (init?.credentials || 'include') as RequestCredentials,
+          headers: {
+            ...init?.headers,
+          }
+        };
+        
+        // Créer une nouvelle requête avec l'URL complète
+        if (typeof input === 'string') {
+          return originalFetch(fullUrl, fetchInit);
+        } else if (input instanceof Request) {
+          // Cloner la requête avec la nouvelle URL
+          return originalFetch(new Request(fullUrl, input), fetchInit);
+        }
+      } catch (error) {
+        console.error('❌ Fetch Proxy Error:', error);
+        return Promise.reject(error);
       }
     }
 
