@@ -66,12 +66,9 @@ app.use(
         return callback(null, true);
       }
 
-      // Accepter TOUTES les URLs Preview Vercel (dr-mi-mi-replit-*.vercel.app)
-      if (
-        origin.includes("dr-mi-mi-replit") &&
-        origin.includes(".vercel.app")
-      ) {
-        console.log(`✅ CORS: Vercel Preview URL autorisée: ${origin}`);
+      // Accepter TOUTES les URLs Vercel (production, preview, et URLs générées)
+      if (origin.includes(".vercel.app")) {
+        console.log(`✅ CORS: Vercel URL autorisée: ${origin}`);
         return callback(null, true);
       }
 
