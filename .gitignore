@@ -26,10 +26,20 @@ dist-ssr
 # Environment variables
 .env
 .env.local
+.env.production
 .env.production.local
 .env.development.local
+
+# Sensitive files
+cookies.txt
+*.cookies
+*.session
 
 # Replit specific
 .replit
 .replit.nix
 replit.nix
+
+# Large files
+attached_assets/*.zip
+*.zip
