@@ -42,6 +42,7 @@ import PaymentDZD from './pages/PaymentDZD'
 import AITutor from './components/AITutor'
 import StudentAnalyticsDashboard from './pages/StudentAnalyticsDashboard'
 import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
+import NotFound from './pages/NotFound'
 
 // Import XXL Components
 import { AdminDashboardAdvanced } from './components/dashboard/AdminDashboardAdvanced'
@@ -192,6 +193,9 @@ function AppContent() {
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
               <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
+              
+              {/* 404 - Must be last */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           ) : showLevelSelector ? (
             <motion.div
@@ -227,6 +231,14 @@ function AppContent() {
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
               <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
+              
+              {/* Aliases et routes manquantes */}
+              <Route path="/premium" element={<FeaturesXXLPage />} />
+              <Route path="/a-propos" element={<AboutMimiDonation />} />
+              <Route path="/actualites" element={<NewsPage />} />
+              
+              {/* 404 - Must be last */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           )}
         </AnimatePresence>
