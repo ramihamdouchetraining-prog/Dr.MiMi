@@ -1,48 +1,26 @@
 // XXL Modules Page for Dr.MiMi platform
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Brain,
-  Heart,
-  Activity,
-  Stethoscope,
-  BookOpen,
-  Clock,
-  Award,
-  TrendingUp,
-  Users,
-  Star,
   ChevronRight,
-  Lock,
-  Unlock,
   GraduationCap,
-  Target,
-  Shield
+  Target
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner, ErrorState } from '../components/EmptyState';
 
 interface Module {
   id: string;
   name: string;
-  nameEn: string;
-  nameAr: string;
-  icon: string;
+  nameEn?: string | null;
+  nameAr?: string | null;
+  icon?: string | null;
   category: 'Preclinical' | 'Clinical' | 'PublicHealth';
-  yearLevels: string[];
-  courses: number;
-  summaries: number;
-  quizzes: number;
-  cases: number;
-  progress: number;
-  isLocked: boolean;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  students: number;
-  rating: number;
-  color: string;
-  description: string;
-  bodySystems: string[];
+  bodySystems?: any; // jsonb
+  description?: string | null;
+  createdAt?: Date | string | null;
 }
 
 const ModulesPage: React.FC = () => {
@@ -54,6 +32,36 @@ const ModulesPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // API State
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch modules from API
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/modules');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch modules: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setModules(data);
+      } catch (err: any) {
+        console.error('Error fetching modules:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des modules');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModules();
+  }, []);
 
   // Study levels
   const studyLevels = [
@@ -75,160 +83,6 @@ const ModulesPage: React.FC = () => {
     { id: 'PublicHealth', name: language === 'en' ? 'Public Health' : language === 'ar' ? 'الصحة العامة' : 'Santé Publique' },
   ];
 
-  // Medical modules data
-  const modules: Module[] = [
-    {
-      id: 'anatomy',
-      name: 'Anatomie',
-      nameEn: 'Anatomy',
-      nameAr: 'التشريح',
-      icon: emojis.heart,
-      category: 'Preclinical',
-      yearLevels: ['Y1', 'Y2'],
-      courses: 45,
-      summaries: 23,
-      quizzes: 15,
-      cases: 8,
-      progress: 65,
-      isLocked: false,
-      difficulty: 'Medium',
-      students: 1234,
-      rating: 4.7,
-      color: '#EF4444',
-      description: language === 'en' 
-        ? 'Study of human body structure and organization'
-        : language === 'ar'
-        ? 'دراسة بنية وتنظيم جسم الإنسان'
-        : "Étude de la structure et de l'organisation du corps humain",
-      bodySystems: ['Musculosquelettique', 'Cardiovasculaire', 'Nerveux']
-    },
-    {
-      id: 'cardiology',
-      name: 'Cardiologie',
-      nameEn: 'Cardiology',
-      nameAr: 'أمراض القلب',
-      icon: emojis.pulse,
-      category: 'Clinical',
-      yearLevels: ['Y3', 'Y4', 'Y5'],
-      courses: 38,
-      summaries: 19,
-      quizzes: 22,
-      cases: 15,
-      progress: 45,
-      isLocked: false,
-      difficulty: 'Hard',
-      students: 892,
-      rating: 4.8,
-      color: '#EC4899',
-      description: language === 'en'
-        ? 'Study of heart diseases and cardiovascular system'
-        : language === 'ar'
-        ? 'دراسة أمراض القلب والجهاز القلبي الوعائي'
-        : 'Étude des maladies cardiaques et du système cardiovasculaire',
-      bodySystems: ['Cardiovasculaire', 'Vasculaire']
-    },
-    {
-      id: 'neurology',
-      name: 'Neurologie',
-      nameEn: 'Neurology',
-      nameAr: 'طب الأعصاب',
-      icon: emojis.brain,
-      category: 'Clinical',
-      yearLevels: ['Y4', 'Y5', 'Y6'],
-      courses: 42,
-      summaries: 26,
-      quizzes: 18,
-      cases: 20,
-      progress: 30,
-      isLocked: false,
-      difficulty: 'Hard',
-      students: 756,
-      rating: 4.9,
-      color: '#8B5CF6',
-      description: language === 'en'
-        ? 'Study of nervous system disorders'
-        : language === 'ar'
-        ? 'دراسة اضطرابات الجهاز العصبي'
-        : 'Étude des troubles du système nerveux',
-      bodySystems: ['Nerveux central', 'Nerveux périphérique']
-    },
-    {
-      id: 'pharmacology',
-      name: 'Pharmacologie',
-      nameEn: 'Pharmacology',
-      nameAr: 'علم الأدوية',
-      icon: emojis.syringe,
-      category: 'Preclinical',
-      yearLevels: ['Y2', 'Y3', 'Y4'],
-      courses: 55,
-      summaries: 32,
-      quizzes: 28,
-      cases: 10,
-      progress: 80,
-      isLocked: false,
-      difficulty: 'Medium',
-      students: 1567,
-      rating: 4.6,
-      color: '#10B981',
-      description: language === 'en'
-        ? 'Study of drugs and their effects on the body'
-        : language === 'ar'
-        ? 'دراسة الأدوية وتأثيراتها على الجسم'
-        : 'Étude des médicaments et leurs effets sur le corps',
-      bodySystems: ['Tous les systèmes']
-    },
-    {
-      id: 'genetics',
-      name: 'Génétique',
-      nameEn: 'Genetics',
-      nameAr: 'علم الوراثة',
-      icon: emojis.dna,
-      category: 'Preclinical',
-      yearLevels: ['Y2', 'Y3'],
-      courses: 28,
-      summaries: 15,
-      quizzes: 12,
-      cases: 6,
-      progress: 20,
-      isLocked: true,
-      difficulty: 'Hard',
-      students: 432,
-      rating: 4.5,
-      color: '#F59E0B',
-      description: language === 'en'
-        ? 'Study of heredity and genetic variation'
-        : language === 'ar'
-        ? 'دراسة الوراثة والتنوع الجيني'
-        : "Étude de l'hérédité et de la variation génétique",
-      bodySystems: ['Génétique moléculaire', 'Génétique clinique']
-    },
-    {
-      id: 'pneumology',
-      name: 'Pneumologie',
-      nameEn: 'Pneumology',
-      nameAr: 'أمراض الرئة',
-      icon: emojis.stethoscope,
-      category: 'Clinical',
-      yearLevels: ['Y4', 'Y5'],
-      courses: 32,
-      summaries: 18,
-      quizzes: 14,
-      cases: 12,
-      progress: 55,
-      isLocked: false,
-      difficulty: 'Medium',
-      students: 678,
-      rating: 4.7,
-      color: '#06B6D4',
-      description: language === 'en'
-        ? 'Study of respiratory system diseases'
-        : language === 'ar'
-        ? 'دراسة أمراض الجهاز التنفسي'
-        : 'Étude des maladies du système respiratoire',
-      bodySystems: ['Respiratoire']
-    }
-  ];
-
   // Filter modules
   const filteredModules = useMemo(() => {
     let filtered = modules;
@@ -237,27 +91,43 @@ const ModulesPage: React.FC = () => {
       filtered = filtered.filter(m => m.category === selectedCategory);
     }
 
-    if (selectedLevel !== 'all') {
-      filtered = filtered.filter(m => m.yearLevels.includes(selectedLevel));
-    }
-
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(m => 
         m.name.toLowerCase().includes(term) ||
-        m.nameEn.toLowerCase().includes(term) ||
-        m.nameAr.includes(term) ||
-        m.description.toLowerCase().includes(term)
+        (m.nameEn && m.nameEn.toLowerCase().includes(term)) ||
+        (m.nameAr && m.nameAr.includes(term)) ||
+        (m.description && m.description.toLowerCase().includes(term))
       );
     }
 
     return filtered;
-  }, [selectedCategory, selectedLevel, searchTerm]);
+  }, [modules, selectedCategory, selectedLevel, searchTerm]);
 
-  // Get module name based on language
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <ErrorState 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
   const getModuleName = (module: Module) => {
-    if (language === 'en') return module.nameEn;
-    if (language === 'ar') return module.nameAr;
+    if (language === 'ar') return module.nameAr || module.name;
+    if (language === 'en') return module.nameEn || module.name;
     return module.name;
   };
 
@@ -439,10 +309,18 @@ const ModuleCard: React.FC<{
   getModuleName: (module: Module) => string;
   language: string;
   isRTL: boolean;
-}> = ({ module, getModuleName, language, isRTL }) => {
+}> = ({ module, getModuleName, language }) => {
+  const categoryColors = {
+    Preclinical: { bg: '#DBEAFE', text: '#1E40AF' },
+    Clinical: { bg: '#FEE2E2', text: '#991B1B' },
+    PublicHealth: { bg: '#D1FAE5', text: '#065F46' }
+  };
+
+  const categoryColor = categoryColors[module.category] || categoryColors.Clinical;
+
   return (
     <motion.div
-      className="rounded-xl overflow-hidden shadow-lg cursor-pointer relative"
+      className="rounded-xl overflow-hidden shadow-lg cursor-pointer"
       style={{ 
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
@@ -452,129 +330,85 @@ const ModuleCard: React.FC<{
       whileHover={{ y: -5 }}
       layout
     >
-      {/* Lock Overlay */}
-      {module.isLocked && (
-        <div className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center">
-          <div className="text-center text-white">
-            <Lock size={48} className="mx-auto mb-2" />
-            <p className="font-semibold">
-              {language === 'en' ? 'Premium Module' : language === 'ar' ? 'وحدة مميزة' : 'Module Premium'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Header with gradient */}
+      {/* Header */}
       <div 
         className="h-32 p-4 flex flex-col justify-between"
         style={{ 
-          background: `linear-gradient(135deg, ${module.color}88 0%, ${module.color}44 100%)` 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
         }}
       >
         <div className="flex justify-between items-start">
-          <div className="text-4xl">{module.icon}</div>
-          <div className={`flex items-center gap-1 bg-white/90 px-2 py-1 rounded-full`}>
-            <Star size={14} fill="gold" className="text-yellow-500" />
-            <span className="text-sm font-semibold text-gray-800">{module.rating}</span>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {module.yearLevels.map(level => (
-            <span 
-              key={level} 
-              className="text-xs px-2 py-1 bg-white/80 rounded-full font-medium text-gray-800"
-            >
-              {level}
-            </span>
-          ))}
+          <div className="text-4xl">{module.icon || '📚'}</div>
         </div>
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+        <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
           {getModuleName(module)}
         </h3>
         
-        <span className={`inline-block px-2 py-1 text-xs rounded-full mb-3`}
-              style={{ 
-                backgroundColor: module.category === 'Preclinical' 
-                  ? '#DBEAFE' 
-                  : module.category === 'Clinical'
-                  ? '#FEE2E2'
-                  : '#D1FAE5',
-                color: module.category === 'Preclinical' 
-                  ? '#1E40AF' 
-                  : module.category === 'Clinical'
-                  ? '#991B1B'
-                  : '#065F46'
-              }}>
+        <span 
+          className="inline-block px-3 py-1 text-xs rounded-full mb-3 font-medium"
+          style={{ 
+            backgroundColor: categoryColor.bg,
+            color: categoryColor.text
+          }}
+        >
           {module.category}
         </span>
 
-        <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-textSecondary)' }}>
-          {module.description}
-        </p>
+        {module.description && (
+          <p className="text-sm mb-4 line-clamp-3" style={{ color: 'var(--color-textSecondary)' }}>
+            {module.description}
+          </p>
+        )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="text-center p-2 rounded-lg" style={{ backgroundColor: 'var(--color-background)' }}>
-            <div className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              {module.courses}
-            </div>
-            <div className="text-xs" style={{ color: 'var(--color-textSecondary)' }}>
-              {language === 'en' ? 'Courses' : language === 'ar' ? 'دروس' : 'Cours'}
+        {/* Body Systems */}
+        {module.bodySystems && Array.isArray(module.bodySystems) && module.bodySystems.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold mb-2" style={{ color: 'var(--color-textSecondary)' }}>
+              {language === 'en' ? 'Systems:' : language === 'ar' ? 'الأنظمة:' : 'Systèmes:'}
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {module.bodySystems.slice(0, 3).map((system: any, idx: number) => (
+                <span 
+                  key={idx}
+                  className="text-xs px-2 py-1 rounded-full"
+                  style={{ 
+                    backgroundColor: 'var(--color-background)',
+                    color: 'var(--color-text)'
+                  }}
+                >
+                  {typeof system === 'string' ? system : system.name || ''}
+                </span>
+              ))}
+              {module.bodySystems.length > 3 && (
+                <span 
+                  className="text-xs px-2 py-1 rounded-full"
+                  style={{ 
+                    backgroundColor: 'var(--color-background)',
+                    color: 'var(--color-textSecondary)'
+                  }}
+                >
+                  +{module.bodySystems.length - 3}
+                </span>
+              )}
             </div>
           </div>
-          <div className="text-center p-2 rounded-lg" style={{ backgroundColor: 'var(--color-background)' }}>
-            <div className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              {module.quizzes}
-            </div>
-            <div className="text-xs" style={{ color: 'var(--color-textSecondary)' }}>
-              {language === 'en' ? 'Quizzes' : language === 'ar' ? 'اختبارات' : 'Quiz'}
-            </div>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mb-4">
-          <div className="flex justify-between mb-1">
-            <span className="text-xs" style={{ color: 'var(--color-textSecondary)' }}>
-              {language === 'en' ? 'Progress' : language === 'ar' ? 'التقدم' : 'Progression'}
-            </span>
-            <span className="text-xs font-semibold" style={{ color: 'var(--color-text)' }}>
-              {module.progress}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="h-2 rounded-full transition-all duration-500"
-              style={{ 
-                width: `${module.progress}%`,
-                backgroundColor: module.color
-              }}
-            />
-          </div>
-        </div>
+        )}
 
         {/* Footer */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-            <Users size={14} />
-            <span>{module.students}</span>
-          </div>
+        <div className="flex justify-end">
           <button
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-              module.isLocked ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all"
             style={{
               backgroundColor: 'var(--color-primary)',
               color: 'white',
             }}
-            disabled={module.isLocked}
           >
-            {module.isLocked ? <Lock size={16} /> : <ChevronRight size={16} />}
-            {language === 'en' ? 'Start' : language === 'ar' ? 'ابدأ' : 'Commencer'}
+            <ChevronRight size={16} />
+            {language === 'en' ? 'Explore' : language === 'ar' ? 'استكشف' : 'Explorer'}
           </button>
         </div>
       </div>
