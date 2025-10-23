@@ -1,5 +1,5 @@
 // XXL Medical News Page for Dr.MiMi platform
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Newspaper,
@@ -25,6 +25,7 @@ import {
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
 
 interface NewsArticle {
   id: string;
@@ -65,6 +66,36 @@ const NewsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('recent');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  
+  // API State
+  const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch news from API
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/news');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch news: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setNewsArticles(data);
+      } catch (err: any) {
+        console.error('Error fetching news:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des actualités');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   // News categories
   const categories = [
@@ -77,144 +108,41 @@ const NewsPage: React.FC = () => {
     { id: 'Conference', name: language === 'en' ? 'Conferences' : language === 'ar' ? 'المؤتمرات' : 'Conférences', icon: '🎤' },
   ];
 
-  // Sample news articles
-  const newsArticles: NewsArticle[] = [
-    {
-      id: '1',
-      title: 'Nouvelle Avancée dans le Traitement du Cancer du Pancréas',
-      titleEn: 'New Breakthrough in Pancreatic Cancer Treatment',
-      titleAr: 'اكتشاف جديد في علاج سرطان البنكرياس',
-      subtitle: 'Une étude révolutionnaire montre des résultats prometteurs avec une nouvelle immunothérapie',
-      subtitleEn: 'Revolutionary study shows promising results with new immunotherapy',
-      subtitleAr: 'دراسة ثورية تظهر نتائج واعدة مع العلاج المناعي الجديد',
-      content: 'Des chercheurs de l\'Institut Curie ont découvert une nouvelle approche thérapeutique...',
-      contentEn: 'Researchers at Curie Institute have discovered a new therapeutic approach...',
-      contentAr: 'اكتشف باحثون في معهد كوري نهجًا علاجيًا جديدًا...',
-      category: 'Research',
-      author: 'Dr. Marie Leblanc',
-      authorRole: 'Rédactrice Médicale Senior',
-      publishedAt: '2024-03-25',
-      readTime: 8,
-      tags: ['Oncologie', 'Immunothérapie', 'Innovation'],
-      views: 5234,
-      likes: 892,
-      comments: 67,
-      shares: 234,
-      isBreaking: true,
-      isFeatured: true,
-      isPremium: false,
-      source: 'Institut Curie',
-      relatedModules: ['oncology', 'immunology']
-    },
-    {
-      id: '2',
-      title: 'L\'IA Révolutionne le Diagnostic Précoce d\'Alzheimer',
-      titleEn: 'AI Revolutionizes Early Alzheimer\'s Diagnosis',
-      titleAr: 'الذكاء الاصطناعي يحدث ثورة في التشخيص المبكر لمرض الزهايمر',
-      subtitle: 'Un algorithme détecte les signes précoces avec 95% de précision',
-      subtitleEn: 'Algorithm detects early signs with 95% accuracy',
-      subtitleAr: 'الخوارزمية تكتشف العلامات المبكرة بدقة 95%',
-      content: 'Une équipe internationale a développé un système d\'intelligence artificielle...',
-      contentEn: 'An international team has developed an artificial intelligence system...',
-      contentAr: 'طور فريق دولي نظام ذكاء اصطناعي...',
-      category: 'Technology',
-      author: 'Prof. Jean Dupont',
-      authorRole: 'Neurologue et Chercheur',
-      publishedAt: '2024-03-24',
-      readTime: 6,
-      tags: ['Neurologie', 'IA', 'Diagnostic'],
-      views: 4567,
-      likes: 723,
-      comments: 89,
-      shares: 312,
-      isBreaking: false,
-      isFeatured: true,
-      isPremium: false,
-      source: 'Nature Medicine',
-      relatedModules: ['neurology', 'radiology']
-    },
-    {
-      id: '3',
-      title: 'Congrès International de Cardiologie 2024 à Alger',
-      titleEn: '2024 International Cardiology Congress in Algiers',
-      titleAr: 'المؤتمر الدولي لأمراض القلب 2024 في الجزائر',
-      subtitle: 'Plus de 2000 spécialistes attendus pour cet événement majeur',
-      subtitleEn: 'Over 2000 specialists expected for this major event',
-      subtitleAr: 'أكثر من 2000 متخصص متوقع لهذا الحدث الكبير',
-      content: 'Le congrès rassemblera les plus grands experts mondiaux en cardiologie...',
-      contentEn: 'The congress will bring together the world\'s leading cardiology experts...',
-      contentAr: 'سيجمع المؤتمر أبرز خبراء أمراض القلب في العالم...',
-      category: 'Conference',
-      author: 'Comité d\'Organisation',
-      authorRole: 'Société Algérienne de Cardiologie',
-      publishedAt: '2024-03-23',
-      readTime: 4,
-      tags: ['Cardiologie', 'Congrès', 'Algérie'],
-      views: 3890,
-      likes: 456,
-      comments: 34,
-      shares: 178,
-      isBreaking: false,
-      isFeatured: false,
-      isPremium: false,
-      source: 'SAC',
-      relatedModules: ['cardiology']
-    },
-    {
-      id: '4',
-      title: 'Réforme de la Formation Médicale en Algérie',
-      titleEn: 'Medical Education Reform in Algeria',
-      titleAr: 'إصلاح التعليم الطبي في الجزائر',
-      subtitle: 'Nouvelles mesures pour améliorer la qualité de la formation',
-      subtitleEn: 'New measures to improve training quality',
-      subtitleAr: 'تدابير جديدة لتحسين جودة التدريب',
-      content: 'Le Ministère de la Santé annonce une série de réformes majeures...',
-      contentEn: 'The Ministry of Health announces a series of major reforms...',
-      contentAr: 'تعلن وزارة الصحة عن سلسلة من الإصلاحات الكبرى...',
-      category: 'Policy',
-      author: 'Rédaction Dr.MiMi',
-      authorRole: 'Équipe Éditoriale',
-      publishedAt: '2024-03-22',
-      readTime: 5,
-      tags: ['Formation', 'Politique', 'Algérie'],
-      views: 6234,
-      likes: 892,
-      comments: 156,
-      shares: 423,
-      isBreaking: true,
-      isFeatured: false,
-      isPremium: true,
-      source: 'Ministère de la Santé',
-      relatedModules: ['education']
-    },
-    {
-      id: '5',
-      title: 'Épidémie de Grippe: Recommandations pour les Étudiants',
-      titleEn: 'Flu Epidemic: Recommendations for Students',
-      titleAr: 'وباء الإنفلونزا: توصيات للطلاب',
-      subtitle: 'Conseils pratiques pour se protéger pendant la saison grippale',
-      subtitleEn: 'Practical advice to protect yourself during flu season',
-      subtitleAr: 'نصائح عملية لحماية نفسك خلال موسم الإنفلونزا',
-      content: 'Face à la recrudescence des cas de grippe, voici les mesures essentielles...',
-      contentEn: 'Faced with the resurgence of flu cases, here are the essential measures...',
-      contentAr: 'في مواجهة عودة حالات الإنفلونزا، إليك التدابير الأساسية...',
-      category: 'Clinical',
-      author: 'Dr. Fatima Benali',
-      authorRole: 'Infectiologue',
-      publishedAt: '2024-03-21',
-      readTime: 3,
-      tags: ['Prévention', 'Infectiologie', 'Santé Publique'],
-      views: 7890,
-      likes: 567,
-      comments: 78,
-      shares: 890,
-      isBreaking: false,
-      isFeatured: false,
-      isPremium: false,
-      source: 'CHU Mustapha',
-      relatedModules: ['infectiology', 'public-health']
-    }
-  ];
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <ErrorState 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
+  // Empty state
+  if (newsArticles.length === 0) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <EmptyState 
+          icon="mimi"
+          title={language === 'en' ? 'No news available' : language === 'ar' ? 'لا توجد أخبار' : 'Aucune actualité disponible'}
+          message={language === 'en' ? 'Check back later for medical news updates' : language === 'ar' ? 'تحقق لاحقًا من تحديثات الأخبار الطبية' : 'Revenez plus tard pour les actualités médicales'}
+        />
+      </div>
+    );
+  }
+
+
 
   // Filter articles
   const filteredArticles = useMemo(() => {
