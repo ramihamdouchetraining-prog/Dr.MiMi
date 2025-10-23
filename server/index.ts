@@ -9,6 +9,8 @@ import { registerRoutes } from "./routes";
 import { setupNewsRoutes } from "./routes-news";
 import { setupCoursesRoutes } from "./routes-courses";
 import { setupSummariesRoutes } from "./routes-summaries";
+import { setupModulesRoutes } from "./routes-modules";
+import { setupCasesRoutes } from "./routes-cases";
 import { seedModules } from "./seed";
 import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
@@ -17,6 +19,7 @@ import { seedNewsArticles } from "./seedNewsArticles";
 import { seedQuizzes } from "./seedQuizzes";
 import { seedCourses } from "./seedCourses";
 import { seedSummaries } from "./seedSummaries";
+import { seedCases } from "./seedCases";
 import WebSocketManager from "./websocket";
 import { configureOAuth } from "./oauth-config";
 import { WebRTCSignalingServer } from "./webrtc-signaling";
@@ -137,6 +140,7 @@ async function startServer() {
     await seedQuizzes(); // Add quiz data for testing
     await seedCourses(); // Add course data for testing
     await seedSummaries(); // Add summaries data for testing
+    await seedCases(); // Add clinical cases for testing
 
     // Configure OAuth providers
     configureOAuth();
@@ -147,6 +151,8 @@ async function startServer() {
     setupNewsRoutes(app); // Add news/blog routes
     setupCoursesRoutes(app); // Add courses routes
     setupSummariesRoutes(app); // Add summaries routes
+    setupModulesRoutes(app); // Add modules routes
+    setupCasesRoutes(app); // Add clinical cases routes
 
     // Initialize WebSocket server for messaging
     const wsManager = new WebSocketManager(httpServer);
