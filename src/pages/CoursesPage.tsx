@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
@@ -14,22 +14,28 @@ import {
   Activity
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
+import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
 
 interface Course {
   id: string;
   title: string;
+  titleEn?: string;
+  titleAr?: string;
   description: string;
-  instructor: string;
-  duration: string;
-  students: number;
-  rating: number;
-  level: 'Débutant' | 'Intermédiaire' | 'Avancé';
-  category: string;
-  price: number;
-  image: string;
-  chapters: number;
-  isPopular?: boolean;
-  isNew?: boolean;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  moduleId?: string;
+  yearLevels?: string[];
+  authors?: string[];
+  language?: string;
+  coverImage?: string;
+  price?: string;
+  currency?: string;
+  rating?: string;
+  status?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface CourseCategory {
@@ -46,6 +52,36 @@ const CoursesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedLevel, setSelectedLevel] = useState('all');
+  
+  // API State
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/courses');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch courses: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCourses(data);
+      } catch (err: any) {
+        console.error('Error fetching courses:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des cours');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const categories: CourseCategory[] = [
     { 
@@ -92,109 +128,47 @@ const CoursesPage: React.FC = () => {
     }
   ];
 
-  const courses: Course[] = [
-    {
-      id: '1',
-      title: 'Anatomie Cardiaque Fondamentale',
-      description: 'Cours complet sur l\'anatomie du système cardiovasculaire avec modèles 3D interactifs et cas cliniques.',
-      instructor: 'Dr. Amina Khelifi',
-      duration: '8 semaines',
-      students: 1247,
-      rating: 4.9,
-      level: 'Débutant',
-      category: 'cardiology',
-      price: 2500,
-      image: '/images/anatomy/heart-diagram.png',
-      chapters: 12,
-      isPopular: true
-    },
-    {
-      id: '2',
-      title: 'Neuroanatomie Avancée',
-      description: 'Exploration détaillée du système nerveux central et périphérique avec imagerie médicale moderne.',
-      instructor: 'Prof. Youcef Benali',
-      duration: '10 semaines',
-      students: 856,
-      rating: 4.8,
-      level: 'Avancé',
-      category: 'neurology',
-      price: 3200,
-      image: '/images/anatomy/brain-diagram.png',
-      chapters: 15,
-      isNew: true
-    },
-    {
-      id: '3',
-      title: 'Système Respiratoire - Physiologie',
-      description: 'Étude complète de la physiologie respiratoire avec applications cliniques pratiques.',
-      instructor: 'Dr. Sarah Mohand',
-      duration: '6 semaines',
-      students: 634,
-      rating: 4.7,
-      level: 'Intermédiaire',
-      category: 'anatomy',
-      price: 1800,
-      image: '/images/anatomy/respiratory-system.png',
-      chapters: 10
-    },
-    {
-      id: '4',
-      title: 'Médecine d\'Urgence Pratique',
-      description: 'Protocoles d\'urgence, gestes de premiers secours et prise en charge des urgences vitales.',
-      instructor: 'Dr. Karim Mansouri',
-      duration: '4 semaines',
-      students: 923,
-      rating: 4.9,
-      level: 'Avancé',
-      category: 'emergency',
-      price: 2200,
-      image: '/images/anatomy/digestive-system.png',
-      chapters: 8,
-      isPopular: true
-    },
-    {
-      id: '5',
-      title: 'Pathologies Cardiovasculaires',
-      description: 'Diagnostic et traitement des principales pathologies du système cardiovasculaire.',
-      instructor: 'Prof. Merieme Benali',
-      duration: '12 semaines',
-      students: 1456,
-      rating: 4.8,
-      level: 'Avancé',
-      category: 'cardiology',
-      price: 4500,
-      image: '/images/anatomy/skeletal-system.png',
-      chapters: 20,
-      isNew: true
-    },
-    {
-      id: '6',
-      title: 'Introduction à la Médecine Générale',
-      description: 'Bases fondamentales de la médecine générale pour étudiants de première année.',
-      instructor: 'Dr. Fatima Zeghdoud',
-      duration: '16 semaines',
-      students: 2134,
-      rating: 4.6,
-      level: 'Débutant',
-      category: 'internal',
-      price: 1500,
-      image: '/images/heroes/medical-education.png',
-      chapters: 24,
-      isPopular: true
-    }
-  ];
 
   const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.instructor.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
-    const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
+    const matchesSearch = course.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.titleEn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.titleAr?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch && matchesCategory && matchesLevel;
+    const matchesLevel = selectedLevel === 'all' || (course.yearLevels && course.yearLevels.includes(selectedLevel));
+    
+    return matchesSearch && matchesLevel;
   });
 
-  const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <ErrorState 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
+  const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
+    const displayTitle = course.title || course.titleEn || course.titleAr || 'Untitled Course';
+    const displayDescription = course.description || course.descriptionEn || course.descriptionAr || '';
+    const displayPrice = course.price ? parseFloat(course.price) : 0;
+    const displayRating = course.rating ? parseFloat(course.rating) : 0;
+    const displayAuthors = course.authors && Array.isArray(course.authors) ? course.authors.join(', ') : 'Dr. MiMi';
+    
+    return (
     <motion.div
       className="rounded-xl overflow-hidden shadow-lg border group cursor-pointer"
       style={{ 
@@ -206,28 +180,20 @@ const CoursesPage: React.FC = () => {
       transition={{ duration: 0.3 }}
     >
       {/* Image Container */}
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={course.image}
-          alt={course.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
+      <div className="relative h-48 overflow-hidden" style={{ backgroundColor: 'var(--color-border)' }}>
+        {course.coverImage ? (
+          <img
+            src={course.coverImage}
+            alt={displayTitle}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-6xl">
+            📚
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          {course.isPopular && (
-            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-500 text-white">
-              ⭐ Populaire
-            </span>
-          )}
-          {course.isNew && (
-            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">
-              🆕 Nouveau
-            </span>
-          )}
-        </div>
-
         {/* Play Button */}
         <div className="absolute bottom-3 right-3">
           <motion.div
@@ -239,68 +205,48 @@ const CoursesPage: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Level */}
-        <div className="absolute top-3 right-3">
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-            course.level === 'Débutant' 
-              ? 'bg-green-500 text-white' 
-              : course.level === 'Intermédiaire'
-              ? 'bg-yellow-500 text-white'
-              : 'bg-red-500 text-white'
-          }`}>
-            {course.level}
-          </span>
-        </div>
+        {/* Year Levels */}
+        {course.yearLevels && course.yearLevels.length > 0 && (
+          <div className="absolute top-3 right-3">
+            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white">
+              {course.yearLevels.join(', ')}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors" 
             style={{ color: 'var(--color-text)' }}>
-          {course.title}
+          {displayTitle}
         </h3>
         
         <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-textSecondary)' }}>
-          {course.description}
+          {displayDescription}
         </p>
-
-        <div className="flex items-center gap-4 text-sm mb-4" style={{ color: 'var(--color-textSecondary)' }}>
-          <div className="flex items-center gap-1">
-            <Clock size={16} />
-            <span>{course.duration}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <BookOpen size={16} />
-            <span>{course.chapters} chapitres</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Users size={16} />
-            <span>{course.students.toLocaleString()}</span>
-          </div>
-        </div>
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <Star size={16} className="text-yellow-500 fill-current" />
-              <span className="font-semibold" style={{ color: 'var(--color-text)' }}>
-                {course.rating}
-              </span>
-            </div>
-            <span className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-              ({course.students} étudiants)
-            </span>
+            {displayRating > 0 && (
+              <div className="flex items-center gap-1">
+                <Star size={16} className="text-yellow-500 fill-current" />
+                <span className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                  {displayRating.toFixed(1)}
+                </span>
+              </div>
+            )}
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-              {course.price.toLocaleString()} DZD
+              {displayPrice > 0 ? `${displayPrice.toLocaleString()} ${course.currency || 'DZD'}` : 'Gratuit'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <p className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-            Par {course.instructor}
+            Par {displayAuthors}
           </p>
           
           <div className="flex gap-2">
@@ -325,7 +271,8 @@ const CoursesPage: React.FC = () => {
         </div>
       </div>
     </motion.div>
-  );
+    );
+  };
 
   const CategoryCard: React.FC<{ category: CourseCategory }> = ({ category }) => (
     <motion.button
@@ -450,15 +397,18 @@ const CoursesPage: React.FC = () => {
           </div>
           <div className="text-center p-4 rounded-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
             <p className="text-3xl font-bold text-green-500">
-              {courses.reduce((acc, course) => acc + course.students, 0).toLocaleString()}
+              {courses.length}
             </p>
             <p className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-              Étudiants inscrits
+              Cours disponibles
             </p>
           </div>
           <div className="text-center p-4 rounded-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
             <p className="text-3xl font-bold text-purple-500">
-              {(courses.reduce((acc, course) => acc + course.rating, 0) / courses.length).toFixed(1)}
+              {courses.length > 0 ? 
+                (courses.reduce((acc, course) => acc + (parseFloat(course.rating || '0')), 0) / courses.length).toFixed(1)
+                : '0.0'
+              }
             </p>
             <p className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
               Note moyenne
@@ -466,10 +416,10 @@ const CoursesPage: React.FC = () => {
           </div>
           <div className="text-center p-4 rounded-lg" style={{ backgroundColor: 'var(--color-surface)' }}>
             <p className="text-3xl font-bold text-yellow-500">
-              {courses.reduce((acc, course) => acc + course.chapters, 0)}
+              {courses.filter(c => c.status === 'published').length}
             </p>
             <p className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-              Chapitres totaux
+              Cours publiés
             </p>
           </div>
         </div>

@@ -7,12 +7,14 @@ import passport from "passport";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupNewsRoutes } from "./routes-news";
+import { setupCoursesRoutes } from "./routes-courses";
 import { seedModules } from "./seed";
 import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
 import { seedAdmin } from "./seed-admin";
 import { seedNewsArticles } from "./seedNewsArticles";
 import { seedQuizzes } from "./seedQuizzes";
+import { seedCourses } from "./seedCourses";
 import WebSocketManager from "./websocket";
 import { configureOAuth } from "./oauth-config";
 import { WebRTCSignalingServer } from "./webrtc-signaling";
@@ -131,6 +133,7 @@ async function startServer() {
     await seedAdmin();
     await seedNewsArticles(); // Add news articles for testing
     await seedQuizzes(); // Add quiz data for testing
+    await seedCourses(); // Add course data for testing
 
     // Configure OAuth providers
     configureOAuth();
@@ -139,6 +142,7 @@ async function startServer() {
     // Register routes and get HTTP server
     await registerRoutes(app);
     setupNewsRoutes(app); // Add news/blog routes
+    setupCoursesRoutes(app); // Add courses routes
 
     // Initialize WebSocket server for messaging
     const wsManager = new WebSocketManager(httpServer);
