@@ -6,10 +6,13 @@ import helmet from "helmet";
 import passport from "passport";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
+import { setupNewsRoutes } from "./routes-news";
 import { seedModules } from "./seed";
 import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
 import { seedAdmin } from "./seed-admin";
+import { seedNewsArticles } from "./seedNewsArticles";
+import { seedQuizzes } from "./seedQuizzes";
 import WebSocketManager from "./websocket";
 import { configureOAuth } from "./oauth-config";
 import { WebRTCSignalingServer } from "./webrtc-signaling";
@@ -126,6 +129,8 @@ async function startServer() {
     await seedMedicalContent();
     await seedOwner();
     await seedAdmin();
+    await seedNewsArticles(); // Add news articles for testing
+    await seedQuizzes(); // Add quiz data for testing
 
     // Configure OAuth providers
     configureOAuth();
@@ -133,6 +138,7 @@ async function startServer() {
 
     // Register routes and get HTTP server
     await registerRoutes(app);
+    setupNewsRoutes(app); // Add news/blog routes
 
     // Initialize WebSocket server for messaging
     const wsManager = new WebSocketManager(httpServer);
