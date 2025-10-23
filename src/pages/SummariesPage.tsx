@@ -1,5 +1,5 @@
 // XXL Summaries Page for Dr.MiMi platform
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
@@ -18,23 +18,28 @@ import {
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
 
 interface Summary {
   id: string;
   title: string;
-  module: string;
-  author: string;
-  pages: number;
-  downloads: number;
-  rating: number;
-  price: number;
-  currency: string;
-  isPremium: boolean;
-  yearLevels: string[];
-  language: string;
-  tags: string[];
-  previewImages: string[];
-  lastUpdated: string;
+  titleEn?: string;
+  titleAr?: string;
+  content?: string;
+  contentEn?: string;
+  contentAr?: string;
+  moduleId?: string | null;
+  pdfAsset?: string | null;
+  previewImages?: any; // jsonb array
+  language?: string | null;
+  pages?: number | null;
+  price?: string | null;
+  currency?: string | null;
+  tags?: any; // jsonb array
+  status?: string | null;
+  createdBy?: string | null;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
 }
 
 const SummariesPage: React.FC = () => {
@@ -48,6 +53,36 @@ const SummariesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showPremiumOnly, setShowPremiumOnly] = useState(false);
   const [sortBy, setSortBy] = useState('popular');
+
+  // API State
+  const [summaries, setSummaries] = useState<Summary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch summaries from API
+  useEffect(() => {
+    const fetchSummaries = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/summaries');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch summaries: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setSummaries(data);
+      } catch (err: any) {
+        console.error('Error fetching summaries:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des résumés');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummaries();
+  }, []);
 
   // Study levels
   const studyLevels = [
@@ -75,95 +110,70 @@ const SummariesPage: React.FC = () => {
   ];
 
   // Sample summaries data
-  const summaries: Summary[] = [
-    {
-      id: '1',
-      title: language === 'en' ? 'Complete Cardiac Anatomy' : language === 'ar' ? 'التشريح القلبي الكامل' : 'Anatomie Cardiaque Complète',
-      module: 'cardiology',
-      author: 'Dr. Sarah Martin',
-      pages: 45,
-      downloads: 1234,
-      rating: 4.8,
-      price: 0,
-      currency: 'DZD',
-      isPremium: false,
-      yearLevels: ['Y2', 'Y3'],
-      language: language,
-      tags: ['Coeur', 'Vaisseaux', 'ECG'],
-      previewImages: ['/images/anatomy/heart-diagram.png'],
-      lastUpdated: '2024-03-15'
-    },
-    {
-      id: '2',
-      title: language === 'en' ? 'Neurological Examination Guide' : language === 'ar' ? 'دليل الفحص العصبي' : 'Guide d\'Examen Neurologique',
-      module: 'neurology',
-      author: 'Prof. Jean Dubois',
-      pages: 62,
-      downloads: 892,
-      rating: 4.9,
-      price: 500,
-      currency: 'DZD',
-      isPremium: true,
-      yearLevels: ['Y4', 'Y5'],
-      language: language,
-      tags: ['Neurologie', 'Examen', 'Diagnostic'],
-      previewImages: ['/images/anatomy/brain-diagram.png'],
-      lastUpdated: '2024-03-10'
-    },
-    {
-      id: '3',
-      title: language === 'en' ? 'Pharmacology Essentials' : language === 'ar' ? 'أساسيات علم الأدوية' : 'Essentiels de Pharmacologie',
-      module: 'pharmacology',
-      author: 'Dr. Ahmed Benali',
-      pages: 78,
-      downloads: 2156,
-      rating: 4.7,
-      price: 0,
-      currency: 'DZD',
-      isPremium: false,
-      yearLevels: ['Y3', 'Y4', 'Y5'],
-      language: language,
-      tags: ['Médicaments', 'Doses', 'Interactions'],
-      previewImages: ['/images/anatomy/heart-diagram.png'],
-      lastUpdated: '2024-03-20'
-    },
-  ];
 
   // Filter summaries based on criteria
   const filteredSummaries = useMemo(() => {
     let filtered = summaries;
     
     if (selectedLevel !== 'all') {
-      filtered = filtered.filter(s => s.yearLevels.includes(selectedLevel));
+      const tags = filtered.map(s => s.tags).filter(Boolean);
+      filtered = filtered.filter(s => {
+        const summaryTags = s.tags as any as string[];
+        return summaryTags && summaryTags.includes(selectedLevel);
+      });
     }
     
     if (selectedModule !== 'all') {
-      filtered = filtered.filter(s => s.module === selectedModule);
+      filtered = filtered.filter(s => s.moduleId === selectedModule);
     }
     
     if (showPremiumOnly) {
-      filtered = filtered.filter(s => s.isPremium);
+      filtered = filtered.filter(s => parseFloat(s.price || '0') > 0);
     }
     
     if (searchTerm) {
-      filtered = filtered.filter(s => 
-        s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      filtered = filtered.filter(s => {
+        const title = s.title || s.titleEn || s.titleAr || '';
+        const content = s.content || s.contentEn || s.contentAr || '';
+        const searchLower = searchTerm.toLowerCase();
+        const tagsArray = s.tags as any as string[];
+        
+        return title.toLowerCase().includes(searchLower) ||
+               content.toLowerCase().includes(searchLower) ||
+               (tagsArray && tagsArray.some((tag: string) => tag.toLowerCase().includes(searchLower)));
+      });
     }
 
-    // Sort
-    if (sortBy === 'popular') {
-      filtered.sort((a, b) => b.downloads - a.downloads);
-    } else if (sortBy === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'recent') {
-      filtered.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
-    }
+    // Sort by recent (createdAt)
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
     
     return filtered;
-  }, [selectedLevel, selectedModule, showPremiumOnly, searchTerm, sortBy]);
+  }, [summaries, selectedLevel, selectedModule, showPremiumOnly, searchTerm, sortBy]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <ErrorState 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -376,6 +386,12 @@ const SummaryCard: React.FC<{ summary: Summary; isRTL: boolean; language: string
   const [isHovered, setIsHovered] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
+  const displayTitle = summary.title || summary.titleEn || summary.titleAr || 'Untitled Summary';
+  const displayPrice = summary.price ? parseFloat(summary.price) : 0;
+  const isPremium = displayPrice > 0;
+  const tagsArray = (summary.tags as any as string[]) || [];
+  const previewArray = (summary.previewImages as any as string[]) || [];
+
   return (
     <motion.div
       className="rounded-xl overflow-hidden shadow-lg cursor-pointer relative"
@@ -392,7 +408,7 @@ const SummaryCard: React.FC<{ summary: Summary; isRTL: boolean; language: string
       layout
     >
       {/* Premium Badge */}
-      {summary.isPremium && (
+      {isPremium && (
         <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} z-10`}>
           <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
             <Award size={14} />
@@ -419,7 +435,7 @@ const SummaryCard: React.FC<{ summary: Summary; isRTL: boolean; language: string
             >
               <Eye size={20} className="text-gray-800" />
             </motion.button>
-            {!summary.isPremium && (
+            {!isPremium && (
               <motion.button
                 className="p-3 bg-primary text-white rounded-full"
                 whileHover={{ scale: 1.1 }}
@@ -434,63 +450,47 @@ const SummaryCard: React.FC<{ summary: Summary; isRTL: boolean; language: string
 
       {/* Content */}
       <div className="p-4">
-        {/* Year Levels */}
-        <div className="flex gap-1 mb-2">
-          {summary.yearLevels.map(level => (
-            <span 
-              key={level}
-              className="px-2 py-1 text-xs rounded-full font-medium"
-              style={{ 
-                backgroundColor: 'var(--color-primary-light)',
-                color: 'var(--color-primary)',
-              }}
-            >
-              {level}
-            </span>
-          ))}
-        </div>
+        {/* Tags/Year Levels */}
+        {tagsArray.length > 0 && (
+          <div className="flex gap-1 mb-2 flex-wrap">
+            {tagsArray.slice(0, 4).map((tag: string, idx: number) => (
+              <span 
+                key={idx}
+                className="px-2 py-1 text-xs rounded-full font-medium"
+                style={{ 
+                  backgroundColor: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)',
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Title */}
         <h3 className="font-semibold text-lg mb-2 line-clamp-2" style={{ color: 'var(--color-text)' }}>
-          {summary.title}
+          {displayTitle}
         </h3>
 
-        {/* Author */}
+        {/* Language & Pages */}
         <p className="text-sm mb-3" style={{ color: 'var(--color-textSecondary)' }}>
-          {summary.author}
+          {summary.language || 'fr'} • {summary.pages || 0} pages
         </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {summary.tags.slice(0, 3).map(tag => (
-            <span
-              key={tag}
-              className="px-2 py-1 text-xs rounded-lg"
-              style={{
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-textSecondary)',
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
 
         {/* Stats */}
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-textSecondary)' }}>
             <span className="flex items-center gap-1">
               <FileText size={14} />
-              {summary.pages} pages
+              {summary.pages || 0} pages
             </span>
-            <span className="flex items-center gap-1">
-              <Download size={14} />
-              {summary.downloads}
-            </span>
-            <span className="flex items-center gap-1">
-              <Star size={14} fill="currentColor" />
-              {summary.rating}
-            </span>
+            {summary.pdfAsset && (
+              <span className="flex items-center gap-1">
+                <Download size={14} />
+                PDF
+              </span>
+            )}
           </div>
         </div>
 
@@ -499,14 +499,14 @@ const SummaryCard: React.FC<{ summary: Summary; isRTL: boolean; language: string
           <button
             className="flex-1 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             style={{
-              backgroundColor: summary.isPremium ? 'var(--color-warning)' : 'var(--color-primary)',
+              backgroundColor: isPremium ? 'var(--color-warning)' : 'var(--color-primary)',
               color: 'white',
             }}
           >
-            {summary.isPremium ? (
+            {isPremium ? (
               <>
                 <Lock size={16} />
-                {summary.price} {summary.currency}
+                {displayPrice.toLocaleString()} {summary.currency || 'DZD'}
               </>
             ) : (
               <>
