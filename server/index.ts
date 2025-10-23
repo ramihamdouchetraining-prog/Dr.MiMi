@@ -8,6 +8,7 @@ import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupNewsRoutes } from "./routes-news";
 import { setupCoursesRoutes } from "./routes-courses";
+import { setupSummariesRoutes } from "./routes-summaries";
 import { seedModules } from "./seed";
 import { seedMedicalContent } from "./seedMedicalContent";
 import { seedOwner } from "./seed-owner";
@@ -15,6 +16,7 @@ import { seedAdmin } from "./seed-admin";
 import { seedNewsArticles } from "./seedNewsArticles";
 import { seedQuizzes } from "./seedQuizzes";
 import { seedCourses } from "./seedCourses";
+import { seedSummaries } from "./seedSummaries";
 import WebSocketManager from "./websocket";
 import { configureOAuth } from "./oauth-config";
 import { WebRTCSignalingServer } from "./webrtc-signaling";
@@ -134,6 +136,7 @@ async function startServer() {
     await seedNewsArticles(); // Add news articles for testing
     await seedQuizzes(); // Add quiz data for testing
     await seedCourses(); // Add course data for testing
+    await seedSummaries(); // Add summaries data for testing
 
     // Configure OAuth providers
     configureOAuth();
@@ -143,6 +146,7 @@ async function startServer() {
     await registerRoutes(app);
     setupNewsRoutes(app); // Add news/blog routes
     setupCoursesRoutes(app); // Add courses routes
+    setupSummariesRoutes(app); // Add summaries routes
 
     // Initialize WebSocket server for messaging
     const wsManager = new WebSocketManager(httpServer);
