@@ -10,6 +10,16 @@
       "destination": "/index.html"
     }
   ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -37,8 +47,5 @@
         }
       ]
     }
-  ],
-  "regions": ["cdg1"],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }
