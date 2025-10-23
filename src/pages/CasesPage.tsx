@@ -1,56 +1,49 @@
 // XXL Clinical Cases Page for Dr.MiMi platform
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
   Clock,
   Award,
-  Star,
-  ChevronRight,
-  User,
-  Lock,
   Play,
   BookOpen,
-  AlertCircle,
-  CheckCircle,
   GraduationCap,
   TrendingUp,
-  BarChart3,
-  MessageCircle,
-  ThumbsUp,
-  Eye
+  BarChart3
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner, ErrorState } from '../components/EmptyState';
 
 interface ClinicalCase {
   id: string;
   title: string;
-  titleEn: string;
-  titleAr: string;
-  module: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  yearLevels: string[];
-  duration: number; // minutes
-  points: number;
-  attempts: number;
-  successRate: number;
-  rating: number;
-  isPremium: boolean;
-  isCompleted: boolean;
-  tags: string[];
-  author: string;
+  titleEn?: string;
+  titleAr?: string;
   description: string;
-  descriptionEn: string;
-  descriptionAr: string;
-  objectives: string[];
-  patientAge: number;
-  patientGender: string;
-  chiefComplaint: string;
-  views: number;
-  likes: number;
-  comments: number;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  presentation: string;
+  presentationEn?: string;
+  presentationAr?: string;
+  history?: string;
+  historyEn?: string;
+  historyAr?: string;
+  exam?: string;
+  examEn?: string;
+  examAr?: string;
+  investigations?: string;
+  investigationsEn?: string;
+  investigationsAr?: string;
+  management?: string;
+  managementEn?: string;
+  managementAr?: string;
+  moduleId: string;
+  difficulty: string;
+  status: string;
+  createdBy?: string;
+  createdAt?: string;
 }
 
 const CasesPage: React.FC = () => {
@@ -59,11 +52,38 @@ const CasesPage: React.FC = () => {
   const { t, language, isRTL } = useLanguage();
   const { isAuthenticated } = useAuth();
 
+  const [cases, setCases] = useState<ClinicalCase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedModule, setSelectedModule] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('popular');
+
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/cases');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch cases: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCases(data);
+      } catch (err: any) {
+        console.error('Error fetching cases:', err);
+        setError(err.message || 'Une erreur est survenue lors du chargement des cas cliniques');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCases();
+  }, []);
 
   // Study levels
   const studyLevels = [
@@ -94,176 +114,66 @@ const CasesPage: React.FC = () => {
     { id: 'nephrology', name: t('module.nephrology') },
   ];
 
-  // Sample clinical cases
-  const clinicalCases: ClinicalCase[] = [
-    {
-      id: '1',
-      title: 'Douleur Thoracique Aiguë chez un Homme de 55 ans',
-      titleEn: 'Acute Chest Pain in a 55-Year-Old Man',
-      titleAr: 'ألم صدري حاد عند رجل عمره 55 عامًا',
-      module: 'cardiology',
-      difficulty: 'Medium',
-      yearLevels: ['Y4', 'Y5'],
-      duration: 30,
-      points: 150,
-      attempts: 892,
-      successRate: 72,
-      rating: 4.7,
-      isPremium: false,
-      isCompleted: false,
-      tags: ['ECG', 'Infarctus', 'Urgence'],
-      author: 'Dr. Pierre Martin',
-      description: 'Patient se présentant aux urgences avec douleur thoracique rétrosternale irradiant vers le bras gauche',
-      descriptionEn: 'Patient presenting to ER with retrosternal chest pain radiating to left arm',
-      descriptionAr: 'مريض يحضر إلى الطوارئ مع ألم صدري خلف القص يشع إلى الذراع الأيسر',
-      objectives: ['Diagnostic différentiel', 'Interprétation ECG', 'Prise en charge urgente'],
-      patientAge: 55,
-      patientGender: 'M',
-      chiefComplaint: 'Douleur thoracique',
-      views: 3456,
-      likes: 234,
-      comments: 45
-    },
-    {
-      id: '2',
-      title: 'Céphalées Récurrentes chez une Femme de 28 ans',
-      titleEn: 'Recurrent Headaches in a 28-Year-Old Woman',
-      titleAr: 'صداع متكرر عند امرأة عمرها 28 عامًا',
-      module: 'neurology',
-      difficulty: 'Easy',
-      yearLevels: ['Y3', 'Y4'],
-      duration: 20,
-      points: 100,
-      attempts: 1234,
-      successRate: 85,
-      rating: 4.8,
-      isPremium: false,
-      isCompleted: true,
-      tags: ['Migraine', 'Neurologie', 'Diagnostic'],
-      author: 'Dr. Sophie Dubois',
-      description: 'Jeune femme consultant pour céphalées pulsatiles unilatérales avec photophobie',
-      descriptionEn: 'Young woman consulting for unilateral pulsating headaches with photophobia',
-      descriptionAr: 'امرأة شابة تستشير لصداع نابض أحادي الجانب مع رهاب الضوء',
-      objectives: ['Critères diagnostiques', 'Traitement de crise', 'Prévention'],
-      patientAge: 28,
-      patientGender: 'F',
-      chiefComplaint: 'Céphalées',
-      views: 5678,
-      likes: 456,
-      comments: 78
-    },
-    {
-      id: '3',
-      title: 'Dyspnée Progressive chez un Fumeur de 65 ans',
-      titleEn: 'Progressive Dyspnea in a 65-Year-Old Smoker',
-      titleAr: 'ضيق تنفس تدريجي عند مدخن عمره 65 عامًا',
-      module: 'pneumology',
-      difficulty: 'Hard',
-      yearLevels: ['Y5', 'Y6'],
-      duration: 45,
-      points: 200,
-      attempts: 567,
-      successRate: 58,
-      rating: 4.5,
-      isPremium: true,
-      isCompleted: false,
-      tags: ['BPCO', 'Tabagisme', 'Spirométrie'],
-      author: 'Prof. Ahmed Benali',
-      description: 'Patient fumeur présentant une dyspnée d\'effort progressive avec toux chronique productive',
-      descriptionEn: 'Smoking patient with progressive exertional dyspnea and chronic productive cough',
-      descriptionAr: 'مريض مدخن يعاني من ضيق تنفس جهدي تدريجي مع سعال مزمن منتج',
-      objectives: ['Évaluation fonctionnelle', 'Classification GOLD', 'Thérapeutique'],
-      patientAge: 65,
-      patientGender: 'M',
-      chiefComplaint: 'Dyspnée',
-      views: 2345,
-      likes: 178,
-      comments: 34
-    },
-    {
-      id: '4',
-      title: 'Douleur Abdominale et Ictère chez une Femme de 42 ans',
-      titleEn: 'Abdominal Pain and Jaundice in a 42-Year-Old Woman',
-      titleAr: 'ألم بطني ويرقان عند امرأة عمرها 42 عامًا',
-      module: 'gastroenterology',
-      difficulty: 'Medium',
-      yearLevels: ['Y4', 'Y5', 'Y6'],
-      duration: 35,
-      points: 175,
-      attempts: 678,
-      successRate: 68,
-      rating: 4.6,
-      isPremium: false,
-      isCompleted: false,
-      tags: ['Lithiase', 'Cholécystite', 'Urgence'],
-      author: 'Dr. Marie Laurent',
-      description: 'Patiente présentant des douleurs de l\'hypochondre droit avec ictère et fièvre',
-      descriptionEn: 'Patient with right upper quadrant pain, jaundice and fever',
-      descriptionAr: 'مريضة تعاني من آلام في الربع العلوي الأيمن مع يرقان وحمى',
-      objectives: ['Diagnostic biologique', 'Imagerie', 'Prise en charge'],
-      patientAge: 42,
-      patientGender: 'F',
-      chiefComplaint: 'Douleur abdominale',
-      views: 3890,
-      likes: 290,
-      comments: 52
-    }
-  ];
+  // Get case title based on language
+  const getCaseTitle = (clinicalCase: ClinicalCase) => {
+    if (language === 'ar') return clinicalCase.titleAr || clinicalCase.title;
+    if (language === 'en') return clinicalCase.titleEn || clinicalCase.title;
+    return clinicalCase.title;
+  };
+
+  // Get case description based on language
+  const getCaseDescription = (clinicalCase: ClinicalCase) => {
+    if (language === 'ar') return clinicalCase.descriptionAr || clinicalCase.description;
+    if (language === 'en') return clinicalCase.descriptionEn || clinicalCase.description;
+    return clinicalCase.description;
+  };
 
   // Filter cases
   const filteredCases = useMemo(() => {
-    let filtered = clinicalCases;
-
-    if (selectedLevel !== 'all') {
-      filtered = filtered.filter(c => c.yearLevels.includes(selectedLevel));
-    }
+    let filtered = cases;
 
     if (selectedDifficulty !== 'all') {
       filtered = filtered.filter(c => c.difficulty === selectedDifficulty);
     }
 
     if (selectedModule !== 'all') {
-      filtered = filtered.filter(c => c.module === selectedModule);
+      filtered = filtered.filter(c => c.moduleId === selectedModule);
     }
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(c =>
         c.title.toLowerCase().includes(term) ||
-        c.titleEn.toLowerCase().includes(term) ||
-        c.titleAr.includes(term) ||
-        c.chiefComplaint.toLowerCase().includes(term) ||
-        c.tags.some(tag => tag.toLowerCase().includes(term))
+        (c.titleEn && c.titleEn.toLowerCase().includes(term)) ||
+        (c.titleAr && c.titleAr.includes(term)) ||
+        (c.description && c.description.toLowerCase().includes(term)) ||
+        (c.presentation && c.presentation.toLowerCase().includes(term))
       );
     }
 
-    // Sort
-    if (sortBy === 'popular') {
-      filtered.sort((a, b) => b.views - a.views);
-    } else if (sortBy === 'rating') {
-      filtered.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === 'difficulty') {
-      const diffOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
-      filtered.sort((a, b) => diffOrder[a.difficulty] - diffOrder[b.difficulty]);
-    } else if (sortBy === 'completion') {
-      filtered.sort((a, b) => b.successRate - a.successRate);
-    }
-
     return filtered;
-  }, [selectedLevel, selectedDifficulty, selectedModule, searchTerm, sortBy]);
+  }, [cases, selectedDifficulty, selectedModule, searchTerm]);
 
-  // Get case title based on language
-  const getCaseTitle = (clinicalCase: ClinicalCase) => {
-    if (language === 'en') return clinicalCase.titleEn;
-    if (language === 'ar') return clinicalCase.titleAr;
-    return clinicalCase.title;
-  };
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-  const getCaseDescription = (clinicalCase: ClinicalCase) => {
-    if (language === 'en') return clinicalCase.descriptionEn;
-    if (language === 'ar') return clinicalCase.descriptionAr;
-    return clinicalCase.description;
-  };
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
+        <ErrorState 
+          message={error} 
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -436,7 +346,6 @@ const CasesPage: React.FC = () => {
                 getCaseTitle={getCaseTitle}
                 getCaseDescription={getCaseDescription}
                 language={language}
-                isRTL={isRTL}
               />
             ))}
           </div>
@@ -473,20 +382,19 @@ const CaseCard: React.FC<{
   getCaseTitle: (c: ClinicalCase) => string;
   getCaseDescription: (c: ClinicalCase) => string;
   language: string;
-  isRTL: boolean;
-}> = ({ clinicalCase, getCaseTitle, getCaseDescription, language, isRTL }) => {
+}> = ({ clinicalCase, getCaseTitle, getCaseDescription, language }) => {
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Easy': return '#10B981';
-      case 'Medium': return '#F59E0B';
-      case 'Hard': return '#EF4444';
+    switch (difficulty.toLowerCase()) {
+      case 'easy': return '#10B981';
+      case 'medium': return '#F59E0B';
+      case 'hard': return '#EF4444';
       default: return 'var(--color-text)';
     }
   };
 
   return (
     <motion.div
-      className="rounded-xl overflow-hidden shadow-lg cursor-pointer relative"
+      className="rounded-xl overflow-hidden shadow-lg cursor-pointer"
       style={{
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
@@ -497,48 +405,26 @@ const CaseCard: React.FC<{
       whileHover={{ y: -5 }}
       layout
     >
-      {/* Premium Badge */}
-      {clinicalCase.isPremium && (
-        <div className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} z-10`}>
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-            <Award size={14} />
-            Premium
-          </div>
-        </div>
-      )}
-
-      {/* Completion Badge */}
-      {clinicalCase.isCompleted && (
-        <div className={`absolute top-4 ${isRTL ? 'right-4' : 'left-4'} z-10`}>
-          <div className="bg-green-500 text-white p-2 rounded-full">
-            <CheckCircle size={20} />
-          </div>
-        </div>
-      )}
-
       <div className="p-6">
         {/* Header */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
-            {/* Year Levels and Difficulty */}
+            {/* Difficulty Badge */}
             <div className="flex gap-2 mb-2">
-              {clinicalCase.yearLevels.map(level => (
-                <span
-                  key={level}
-                  className="px-2 py-1 text-xs rounded-full font-medium"
-                  style={{
-                    backgroundColor: 'var(--color-primary-light)',
-                    color: 'var(--color-primary)',
-                  }}
-                >
-                  {level}
-                </span>
-              ))}
               <span
                 className="px-2 py-1 text-xs rounded-full font-medium text-white"
                 style={{ backgroundColor: getDifficultyColor(clinicalCase.difficulty) }}
               >
                 {clinicalCase.difficulty}
+              </span>
+              <span
+                className="px-2 py-1 text-xs rounded-full font-medium"
+                style={{
+                  backgroundColor: 'var(--color-background)',
+                  color: 'var(--color-textSecondary)',
+                }}
+              >
+                {clinicalCase.moduleId}
               </span>
             </div>
 
@@ -546,133 +432,38 @@ const CaseCard: React.FC<{
             <h3 className="text-xl font-bold mb-2 line-clamp-2" style={{ color: 'var(--color-text)' }}>
               {getCaseTitle(clinicalCase)}
             </h3>
-
-            {/* Author */}
-            <p className="text-sm mb-3 flex items-center gap-2" style={{ color: 'var(--color-textSecondary)' }}>
-              <User size={14} />
-              {clinicalCase.author}
-            </p>
-          </div>
-        </div>
-
-        {/* Patient Info */}
-        <div className="p-3 rounded-lg mb-4" style={{ backgroundColor: 'var(--color-background)' }}>
-          <div className="flex items-center gap-4 text-sm">
-            <span style={{ color: 'var(--color-text)' }}>
-              <AlertCircle size={16} className="inline mr-1" />
-              {clinicalCase.patientAge} {language === 'en' ? 'years' : language === 'ar' ? 'سنة' : 'ans'}, {clinicalCase.patientGender}
-            </span>
-            <span style={{ color: 'var(--color-primary)' }}>
-              {clinicalCase.chiefComplaint}
-            </span>
           </div>
         </div>
 
         {/* Description */}
-        <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-textSecondary)' }}>
+        <p className="text-sm mb-4 line-clamp-3" style={{ color: 'var(--color-textSecondary)' }}>
           {getCaseDescription(clinicalCase)}
         </p>
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1 mb-4">
-          {clinicalCase.tags.map(tag => (
-            <span
-              key={tag}
-              className="px-2 py-1 text-xs rounded-lg"
-              style={{
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-textSecondary)',
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-2 mb-4 text-sm">
-          <div className="text-center">
-            <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
-              {clinicalCase.duration}m
-            </div>
-            <div style={{ color: 'var(--color-textSecondary)' }}>
-              <Clock size={14} className="inline" />
-            </div>
+        {/* Presentation Preview */}
+        {clinicalCase.presentation && (
+          <div className="p-3 rounded-lg mb-4" style={{ backgroundColor: 'var(--color-background)' }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: 'var(--color-text)' }}>
+              {language === 'en' ? 'Presentation:' : language === 'ar' ? 'العرض:' : 'Présentation:'}
+            </p>
+            <p className="text-sm line-clamp-2" style={{ color: 'var(--color-textSecondary)' }}>
+              {language === 'ar' ? (clinicalCase.presentationAr || clinicalCase.presentation)
+                : language === 'en' ? (clinicalCase.presentationEn || clinicalCase.presentation)
+                : clinicalCase.presentation}
+            </p>
           </div>
-          <div className="text-center">
-            <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
-              {clinicalCase.points}
-            </div>
-            <div style={{ color: 'var(--color-textSecondary)' }}>
-              {language === 'en' ? 'pts' : language === 'ar' ? 'نقطة' : 'pts'}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
-              {clinicalCase.successRate}%
-            </div>
-            <div style={{ color: 'var(--color-textSecondary)' }}>
-              <CheckCircle size={14} className="inline" />
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold" style={{ color: 'var(--color-text)' }}>
-              {clinicalCase.rating}
-            </div>
-            <div style={{ color: 'var(--color-textSecondary)' }}>
-              <Star size={14} className="inline" fill="currentColor" />
-            </div>
-          </div>
-        </div>
-
-        {/* Footer Stats */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex gap-3 text-sm" style={{ color: 'var(--color-textSecondary)' }}>
-            <span className="flex items-center gap-1">
-              <Eye size={14} />
-              {clinicalCase.views}
-            </span>
-            <span className="flex items-center gap-1">
-              <ThumbsUp size={14} />
-              {clinicalCase.likes}
-            </span>
-            <span className="flex items-center gap-1">
-              <MessageCircle size={14} />
-              {clinicalCase.comments}
-            </span>
-          </div>
-        </div>
+        )}
 
         {/* Action Button */}
         <button
-          className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-            clinicalCase.isPremium && !clinicalCase.isCompleted ? 'opacity-80' : ''
-          }`}
+          className="w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
           style={{
-            backgroundColor: clinicalCase.isCompleted
-              ? 'var(--color-success)'
-              : clinicalCase.isPremium
-              ? 'var(--color-warning)'
-              : 'var(--color-primary)',
+            backgroundColor: 'var(--color-primary)',
             color: 'white',
           }}
         >
-          {clinicalCase.isCompleted ? (
-            <>
-              <CheckCircle size={18} />
-              {language === 'en' ? 'Review' : language === 'ar' ? 'مراجعة' : 'Réviser'}
-            </>
-          ) : clinicalCase.isPremium ? (
-            <>
-              <Lock size={18} />
-              {language === 'en' ? 'Unlock' : language === 'ar' ? 'فتح' : 'Débloquer'}
-            </>
-          ) : (
-            <>
-              <Play size={18} />
-              {language === 'en' ? 'Start Case' : language === 'ar' ? 'بدء الحالة' : 'Commencer'}
-            </>
-          )}
+          <Play size={18} />
+          {language === 'en' ? 'Start Case' : language === 'ar' ? 'بدء الحالة' : 'Commencer'}
         </button>
       </div>
     </motion.div>
