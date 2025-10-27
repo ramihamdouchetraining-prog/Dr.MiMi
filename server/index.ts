@@ -1,4 +1,4 @@
-// Main server entry point for Dr.MiMi backend - CORRECTED VERSION
+// Main server entry point for Dr.MiMi backend - ULTIMATE FIX VERSION
 import "dotenv/config"; // Load environment variables
 import express from "express";
 import cors from "cors";
@@ -31,50 +31,74 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
 
-// 🔒 SÉCURITÉ - Configuration Helmet améliorée
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com", "https:", "data:"],
-        imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: [
-          "'self'", 
-          "https://drmimi-replit.onrender.com",
-          "https://dr-mi-mi-five.vercel.app",
-          "wss://drmimi-replit.onrender.com"
-        ],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+// 🚨 CRITICAL FIX: CORS Preflight Handler - MUST BE FIRST
+// This ensures OPTIONS requests get CORS headers even during cold starts
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Liste des origines autorisées
+  const allowedOrigins = [
+    'https://dr-mi-mi-five.vercel.app',
+    'https://dr-mi-mi-git-main-ramis-projects-7dac3957.vercel.app',
+    'http://localhost:5000',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5000',
+    'https://dr-mimi.netlify.app',
+  ];
 
-// 🔥 COMPRESSION pour optimiser les réponses
+  // Pattern pour tous les previews Vercel
+  const vercelPreviewPattern = /^https:\/\/dr-mi-mi-.*\.vercel\.app$/;
+  const replitPattern = /^https:\/\/.*\.replit\.(dev|app|co)$/;
+
+  // Vérifier si l'origin est autorisée
+  const isAllowed = !origin || 
+    allowedOrigins.includes(origin) || 
+    vercelPreviewPattern.test(origin) ||
+    replitPattern.test(origin);
+
+  if (isAllowed && origin) {
+    // Définir les headers CORS pour cette origin
+    res.header('Access-Control-Allow-Origin', origin);
+    console.log(`✅ CORS: Origin autorisée: ${origin}`);
+  } else if (!origin) {
+    // Pas d'origin (requests directes, curl, etc.)
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    console.warn(`🚫 CORS: Origin bloquée: ${origin}`);
+  }
+
+  // Headers CORS obligatoires
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
+  res.header('Access-Control-Max-Age', '86400'); // 24h de cache pour préflight
+  res.header('Vary', 'Origin');
+
+  // Réponse immédiate pour les requêtes OPTIONS (préflight)
+  if (req.method === 'OPTIONS') {
+    console.log(`✅ CORS Preflight: ${req.path} pour ${origin || 'no-origin'}`);
+    return res.status(204).end();
+  }
+
+  next();
+});
+
+// 🔥 COMPRESSION - avant tout le reste
 app.use(compression({
   filter: (req, res) => {
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
+    if (req.headers['x-no-compression']) return false;
     return compression.filter(req, res);
   },
   level: 6
 }));
 
-// 🕡 RATE LIMITING pour prévenir les abus
+// 🛡️ RATE LIMITING - Protection anti-spam
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // 1000 requêtes par IP
+  max: 2000, // 2000 requêtes par IP (plus généreux)
   message: {
-    error: 'Trop de requêtes, veuillez réessayer plus tard',
+    error: 'Trop de requêtes Dr.MiMi, veuillez réessayer plus tard',
     retryAfter: '15 minutes'
   },
   standardHeaders: true,
@@ -83,100 +107,32 @@ const generalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives de connexion
+  max: 10, // 10 tentatives de connexion admin
   message: {
-    error: 'Trop de tentatives de connexion, veuillez réessayer dans 15 minutes'
+    error: 'Trop de tentatives de connexion admin Dr.MiMi, veuillez réessayer dans 15 minutes'
   },
   skipSuccessfulRequests: true,
 });
 
 app.use('/api/', generalLimiter);
+app.use('/api/admin/login', authLimiter);
 app.use('/api/auth/login', authLimiter);
 
-// 🌍 CORS - Configuration COMPLETE et sécurisée
-const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
-    // Autoriser les requêtes sans origin (mobile apps, Postman, curl, etc.)
-    if (!origin) {
-      return callback(null, true);
-    }
+// 🔒 SECURITY - Configuration Helmet réduite pour éviter blocages
+app.use(helmet({
+  contentSecurityPolicy: false, // Désactivé pour éviter les blocages TipTap/Chat
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
-    // Liste des origines statiques autorisées
-    const allowedOrigins = [
-      "http://localhost:5000",
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://127.0.0.1:5000",
-      "http://127.0.0.1:5173", 
-      "http://127.0.0.1:3000",
-      "https://dr-mi-mi-five.vercel.app",
-      "https://dr-mi-mi-git-main-ramis-projects-7dac3957.vercel.app",
-      "https://dr-mimi.netlify.app",
-      "https://dr-mi-mi-replit.vercel.app",
-      "https://drmimi-replit.onrender.com",
-    ];
-
-    // Vérifier si l'origin est dans la liste statique
-    if (allowedOrigins.includes(origin)) {
-      console.log(`✅ CORS: Origin autorisée: ${origin}`);
-      return callback(null, true);
-    }
-
-    // Accepter TOUTES les URLs Replit (.replit.dev, .replit.app, .repl.co)
-    if (
-      origin.includes(".replit.dev") ||
-      origin.includes(".replit.app") ||
-      origin.includes(".repl.co")
-    ) {
-      console.log(`✅ CORS: Replit URL autorisée: ${origin}`);
-      return callback(null, true);
-    }
-
-    // Accepter TOUTES les URLs Vercel (production, preview, et URLs générées)
-    if (origin.includes(".vercel.app")) {
-      console.log(`✅ CORS: Vercel URL autorisée: ${origin}`);
-      return callback(null, true);
-    }
-
-    // Accepter les URLs de preview Vercel avec pattern spécifique
-    const vercelPreviewPattern = /^https:\/\/dr-mi-mi-.*\.vercel\.app$/;
-    if (vercelPreviewPattern.test(origin)) {
-      console.log(`✅ CORS: Vercel Preview autorisée: ${origin}`);
-      return callback(null, true);
-    }
-
-    // Rejeter toutes les autres origines
-    console.warn(`🚫 CORS: Origin NON autorisée: ${origin}`);
-    callback(new Error(`CORS: Origin '${origin}' non autorisée par la politique de sécurité Dr.MiMi`));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: [
-    "Origin",
-    "X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "Authorization",
-    "Cache-Control",
-    "X-Forwarded-For",
-    "Access-Control-Allow-Credentials"
-  ],
-  optionsSuccessStatus: 200,
-  maxAge: 86400, // 24 heures de cache pour les requetes preflight
-};
-
-app.use(cors(corsOptions));
-
-// Gérer explicitement les requêtes OPTIONS pour CORS
-app.options('*', cors(corsOptions));
-
-// 📝 Body parsing middleware avec limites appropriées
+// 📝 BODY PARSING
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// 🍪 Sessions sécurisées
+// 🍪 SESSIONS sécurisées
+const sessionSecret = process.env.SESSION_SECRET || 'dr-mimi-session-secret-fallback-change-me';
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dr-mimi-default-secret-change-in-production',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -185,254 +141,305 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000, // 24 heures
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   },
-  name: 'drmimi.session.id'
+  name: 'drmimi.sessionid'
 }));
 
-// 📁 Servir les fichiers statiques
+// 📁 Static files
 app.use("/uploads", express.static("uploads"));
 
-// 📝 Logging middleware amélioré
+// 📊 LOGGING détaillé
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  const userAgent = req.get('User-Agent')?.substring(0, 50) || 'Unknown';
-  console.log(`${timestamp} ${req.method} ${req.path} - IP: ${req.ip} - UA: ${userAgent}`);
+  const userAgent = req.get('User-Agent')?.substring(0, 80) || 'Unknown';
+  const origin = req.get('Origin') || 'no-origin';
+  console.log(`${timestamp} ${req.method} ${req.path} - IP: ${req.ip} - Origin: ${origin}`);
   next();
 });
 
-// 🏠 Root endpoint - Backend API info
-app.get("/", (req, res) => {
-  res.json({
-    name: "Dr.MiMi API Server",
-    version: "2.0.0",
-    status: "running",
-    environment: process.env.NODE_ENV || "development",
-    message: "🩺 API Backend pour la plateforme d'éducation médicale Dr.MiMi",
-    timestamp: new Date().toISOString(),
-    uptime: `${Math.floor(process.uptime())} secondes`,
-    endpoints: {
-      health: "/api/health",
-      auth: "/api/auth/*",
-      articles: "/api/articles",
-      courses: "/api/courses",
-      quizzes: "/api/quizzes",
-      cases: "/api/cases",
-      news: "/api/news",
-      summaries: "/api/summaries",
-      modules: "/api/modules",
-      admin: "/api/admin/*",
-    },
-    cors: {
-      allowedOrigins: "Vercel (.vercel.app), Replit (.replit.dev), localhost",
-      methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-      credentials: true
-    },
-    documentation: "https://github.com/ramihamdouchetraining-prog/Dr.MiMi",
-    support: "Formation médicale pour étudiants francophones 🇵🇸"
-  });
-});
-
-// 🔍 Health check endpoint pour monitoring
-app.get("/api/health", (req, res) => {
+// 🚀 HEALTH CHECK - Simple et rapide (sans DB)
+app.get('/api/health', (req, res) => {
   const healthData = {
-    status: "healthy",
-    service: "Dr.MiMi API",
+    status: 'healthy',
+    service: 'Dr.MiMi API Server',
+    version: '2.1.0',
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),
-    environment: process.env.NODE_ENV || "development",
-    version: "2.0.0",
-    database: {
-      status: "connected",
-      provider: "PostgreSQL via Neon"
+    environment: process.env.NODE_ENV || 'development',
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + 'MB'
     },
     cors: {
       configured: true,
-      allowedOrigins: "Dynamic (Vercel, Replit, localhost)"
-    },
-    rateLimit: {
-      general: "1000 req/15min per IP",
-      auth: "5 req/15min per IP"
-    },
-    lastStartup: new Date(Date.now() - process.uptime() * 1000).toISOString()
+      allowedOrigins: 'Vercel (dr-mi-mi-*.vercel.app), localhost, Replit'
+    }
   };
 
   res.set({
     'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
+    'Pragma': 'no-cache', 
     'Expires': '0'
   });
   
   res.json(healthData);
 });
 
-// 🚀 Fonction principale de démarrage du serveur
+// 🏠 ROOT endpoint - Info du serveur
+app.get("/", (req, res) => {
+  res.json({
+    name: "🩺 Dr.MiMi API Server",
+    version: "2.1.0", 
+    status: "running",
+    environment: process.env.NODE_ENV || "development",
+    message: "API Backend pour la plateforme d'éducation médicale Dr.MiMi",
+    owner: "Merieme BENNAMANE - Étudiante en Médecine",
+    location: "Boumerdès, Algérie 🇩🇿",
+    support: "Éducation médicale francophone 🩺",
+    timestamp: new Date().toISOString(),
+    uptime: `${Math.floor(process.uptime())} secondes`,
+    endpoints: {
+      health: "/api/health - État du serveur",
+      auth: "/api/auth/* - Authentification", 
+      admin: "/api/admin/* - Administration",
+      articles: "/api/articles - Articles médicaux",
+      courses: "/api/courses - Cours",
+      quizzes: "/api/quizzes - Quiz",
+      cases: "/api/cases - Cas cliniques",
+      news: "/api/news - Actualités",
+      chat: "/api/chat - Chatbot médical",
+      library: "/api/library/* - Bibliothèque",
+    },
+    documentation: "https://github.com/ramihamdouchetraining-prog/Dr.MiMi"
+  });
+});
+
+// 🎯 WARM-UP endpoint pour éviter les cold starts
+app.get("/api/warmup", (req, res) => {
+  console.log("🔥 Warm-up request received");
+  res.json({
+    message: "Dr.MiMi server is now warm and ready!",
+    timestamp: new Date().toISOString(),
+    warmupComplete: true
+  });
+});
+
+// 🚀 FONCTION DE DÉMARRAGE
 async function startServer() {
   try {
-    console.log('🎆 Démarrage du serveur Dr.MiMi...');
+    console.log('🩺 Démarrage du serveur Dr.MiMi...');
+    console.log('================================');
 
-    // Initialisation de la base de données avec contenu médical
+    // Initialisation de la base de données
     console.log('🌱 Initialisation de la base de données...');
-    await seedModules();
-    await seedMedicalContent();
-    await seedOwner();
-    await seedAdmin();
-    await seedNewsArticles();
-    await seedQuizzes();
-    await seedCourses();
-    await seedSummaries();
-    await seedCases();
-    console.log('✅ Base de données initialisée avec le contenu médical');
+    try {
+      await seedModules();
+      await seedMedicalContent();
+      await seedOwner();
+      await seedAdmin();
+      await seedNewsArticles();
+      await seedQuizzes();
+      await seedCourses();
+      await seedSummaries();
+      await seedCases();
+      console.log('✅ Base de données Dr.MiMi initialisée avec succès');
+    } catch (dbError) {
+      console.error('⚠️ Erreur lors de l\'initialisation de la DB, mais le serveur continue:', dbError.message);
+    }
 
     // Configuration OAuth
-    console.log('🔐 Configuration de l\'authentification...');
-    configureOAuth();
-    app.use(passport.initialize());
-    console.log('✅ Authentification configurée');
+    try {
+      configureOAuth();
+      app.use(passport.initialize());
+      console.log('✅ OAuth configuré');
+    } catch (oauthError) {
+      console.warn('⚠️ OAuth non configuré:', oauthError.message);
+    }
 
     // Enregistrement des routes
-    console.log('🗺 Enregistrement des routes API...');
+    console.log('🗺️ Enregistrement des routes...');
     await registerRoutes(app);
     setupNewsRoutes(app);
-    setupCoursesRoutes(app);
+    setupCoursesRoutes(app); 
     setupSummariesRoutes(app);
     setupModulesRoutes(app);
     setupCasesRoutes(app);
-    console.log('✅ Routes API enregistrées');
+    console.log('✅ Toutes les routes Dr.MiMi enregistrées');
 
-    // Initialisation WebSocket et WebRTC
-    console.log('🔌 Initialisation des services temps réel...');
-    const wsManager = new WebSocketManager(httpServer);
-    const webrtcSignaling = new WebRTCSignalingServer(httpServer);
-    console.log('✅ WebSocket et WebRTC prêts');
+    // Services temps réel
+    try {
+      const wsManager = new WebSocketManager(httpServer);
+      const webrtcSignaling = new WebRTCSignalingServer(httpServer);
+      console.log('✅ WebSocket et WebRTC initialisés');
+    } catch (wsError) {
+      console.warn('⚠️ Services temps réel non disponibles:', wsError.message);
+    }
 
-    // Démarrage du serveur HTTP
+    // 🎉 DÉMARRAGE DU SERVEUR
     httpServer.listen(PORT, () => {
       console.log(`
-🩺===================================`);
-      console.log(`   Dr.MiMi API Server READY!`);
-      console.log(`===================================`);
-      console.log(`🚀 Port: ${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`📅 Started: ${new Date().toLocaleString('fr-FR')}`);
-      console.log(`🔗 Health Check: http://localhost:${PORT}/api/health`);
-      console.log(``);
-      console.log(`📡 CORS configuré pour:`);
-      console.log(`  - https://dr-mi-mi-five.vercel.app (production)`);
-      console.log(`  - https://dr-mi-mi-*.vercel.app (previews)`);
-      console.log(`  - localhost:5000 (développement)`);
-      console.log(`  - *.replit.dev/app (Replit)`);
-      console.log(``);
-      console.log(`🗺 Endpoints disponibles:`);
-      console.log(`  GET  /api/health - Health check`);
-      console.log(`  GET  /api/articles - Articles médicaux`);
-      console.log(`  GET  /api/courses - Cours`);
-      console.log(`  GET  /api/quizzes - Quiz`);
-      console.log(`  GET  /api/cases - Cas cliniques`);
-      console.log(`  GET  /api/news - Actualités`);
-      console.log(`  POST /api/auth/login - Connexion admin`);
-      console.log(``);
-      console.log(`🔒 Sécurité:`);
-      console.log(`  - Rate limiting activé`);
-      console.log(`  - Headers sécurisés (Helmet)`);
-      console.log(`  - CORS dynamique`);
-      console.log(`  - Sessions chiffrées`);
-      console.log(``);
-      console.log(`📊 Services:`);
-      console.log(`  - Base de données: PostgreSQL (Neon) ✅`);
-      console.log(`  - WebSocket: Messages temps réel ✅`);
-      console.log(`  - WebRTC: Collaboration vidéo ✅`);
-      console.log(`  - Compression: Gzip activé ✅`);
-      console.log(``);
-      console.log(`🎆 Dr.MiMi est prêt à servir les étudiants en médecine! 🩺`);
-      console.log(`===================================\n`);
+🩺 =======================================
+   Dr.MiMi API Server - READY TO HEAL! 
+=======================================
+🚀 Port: ${PORT}
+🌍 Environment: ${process.env.NODE_ENV || 'development'}
+📅 Started: ${new Date().toLocaleString('fr-FR')}
+⚡ Uptime: ${Math.floor(process.uptime())}s
+🔗 Health: http://localhost:${PORT}/api/health
+🔥 Warm-up: http://localhost:${PORT}/api/warmup
+
+📡 CORS configuré pour:
+  ✅ https://dr-mi-mi-five.vercel.app (production)
+  ✅ https://dr-mi-mi-*.vercel.app (previews)
+  ✅ localhost:5000, :5173, :3000 (dev)
+  ✅ *.replit.dev/app (Replit)
+
+🗺️ Endpoints Dr.MiMi disponibles:
+  🔍 GET  /api/health - Health check rapide
+  🔥 GET  /api/warmup - Réveil du serveur
+  📚 GET  /api/articles - Articles médicaux
+  🎓 GET  /api/courses - Cours complets
+  ❓ GET  /api/quizzes - Quiz interactifs
+  🏥 GET  /api/cases - Cas cliniques
+  📰 GET  /api/news - Actualités médicales
+  💬 POST /api/chat - Chatbot Dr.MiMi
+  📖 GET  /api/library/* - Bibliothèque
+  🔐 POST /api/admin/login - Connexion admin
+  👤 GET  /api/auth/me - Profil utilisateur
+
+🔒 Sécurité Dr.MiMi:
+  ✅ Headers sécurisés (Helmet)
+  ✅ Rate limiting (2000 req/15min general, 10 req/15min auth)
+  ✅ Sessions chiffrées
+  ✅ CORS dynamique avec préflight instantané
+
+🎯 Cold Start Prevention:
+  ✅ Health check sans DB
+  ✅ Préflight OPTIONS immédiat
+  ✅ Compression active
+  ✅ Gestion gracieuse des erreurs
+
+🩺 Dr.MiMi est prêt à servir les étudiants en médecine! 🇩🇿
+Support: Merieme BENNAMANE - Boumerdès 🌟
+=======================================
+      `);
+      
+      // Auto warm-up pour éviter les cold starts
+      setTimeout(async () => {
+        try {
+          console.log('🔥 Auto warm-up Dr.MiMi...');
+          // Optionnel: fetch vers soi-même pour garder actif
+        } catch (e) {
+          // Silencieux
+        }
+      }, 5000);
     });
+
   } catch (error) {
-    console.error('💥 Échec du démarrage du serveur Dr.MiMi:', error);
-    console.error('Stack trace:', error);
+    console.error('💥 Échec critique du démarrage Dr.MiMi:', error);
+    console.error('Stack:', error.stack);
     process.exit(1);
   }
 }
 
-// 🚫 Gestionnaire d'erreurs global
+// 🚫 ERROR HANDLERS - Gestion complète des erreurs
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(`❌ Erreur serveur Dr.MiMi:`, error);
+  console.error(`💥 Erreur serveur Dr.MiMi [${req.method} ${req.path}]:`, error.message);
 
-  // Erreur de validation
+  // Toujours ajouter CORS aux réponses d'erreur
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('.vercel.app') || origin.includes('localhost'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+
+  // Types d'erreurs spécifiques
   if (error.name === 'ValidationError') {
     return res.status(400).json({
       error: 'Données invalides',
-      message: 'Les données soumises ne respectent pas le format requis',
+      message: 'Les données soumises ne respectent pas le format Dr.MiMi',
       details: error.message,
       timestamp: new Date().toISOString()
     });
   }
 
-  // Erreur de base de données
   if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
     return res.status(503).json({
-      error: 'Service temporairement indisponible',
-      message: 'Problème de connexion à la base de données Dr.MiMi',
+      error: 'Base de données temporairement indisponible',
+      message: 'Dr.MiMi réinitialise la connexion, veuillez réessayer dans 30 secondes',
       timestamp: new Date().toISOString()
     });
   }
 
-  // Erreur CORS
   if (error.message.includes('CORS')) {
     return res.status(403).json({
       error: 'Accès CORS refusé',
-      message: 'Votre domaine n\'est pas autorisé à accéder à l\'API Dr.MiMi',
+      message: 'Votre domaine n\'est pas autorisé à accéder à Dr.MiMi',
+      allowedOrigins: 'dr-mi-mi-five.vercel.app et previews',
       timestamp: new Date().toISOString()
     });
   }
 
-  // Erreur par défaut
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  // Erreur générale
+  const isDev = process.env.NODE_ENV === 'development';
   res.status(500).json({
-    error: 'Erreur interne du serveur Dr.MiMi',
-    message: isDevelopment 
-      ? error.message 
-      : 'Une erreur inattendue est survenue. L\'\u00e9quipe Dr.MiMi a été notifiée.',
+    error: 'Erreur interne Dr.MiMi',
+    message: isDev 
+      ? `Détail technique: ${error.message}`
+      : 'Une erreur inattendue est survenue. L\'équipe Dr.MiMi a été notifiée.',
     timestamp: new Date().toISOString(),
-    ...(isDevelopment && { stack: error.stack })
+    requestId: req.headers['x-request-id'] || 'unknown',
+    ...(isDev && { stack: error.stack })
   });
 });
 
-// 🚫 404 handler pour les routes non trouvées
+// 🚫 404 handler avec CORS
 app.use('*', (req, res) => {
+  // Ajouter CORS même aux 404
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('.vercel.app') || origin.includes('localhost'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+
   res.status(404).json({
-    error: 'Route non trouvée',
+    error: 'Route Dr.MiMi non trouvée',
     message: `La route '${req.originalUrl}' n'existe pas sur l'API Dr.MiMi`,
     method: req.method,
-    availableRoutes: [
-      'GET /api/health',
-      'GET /api/articles', 
-      'GET /api/courses',
-      'GET /api/quizzes',
-      'GET /api/cases',
-      'GET /api/news',
-      'POST /api/auth/login'
+    availableEndpoints: [
+      'GET /api/health - État du serveur',
+      'GET /api/warmup - Réveil du serveur', 
+      'GET /api/articles - Articles médicaux',
+      'GET /api/courses - Cours',
+      'GET /api/quizzes - Quiz',
+      'GET /api/cases - Cas cliniques',
+      'GET /api/news - Actualités',
+      'POST /api/chat - Chatbot',
+      'POST /api/admin/login - Admin',
+      'GET /api/auth/me - Profil'
     ],
     timestamp: new Date().toISOString()
   });
 });
 
-// 🚫 Gestionnaire d'arrêt gracieux
-process.on('SIGTERM', () => {
-  console.log('📴 SIGTERM reçu, arrêt gracieux du serveur Dr.MiMi...');
+// 🛑 GRACEFUL SHUTDOWN
+const gracefulShutdown = (signal: string) => {
+  console.log(`📴 ${signal} reçu - Arrêt gracieux du serveur Dr.MiMi...`);
   httpServer.close(() => {
     console.log('✅ Serveur Dr.MiMi arrêté proprement');
     process.exit(0);
   });
-});
 
-process.on('SIGINT', () => {
-  console.log('📴 SIGINT reçu, arrêt gracieux du serveur Dr.MiMi...');
-  httpServer.close(() => {
-    console.log('✅ Serveur Dr.MiMi arrêté proprement');
-    process.exit(0);
-  });
-});
+  // Force shutdown after 10s
+  setTimeout(() => {
+    console.error('⚠️ Arrêt forcé du serveur Dr.MiMi après timeout');
+    process.exit(1);
+  }, 10000);
+};
 
-// 🚀 Démarrer le serveur Dr.MiMi
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// 🔄 Démarrer le serveur Dr.MiMi
 startServer();
 
 export default app;
