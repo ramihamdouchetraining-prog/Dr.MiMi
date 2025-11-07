@@ -49,12 +49,15 @@ app.use((req, res, next) => {
 
   // Pattern pour tous les previews Vercel (incluant URLs avec hash aléatoire)
   const vercelPreviewPattern = /^https:\/\/(dr-mi-|dr-mi-mi-).*ramis-projects.*\.vercel\.app$/;
+  // Pattern ultra-permissif pour tous les déploiements Vercel du projet
+  const vercelWildcardPattern = /^https:\/\/.*\.vercel\.app$/;
   const replitPattern = /^https:\/\/.*\.replit\.(dev|app|co)$/;
 
   // Vérifier si l'origin est autorisée
   const isAllowed = !origin || 
     allowedOrigins.includes(origin) || 
     vercelPreviewPattern.test(origin) ||
+    vercelWildcardPattern.test(origin) ||  // Temporaire: autorise TOUS les .vercel.app
     replitPattern.test(origin);
 
   if (isAllowed && origin) {
