@@ -14,6 +14,7 @@ import { EnhancedDrMimiAvatar, FloatingDrMimi } from './components/EnhancedDrMim
 import { SimpleMimiButton } from './components/SimpleMimiButton'
 import { FeaturedAvatarCarousel } from './components/AvatarCarousel'
 import { InteractiveMimi } from './components/MimiAnimated'
+import { useBackendWarming } from './hooks/useBackendWarming'
 import EnhancedQuizPage from './pages/EnhancedQuizPage'
 import MedicalLibraryPage from './pages/MedicalLibraryPage'
 import MimiLibrary from './pages/MimiLibrary'
@@ -76,6 +77,9 @@ function App() {
 
 // App content with all XXL enhancements
 function AppContent() {
+  // Initialize backend warming to prevent 503 errors
+  useBackendWarming();
+  
   // const { isFeminine } = useTheme();
   const { isRTL } = useLanguage();
   const location = useLocation();

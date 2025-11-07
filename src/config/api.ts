@@ -26,24 +26,50 @@ export function getApiUrl(path: string): string {
   return `${baseUrl}${cleanPath}`;
 }
 
-// Helper pour les requêtes fetch
-export async function apiFetch(path: string, options?: RequestInit) {
+// Helper pour les requêtes fetch avec gestion automatique du 503 (backend en veille)
+export async function apiFetch(path: string, options?: RequestInit, retryCount = 0): Promise<any> {
   const url = getApiUrl(path);
-  const response = await fetch(url, {
-    ...options,
-    credentials: 'include', // Important pour les cookies de session
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
+  const maxRetries = 2;
+  const retryDelay = 15000; // 15 secondes entre les tentatives
   
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || `HTTP ${response.status}`);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      credentials: 'include', // Important pour les cookies de session
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
+    
+    // Gestion spéciale du 503 (backend Render en veille)
+    if (response.status === 503 && retryCount < maxRetries) {
+      console.warn(`⚠️ Backend en veille (503) - Tentative ${retryCount + 1}/${maxRetries + 1}`);
+      console.log(`⏳ Attente de ${retryDelay / 1000}s pour réveil du backend...`);
+      
+      // Attendre que le backend se réveille
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      
+      // Réessayer
+      console.log('🔄 Nouvelle tentative...');
+      return apiFetch(path, options, retryCount + 1);
+    }
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || `HTTP ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error) {
+    // Si erreur réseau et qu'on n'a pas épuisé les tentatives
+    if (error instanceof TypeError && error.message.includes('fetch') && retryCount < maxRetries) {
+      console.warn(`⚠️ Erreur réseau - Tentative ${retryCount + 1}/${maxRetries + 1}`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      return apiFetch(path, options, retryCount + 1);
+    }
+    throw error;
   }
-  
-  return response.json();
 }
 
 // Configuration
