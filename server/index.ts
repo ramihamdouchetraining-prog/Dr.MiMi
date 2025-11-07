@@ -40,6 +40,8 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'https://dr-mi-mi-five.vercel.app',
     'https://dr-mi-mi-git-main-ramis-projects-7dac3957.vercel.app',
+    'https://dr-mi-qfyexlxeu-ramis-projects-7dac3957.vercel.app',
+    'https://dr-mi-8gb8utcxc-ramis-projects-7dac3957.vercel.app',
     'http://localhost:5000',
     'http://localhost:5173',
     'http://localhost:3000',
@@ -53,30 +55,37 @@ app.use((req, res, next) => {
   const vercelWildcardPattern = /^https:\/\/.*\.vercel\.app$/;
   const replitPattern = /^https:\/\/.*\.replit\.(dev|app|co)$/;
 
-  // Vérifier si l'origin est autorisée
-  const isAllowed = !origin || 
-    allowedOrigins.includes(origin) || 
-    vercelPreviewPattern.test(origin) ||
-    vercelWildcardPattern.test(origin) ||  // Temporaire: autorise TOUS les .vercel.app
-    replitPattern.test(origin);
-
-  if (isAllowed && origin) {
-    // Définir les headers CORS pour cette origin
-    res.header('Access-Control-Allow-Origin', origin);
-    console.log(`✅ CORS: Origin autorisée: ${origin}`);
-  } else if (!origin) {
-    // Pas d'origin (requests directes, curl, etc.)
-    res.header('Access-Control-Allow-Origin', '*');
+  // Vérifier si l'origin est autorisée - ULTRA PERMISSIVE FOR VERCEL
+  let isAllowed = false;
+  
+  if (!origin) {
+    isAllowed = true; // Pas d'origin = OK
+  } else if (allowedOrigins.includes(origin)) {
+    isAllowed = true; // Dans la liste = OK
+    console.log(`✅ CORS: Origin dans liste blanche: ${origin}`);
+  } else if (origin.includes('.vercel.app')) {
+    isAllowed = true; // Tous les .vercel.app = OK
+    console.log(`✅ CORS: Origin Vercel autorisée: ${origin}`);
+  } else if (replitPattern.test(origin)) {
+    isAllowed = true; // Replit = OK
+    console.log(`✅ CORS: Origin Replit autorisée: ${origin}`);
   } else {
-    console.warn(`🚫 CORS: Origin bloquée: ${origin}`);
+    console.warn(`⚠️ CORS: Origin NON autorisée: ${origin}`);
   }
 
-  // Headers CORS obligatoires
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
-  res.header('Access-Control-Max-Age', '86400'); // 24h de cache pour préflight
-  res.header('Vary', 'Origin');
+  // TOUJOURS ajouter les headers CORS si origin présente et autorisée
+  if (isAllowed) {
+    if (origin) {
+      res.header('Access-Control-Allow-Origin', origin);
+    } else {
+      res.header('Access-Control-Allow-Origin', '*');
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
+    res.header('Access-Control-Max-Age', '86400');
+    res.header('Vary', 'Origin');
+  }
 
   // Réponse immédiate pour les requêtes OPTIONS (préflight)
   if (req.method === 'OPTIONS') {
