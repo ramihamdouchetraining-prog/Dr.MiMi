@@ -156,6 +156,74 @@ export function EnhancedQuizPage() {
     return true;
   });
 
+  // Si un module est sélectionné, afficher le quiz
+  if (selectedModule) {
+    const module = availableModules.find(m => m.id === selectedModule);
+    const quiz = getQuizByModule(selectedModule);
+    
+    if (quiz && module) {
+      return (
+        <div className="min-h-screen">
+          <QuizComponent
+            questions={quiz}
+            title={module.name}
+            onComplete={(score) => {
+              console.log('Quiz completed with score:', score);
+              setSelectedModule(null);
+            }}
+          />
+        </div>
+      );
+    }
+  }
+
+  // Si un jeu est sélectionné, afficher le jeu
+  if (selectedGame) {
+    let GameComponent;
+    switch (selectedGame) {
+      case 'anatomie_puzzle_3d':
+        GameComponent = AnatomiePuzzle;
+        break;
+      case 'chirurgie_simulator':
+      case 'battle_royale_medical':
+      case 'escape_room_hopital':
+      case 'pharmacologie_tower_defense':
+      case 'memory_medical':
+        // Pour les autres jeux, afficher un message temporaire
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-purple-900 flex items-center justify-center p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+              <div className="mb-6">
+                <Gamepad2 className="w-16 h-16 mx-auto text-purple-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Jeu en développement
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Ce jeu sera bientôt disponible. Restez connecté !
+              </p>
+              <button
+                onClick={() => setSelectedGame(null)}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+              >
+                Retour aux jeux
+              </button>
+            </div>
+          </div>
+        );
+      default:
+        GameComponent = null;
+    }
+
+    if (GameComponent) {
+      return (
+        <div className="min-h-screen">
+          <GameComponent />
+        </div>
+      );
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
       {/* Header amélioré */}
