@@ -67,8 +67,7 @@ const SummariesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await apiFetch('/api/summaries');
-        const data = await response.json();
+        const data = await apiFetch('/api/summaries');
         setSummaries(data);
       } catch (err: any) {
         console.error('Error fetching summaries:', err);

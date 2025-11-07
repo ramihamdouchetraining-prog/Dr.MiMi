@@ -66,8 +66,7 @@ const CoursesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await apiFetch('/api/courses');
-        const data = await response.json();
+        const data = await apiFetch('/api/courses');
         setCourses(data);
       } catch (err: any) {
         console.error('Error fetching courses:', err);

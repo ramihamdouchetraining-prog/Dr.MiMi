@@ -46,8 +46,7 @@ const ModulesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await apiFetch('/api/modules');
-        const data = await response.json();
+        const data = await apiFetch('/api/modules');
         setModules(data);
       } catch (err: any) {
         console.error('Error fetching modules:', err);
