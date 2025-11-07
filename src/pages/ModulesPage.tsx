@@ -10,6 +10,7 @@ import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, ErrorState } from '../components/EmptyState';
+import { apiFetch } from '../config/api';
 
 interface Module {
   id: string;
@@ -45,11 +46,7 @@ const ModulesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/modules');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch modules: ${response.status}`);
-        }
-        
+        const response = await apiFetch('/api/modules');
         const data = await response.json();
         setModules(data);
       } catch (err: any) {

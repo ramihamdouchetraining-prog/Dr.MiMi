@@ -23,6 +23,7 @@ import {
   Bell
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
+import { apiFetch } from '../config/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
@@ -79,11 +80,7 @@ const NewsPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/news');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch news: ${response.status}`);
-        }
-        
+        const response = await apiFetch('/api/news');
         const data = await response.json();
         setNewsArticles(data);
       } catch (err: any) {

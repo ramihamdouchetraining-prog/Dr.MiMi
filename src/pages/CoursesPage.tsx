@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
+import { apiFetch } from '../config/api';
 
 interface Course {
   id: string;
@@ -65,11 +66,7 @@ const CoursesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/courses');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch courses: ${response.status}`);
-        }
-        
+        const response = await apiFetch('/api/courses');
         const data = await response.json();
         setCourses(data);
       } catch (err: any) {

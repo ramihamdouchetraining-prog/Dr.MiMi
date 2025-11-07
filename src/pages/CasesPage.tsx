@@ -15,6 +15,7 @@ import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, ErrorState } from '../components/EmptyState';
+import { apiFetch } from '../config/api';
 
 interface ClinicalCase {
   id: string;
@@ -67,11 +68,7 @@ const CasesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/cases');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch cases: ${response.status}`);
-        }
-        
+        const response = await apiFetch('/api/cases');
         const data = await response.json();
         setCases(data);
       } catch (err: any) {

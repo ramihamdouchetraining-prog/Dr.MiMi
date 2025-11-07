@@ -19,6 +19,7 @@ import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
+import { apiFetch } from '../config/api';
 
 interface Summary {
   id: string;
@@ -66,11 +67,7 @@ const SummariesPage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/summaries');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch summaries: ${response.status}`);
-        }
-        
+        const response = await apiFetch('/api/summaries');
         const data = await response.json();
         setSummaries(data);
       } catch (err: any) {

@@ -1,0 +1,1004 @@
+{
+  "project_context": {
+    "name": "Dr.MiMi Medical Education Platform",
+    "version": "2.0.0",
+    "description": "Plateforme e-learning médicale complète avec système de quiz, cours, cas cliniques, et chatbot IA",
+    "owner": "ramihamdouchetraining-prog",
+    "repository": "https://github.com/ramihamdouchetraining-prog/Dr.MiMi",
+    "branch": "main",
+    "last_commit": "a5e8a67",
+    "deployment_date": "2025-11-07"
+  },
+
+  "architecture": {
+    "type": "Full-Stack Web Application",
+    "pattern": "Client-Server avec API REST",
+    "deployment_model": "Frontend (Vercel) + Backend (Render) + Database (Neon PostgreSQL)",
+    
+    "stack": {
+      "frontend": {
+        "framework": "React 18.3.1",
+        "language": "TypeScript 5.6.3",
+        "build_tool": "Vite 5.4.20",
+        "styling": "Tailwind CSS 3.4.15",
+        "animations": "Framer Motion 12.23.22",
+        "routing": "React Router DOM 7.1.0",
+        "state_management": "React Query (TanStack Query) 5.62.11",
+        "icons": "Lucide React 0.468.0",
+        "forms": "React Hook Form",
+        "ui_components": "Headless UI, Radix UI"
+      },
+      
+      "backend": {
+        "runtime": "Node.js 22.19.0",
+        "framework": "Express.js 5.1.0",
+        "language": "TypeScript",
+        "orm": "Drizzle ORM 0.44.5",
+        "authentication": "Passport.js + Express Session",
+        "validation": "Zod",
+        "security": "Helmet, CORS, Rate Limiting",
+        "websocket": "Socket.io",
+        "webrtc": "WebRTC Signaling Server"
+      },
+      
+      "database": {
+        "type": "PostgreSQL",
+        "provider": "Neon (Serverless)",
+        "connection_string": "postgresql://neondb_owner:***@ep-quiet-salad-a2m3snot-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+        "schema_management": "Drizzle Kit 0.31.5",
+        "migrations": "Drizzle Migrations"
+      },
+      
+      "deployment": {
+        "frontend": {
+          "platform": "Vercel",
+          "url": "https://votre-app.vercel.app",
+          "auto_deploy": true,
+          "build_command": "npm run build",
+          "output_directory": "dist"
+        },
+        "backend": {
+          "platform": "Render",
+          "url": "https://drmimi-replit.onrender.com",
+          "plan": "Free Tier",
+          "auto_deploy": true,
+          "cold_start_time": "30-60 seconds",
+          "idle_timeout": "15 minutes"
+        }
+      }
+    }
+  },
+
+  "file_structure": {
+    "root": {
+      "config_files": [
+        "package.json - Dependencies et scripts",
+        "tsconfig.json - TypeScript config frontend",
+        "tsconfig.backend.json - TypeScript config backend",
+        "tsconfig.node.json - TypeScript config Node",
+        "vite.config.ts - Configuration Vite",
+        "tailwind.config.js - Configuration Tailwind",
+        "postcss.config.js - Configuration PostCSS",
+        "drizzle.config.ts - Configuration Drizzle ORM",
+        "playwright.config.ts - Configuration tests E2E",
+        ".env.local - Variables environnement local (créé)",
+        ".env.production - Variables environnement production",
+        ".env.vercel - Variables environnement Vercel"
+      ],
+      
+      "documentation": [
+        "README.md - Documentation principale",
+        "SOLUTION_503_COMPLETE.md - Solution retry automatique 503",
+        "DEPLOY_503_SOLUTION_RECAP.md - Récapitulatif déploiement",
+        "TEST_503_RETRY_GUIDE.md - Guide tests retry",
+        "ETAT_FINAL_503_SOLUTION.md - État final solution",
+        "ACTION_URGENT_VERCEL_CONFIG.md - Config Vercel urgente",
+        "GUIDE_TEST_COMPLET.md - Guide tests toutes pages",
+        "QUIZ_CREATOR_FEATURE.md - Documentation créateur quiz",
+        "FIX_503_MODULES_ERROR.md - Fix initial 503",
+        "FIX_QUIZ_INTERACTIVITY.md - Fix interactivité quiz"
+      ]
+    },
+    
+    "src": {
+      "description": "Code source frontend React",
+      "path": "src/",
+      
+      "config": {
+        "api.ts": {
+          "purpose": "Configuration API et helper fetch",
+          "exports": [
+            "API_BASE_URL - URL backend (VITE_API_URL ou vide)",
+            "getApiUrl(path) - Construit URL complète",
+            "apiFetch(path, options, retryCount) - Fetch avec retry 503"
+          ],
+          "key_logic": {
+            "retry_mechanism": {
+              "max_retries": 2,
+              "retry_delay": 15000,
+              "triggers": ["503 status", "Network errors"],
+              "behavior": "Attend 15s entre chaque tentative, log dans console"
+            },
+            "environment_detection": {
+              "development": "Utilise proxy Vite (/api -> localhost:5001)",
+              "production": "Utilise VITE_API_URL depuis env"
+            }
+          }
+        }
+      },
+      
+      "utils": {
+        "backendWarming.ts": {
+          "purpose": "Utilitaires pour warming backend Render",
+          "exports": [
+            "checkBackendHealth() - Vérifie si backend réveillé",
+            "wakeUpBackend() - Réveille le backend manuellement",
+            "startBackendWarming() - Ping périodique 10 min",
+            "fetchWithWakeup() - Fetch intelligent avec wake-up"
+          ]
+        }
+      },
+      
+      "hooks": {
+        "useBackendWarming.ts": {
+          "purpose": "Hook React pour warming automatique",
+          "usage": "Appelé dans App.tsx au mount",
+          "behavior": "Ping initial + ping toutes les 10 min"
+        }
+      },
+      
+      "components": {
+        "BackendWakeupStatus.tsx": "Modal UI pour statut réveil backend",
+        "QuizCreator.tsx": "Créateur de quiz 4 étapes (790 lignes)",
+        "ModernNavbar.tsx": "Navigation principale",
+        "LoadingSpinner.tsx": "Spinner chargement",
+        "ErrorState.tsx": "État erreur",
+        "autres": "50+ composants UI"
+      },
+      
+      "pages": {
+        "EnhancedQuizPage.tsx": {
+          "purpose": "Page quiz avec créateur et lancement",
+          "features": [
+            "Tabs Quiz/Jeux",
+            "Liste modules quiz",
+            "Bouton Créer un Quiz",
+            "Modal QuizCreator",
+            "Lancement QuizComponent conditionnellement"
+          ],
+          "state": {
+            "selectedModule": "Module quiz sélectionné",
+            "selectedGame": "Jeu sélectionné",
+            "showQuizCreator": "Affiche modal créateur"
+          }
+        },
+        "ModulesPage.tsx": {
+          "purpose": "Liste des 12 modules médicaux",
+          "api_endpoint": "/api/modules",
+          "data_count": 12,
+          "fields_displayed": ["name", "description", "category", "bodySystem"]
+        },
+        "CasesPage.tsx": {
+          "purpose": "Liste des 5 cas cliniques",
+          "api_endpoint": "/api/cases",
+          "data_count": 5,
+          "fields_displayed": ["title", "difficulty", "moduleId", "presentation"]
+        },
+        "SummariesPage.tsx": {
+          "purpose": "Liste des 6 résumés médicaux",
+          "api_endpoint": "/api/summaries",
+          "data_count": 6
+        },
+        "CoursesPage.tsx": {
+          "purpose": "Liste des 8 cours",
+          "api_endpoint": "/api/courses",
+          "data_count": 8
+        }
+      },
+      
+      "App.tsx": {
+        "purpose": "Composant racine",
+        "providers": ["QueryClientProvider", "ThemeProvider", "LanguageProvider", "Router"],
+        "warming_integration": "useBackendWarming() appelé dans AppContent()",
+        "routes": "Toutes les routes de l'application"
+      }
+    },
+    
+    "server": {
+      "description": "Code source backend Express",
+      "path": "server/",
+      
+      "index.ts": {
+        "purpose": "Point d'entrée backend",
+        "port": 5001,
+        "features": [
+          "Configuration CORS",
+          "Rate limiting",
+          "Session management",
+          "Passport OAuth",
+          "WebSocket server",
+          "WebRTC signaling",
+          "Routes registration",
+          "Database seeding"
+        ],
+        "startup_sequence": [
+          "1. Load environment variables",
+          "2. Configure Express middleware",
+          "3. Setup security (Helmet, CORS)",
+          "4. Initialize session",
+          "5. Configure OAuth",
+          "6. Register routes",
+          "7. Seed database",
+          "8. Start HTTP server",
+          "9. Initialize WebSocket",
+          "10. Listen on port 5001"
+        ]
+      },
+      
+      "routes": {
+        "routes.ts": "Routes principales",
+        "routes-news.ts": {
+          "endpoints": [
+            "GET /api/news - Liste articles (8)",
+            "GET /api/news/:id - Détail article"
+          ]
+        },
+        "routes-courses.ts": {
+          "endpoints": [
+            "GET /api/courses - Liste cours (8)",
+            "GET /api/courses/:id - Détail cours",
+            "GET /api/courses/category/:category - Par catégorie"
+          ]
+        },
+        "routes-summaries.ts": {
+          "endpoints": [
+            "GET /api/summaries - Liste résumés (6)",
+            "GET /api/summaries/:id - Détail résumé"
+          ]
+        },
+        "routes-modules.ts": {
+          "endpoints": [
+            "GET /api/modules - Liste modules (12)",
+            "GET /api/modules/:id - Détail module"
+          ]
+        },
+        "routes-cases.ts": {
+          "endpoints": [
+            "GET /api/cases - Liste cas (5)",
+            "GET /api/cases/:id - Détail cas"
+          ]
+        }
+      },
+      
+      "db": {
+        "index.ts": "Connexion PostgreSQL Neon",
+        "schema.ts": {
+          "tables": {
+            "users": "Utilisateurs (id, username, email, password, role, etc.)",
+            "news": "Articles (8 seedés)",
+            "courses": "Cours (8 seedés)",
+            "summaries": "Résumés (6 seedés)",
+            "modules": "Modules (12 seedés)",
+            "cases": "Cas cliniques (5 seedés)",
+            "quizzes": "Quiz",
+            "quiz_questions": "Questions quiz",
+            "lessons": "Leçons",
+            "content_blocks": "Blocs contenu",
+            "user_progress": "Progression utilisateur",
+            "certificates": "Certificats",
+            "achievements": "Accomplissements"
+          }
+        }
+      },
+      
+      "seed_files": {
+        "seed.ts": "Seed modules (12)",
+        "seedNewsArticles.ts": "Seed news (8)",
+        "seedCourses.ts": "Seed courses (8)",
+        "seedSummaries.ts": "Seed summaries (6)",
+        "seedCases.ts": "Seed cases (5)",
+        "seedQuizzes.ts": "Seed quizzes",
+        "seed-owner.ts": "Seed owner user",
+        "seed-admin.ts": "Seed admin user"
+      }
+    },
+    
+    "public": {
+      "_redirects": "Configuration redirects Netlify/Vercel",
+      "favicon.png": "Icône application",
+      "assets": "Images et ressources statiques"
+    }
+  },
+
+  "data_flow": {
+    "typical_page_load": {
+      "step_1": {
+        "action": "User opens /modules",
+        "trigger": "React Router navigation"
+      },
+      "step_2": {
+        "action": "ModulesPage.tsx mounts",
+        "trigger": "useEffect(() => {}, [])"
+      },
+      "step_3": {
+        "action": "Fetch call initiated",
+        "code": "fetch(getApiUrl('/modules'))",
+        "function_call": "apiFetch('/modules')"
+      },
+      "step_4": {
+        "action": "URL construction",
+        "development": "/api/modules (proxied to localhost:5001)",
+        "production": "https://drmimi-replit.onrender.com/api/modules"
+      },
+      "step_5": {
+        "action": "Backend receives request",
+        "endpoint": "GET /api/modules",
+        "handler": "setupModulesRoutes() in routes-modules.ts"
+      },
+      "step_6": {
+        "action": "Database query",
+        "query": "SELECT * FROM modules",
+        "orm": "Drizzle ORM",
+        "database": "Neon PostgreSQL"
+      },
+      "step_7": {
+        "action": "Response sent",
+        "format": "JSON array of 12 modules",
+        "status": 200
+      },
+      "step_8": {
+        "action": "Frontend receives data",
+        "state_update": "setModules(data)",
+        "render": "Display 12 ModuleCard components"
+      }
+    },
+    
+    "503_error_flow": {
+      "scenario": "Backend Render in cold start",
+      
+      "step_1": {
+        "action": "User opens /modules after 20+ min inactivity",
+        "backend_state": "Sleeping (Render free tier)"
+      },
+      "step_2": {
+        "action": "Frontend calls apiFetch('/modules')",
+        "attempt": 1
+      },
+      "step_3": {
+        "action": "Fetch sent to https://drmimi-replit.onrender.com/api/modules",
+        "backend_response": "503 Service Unavailable"
+      },
+      "step_4": {
+        "action": "apiFetch detects 503",
+        "condition": "response.status === 503 && retryCount < 2",
+        "log": "⚠️ Backend en veille (503) - Tentative 1/3"
+      },
+      "step_5": {
+        "action": "Wait before retry",
+        "duration": "15 seconds",
+        "log": "⏳ Attente de 15s pour réveil du backend..."
+      },
+      "step_6": {
+        "action": "Backend wakes up during wait",
+        "render_behavior": "Cold start initiated by first request"
+      },
+      "step_7": {
+        "action": "Retry attempt 2",
+        "log": "🔄 Nouvelle tentative..."
+      },
+      "step_8": {
+        "action": "Backend now ready",
+        "response": "200 OK with data",
+        "log": "✅ GET /api/modules 200 OK"
+      },
+      "step_9": {
+        "action": "Data displayed",
+        "user_experience": "LoadingSpinner 15-45s, then data appears"
+      },
+      
+      "OLD_BEHAVIOR": {
+        "step_3_old": "503 received",
+        "step_4_old": "throw new Error('HTTP 503')",
+        "step_5_old": "Error displayed immediately",
+        "user_experience_old": "Failed to fetch modules: 503"
+      }
+    }
+  },
+
+  "environment_variables": {
+    "frontend": {
+      "LOCAL": {
+        "file": ".env.local",
+        "variables": {
+          "VITE_API_URL": {
+            "value": "https://drmimi-replit.onrender.com",
+            "purpose": "URL backend Render",
+            "required": true,
+            "created": "2025-11-07"
+          }
+        }
+      },
+      "VERCEL_PRODUCTION": {
+        "location": "Vercel Dashboard > Settings > Environment Variables",
+        "variables": {
+          "VITE_API_URL": {
+            "value": "https://drmimi-replit.onrender.com",
+            "environments": ["Production", "Preview", "Development"],
+            "status": "⚠️ TO BE VERIFIED - May be missing",
+            "critical": true
+          }
+        }
+      }
+    },
+    
+    "backend": {
+      "RENDER": {
+        "location": "Render Dashboard > Environment Variables",
+        "variables": {
+          "DATABASE_URL": "postgresql://neondb_owner:***@ep-quiet-salad-a2m3snot-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+          "NODE_ENV": "production",
+          "PORT": "5001",
+          "SESSION_SECRET": "***",
+          "GOOGLE_CLIENT_ID": "***",
+          "GOOGLE_CLIENT_SECRET": "***"
+        }
+      }
+    }
+  },
+
+  "commits_history": {
+    "recent_commits": [
+      {
+        "sha": "a5e8a67",
+        "date": "2025-11-07 10:16",
+        "message": "feat: Implement automatic 503 retry and backend warming system",
+        "files_changed": [
+          "src/config/api.ts - Added retry logic",
+          "src/utils/backendWarming.ts - NEW",
+          "src/hooks/useBackendWarming.ts - NEW",
+          "src/components/BackendWakeupStatus.tsx - NEW",
+          "src/App.tsx - Integrated warming",
+          "SOLUTION_503_COMPLETE.md - NEW",
+          "ACTION_URGENT_VERCEL_CONFIG.md - NEW"
+        ],
+        "impact": "Automatic retry on 503 errors (3 attempts, 15s delay each)"
+      },
+      {
+        "sha": "923730c",
+        "date": "2025-11-07 09:45",
+        "message": "docs: Add comprehensive documentation and fix guides",
+        "files_changed": [
+          "FIX_503_MODULES_ERROR.md - NEW",
+          "QUIZ_CREATOR_FEATURE.md - NEW",
+          "GUIDE_TEST_COMPLET.md - NEW",
+          "package.json - Added express-rate-limit"
+        ]
+      },
+      {
+        "sha": "8bb1500",
+        "message": "feat: Add ultra-modern Quiz Creator with AI suggestions",
+        "files_changed": [
+          "src/components/QuizCreator.tsx - NEW (790 lines)",
+          "src/pages/EnhancedQuizPage.tsx - Connected creator"
+        ]
+      },
+      {
+        "sha": "8dfe6f5",
+        "message": "fix: Quiz and Games interaction - Add conditional rendering",
+        "files_changed": [
+          "src/pages/EnhancedQuizPage.tsx - Fixed onClick handlers"
+        ]
+      },
+      {
+        "sha": "523e7c3",
+        "message": "feat: Integrate Cases API in frontend",
+        "files_changed": [
+          "src/pages/CasesPage.tsx - Fetch from /api/cases"
+        ]
+      },
+      {
+        "sha": "a13b6e0",
+        "message": "feat: Integrate Modules API in frontend",
+        "files_changed": [
+          "src/pages/ModulesPage.tsx - Fetch from /api/modules"
+        ]
+      },
+      {
+        "sha": "8db47ae",
+        "message": "feat: Create backend Modules and Cases routes + seed",
+        "files_changed": [
+          "server/routes-modules.ts - NEW",
+          "server/routes-cases.ts - NEW",
+          "server/seedCases.ts - NEW"
+        ]
+      }
+    ]
+  },
+
+  "current_problem": {
+    "symptom": "Erreur 503 persiste sur les pages Modules, Cases, Summaries, Courses",
+    "user_report": "L'utilisateur a relancé Render mais voit toujours l'erreur 503",
+    
+    "CRITICAL_CONTEXT": {
+      "backend_status": {
+        "health_check_result": "✅ 200 OK",
+        "uptime": "483 seconds (8 minutes)",
+        "url": "https://drmimi-replit.onrender.com",
+        "last_tested": "2025-11-07 10:28:57",
+        "conclusion": "Backend is AWAKE and FUNCTIONAL"
+      },
+      
+      "code_deployment": {
+        "retry_logic": "✅ DEPLOYED in src/config/api.ts (commit a5e8a67)",
+        "warming_hook": "✅ INTEGRATED in App.tsx",
+        "git_push": "✅ SUCCESSFUL to GitHub",
+        "vercel_build": "⏳ TRIGGERED automatically",
+        "local_server": "❌ NOT RUNNING (port 5000 free)"
+      },
+      
+      "environment_config": {
+        "local_env": "✅ .env.local created with VITE_API_URL",
+        "vercel_env": "⚠️ VITE_API_URL status UNKNOWN (needs verification)",
+        "render_env": "✅ All variables configured"
+      }
+    },
+    
+    "hypothesis": {
+      "most_likely": {
+        "theory": "Code with retry not active yet",
+        "reasons": [
+          "1. Local server not restarted after code changes",
+          "2. Browser cache showing old code",
+          "3. Vercel build not completed yet",
+          "4. VITE_API_URL missing on Vercel (production only)"
+        ],
+        "evidence": [
+          "Backend is confirmed awake (200 OK)",
+          "Retry code exists in git (grep confirmed)",
+          "Port 5000 is free (server stopped)",
+          "User says 'relancé Render' but issue is client-side"
+        ]
+      },
+      
+      "less_likely": {
+        "theory": "Backend has different issue",
+        "counter_evidence": [
+          "Health endpoint returns 200 OK",
+          "Uptime is 8 minutes (not sleeping)",
+          "Same backend URL works from PowerShell"
+        ]
+      }
+    },
+    
+    "root_cause_analysis": {
+      "timeline": [
+        "1. User initially saw 503 errors (backend cold start)",
+        "2. Solution coded and deployed (commit a5e8a67)",
+        "3. Git push successful",
+        "4. User sees 503 AGAIN",
+        "5. User 'relaunches Render' (unnecessary - backend was awake)",
+        "6. Still sees 503"
+      ],
+      
+      "key_insight": "The 503 errors user sees are likely from OLD CODE running in browser/Vercel, not from backend being down",
+      
+      "explanation": {
+        "the_confusion": "User thinks backend needs restart, but backend is fine",
+        "the_reality": "Frontend code needs to reload to get new retry logic",
+        "the_solution": "Restart local dev server OR wait for Vercel build OR verify Vercel env"
+      }
+    },
+    
+    "diagnostic_questions": {
+      "Q1": {
+        "question": "Where are you seeing the 503 error?",
+        "answers": {
+          "A": "Local (localhost:5000) - Need to restart dev server",
+          "B": "Production (Vercel URL) - Need to verify VITE_API_URL + wait build",
+          "C": "Both - Need both actions"
+        }
+      },
+      
+      "Q2": {
+        "question": "What does browser console show?",
+        "answers": {
+          "A": "Just '503' error - Old code without retry",
+          "B": "'Backend en veille (503) - Tentative 1/3' - New code working!",
+          "C": "'API URL not configured' - Missing VITE_API_URL"
+        }
+      },
+      
+      "Q3": {
+        "question": "Is local dev server running?",
+        "answers": {
+          "A": "Yes (port 5000 active) - Check console logs",
+          "B": "No (port 5000 free) - MUST restart with: npm run dev:frontend",
+          "C": "Don't know - Run: netstat -ano | findstr ':5000'"
+        }
+      }
+    }
+  },
+
+  "solution_steps": {
+    "IMMEDIATE_FIX": {
+      "priority": "URGENT",
+      "estimated_time": "5 minutes",
+      
+      "step_1": {
+        "action": "Restart local development server",
+        "commands": [
+          "# Stop any running server (Ctrl+C if active)",
+          "# Then run:",
+          "npm run dev:frontend"
+        ],
+        "wait_for": "Server starts on http://localhost:5000",
+        "expected_output": "VITE v5.4.20 ready in XXXms"
+      },
+      
+      "step_2": {
+        "action": "Clear browser cache",
+        "commands": ["Ctrl+Shift+R (hard refresh)", "Or F12 > Network > Disable cache"],
+        "purpose": "Ensure new code loads"
+      },
+      
+      "step_3": {
+        "action": "Open page with F12 Console",
+        "url": "http://localhost:5000/modules",
+        "observe": "Console logs"
+      },
+      
+      "step_4": {
+        "action": "Check console output",
+        "success_indicators": [
+          "If backend awake: '✅ GET /api/modules 200 OK' - Data loads fast",
+          "If backend sleeping: '⚠️ Backend en veille (503) - Tentative X/3' - Retry activates"
+        ],
+        "failure_indicators": [
+          "'Failed to fetch: 503' without retry logs - Code not loaded",
+          "'API URL not configured' - .env.local missing"
+        ]
+      }
+    },
+    
+    "PRODUCTION_FIX": {
+      "priority": "HIGH",
+      "estimated_time": "10-15 minutes",
+      
+      "prerequisites": [
+        "Local tests successful",
+        "Understand retry behavior",
+        "Have Vercel Dashboard access"
+      ],
+      
+      "step_1": {
+        "action": "Go to Vercel Dashboard",
+        "url": "https://vercel.com/dashboard",
+        "navigate_to": "Your project > Settings > Environment Variables"
+      },
+      
+      "step_2": {
+        "action": "Verify VITE_API_URL exists",
+        "check_for": {
+          "key": "VITE_API_URL",
+          "value": "https://drmimi-replit.onrender.com",
+          "environments": ["Production", "Preview", "Development"]
+        },
+        "if_missing": "Click 'Add New' and create it"
+      },
+      
+      "step_3": {
+        "action": "Wait for Vercel build",
+        "check_status": "Deployments tab",
+        "wait_for": "Status changes to 'Ready'",
+        "typical_duration": "3-5 minutes"
+      },
+      
+      "step_4": {
+        "action": "Test production URL",
+        "url": "https://your-app.vercel.app/modules",
+        "open_console": "F12",
+        "observe": "Retry logs if backend sleeping"
+      }
+    },
+    
+    "VALIDATION": {
+      "test_1": {
+        "name": "Backend Awake Test",
+        "backend_state": "Recently active",
+        "expected_behavior": "Page loads in < 2 seconds",
+        "console_log": "✅ GET /api/modules 200 OK"
+      },
+      
+      "test_2": {
+        "name": "Backend Cold Start Test",
+        "backend_state": "Sleeping (20+ min idle)",
+        "expected_behavior": "LoadingSpinner 15-45s, then data appears",
+        "console_logs": [
+          "⚠️ Backend en veille (503) - Tentative 1/3",
+          "⏳ Attente de 15s pour réveil du backend...",
+          "🔄 Nouvelle tentative...",
+          "✅ GET /api/modules 200 OK"
+        ]
+      },
+      
+      "test_3": {
+        "name": "Backend Warming Test",
+        "duration": "15 minutes",
+        "expected_behavior": "Backend stays awake",
+        "console_logs": [
+          "🔥 Warming backend... (every 10 min)",
+          "✅ Backend is awake! Response time: XXXms"
+        ]
+      }
+    },
+    
+    "TROUBLESHOOTING": {
+      "issue_1": {
+        "symptom": "Still seeing 503 without retry logs",
+        "diagnosis": "Old code still running",
+        "solutions": [
+          "1. Verify server restarted (check terminal output)",
+          "2. Hard refresh browser (Ctrl+Shift+R)",
+          "3. Clear Vite cache: rm -rf node_modules/.vite",
+          "4. Check git status: ensure on commit a5e8a67+"
+        ]
+      },
+      
+      "issue_2": {
+        "symptom": "API URL not configured error",
+        "diagnosis": "Missing .env.local or VITE_API_URL",
+        "solutions": [
+          "1. Local: Create .env.local with VITE_API_URL=https://drmimi-replit.onrender.com",
+          "2. Production: Add VITE_API_URL on Vercel Dashboard",
+          "3. Restart server/redeploy after adding"
+        ]
+      },
+      
+      "issue_3": {
+        "symptom": "Retry activates but fails 3 times",
+        "diagnosis": "Backend has real issue",
+        "solutions": [
+          "1. Check Render dashboard for errors",
+          "2. Check Render logs for crash reasons",
+          "3. Verify DATABASE_URL is valid",
+          "4. Try manual wake: Invoke-WebRequest https://drmimi-replit.onrender.com/api/health"
+        ]
+      }
+    }
+  },
+
+  "task_for_debugging_ai": {
+    "mission": "Fix persistent 503 errors on Dr.MiMi medical education platform",
+    
+    "context_summary": "Full-stack application with React frontend (Vercel), Express backend (Render free tier with cold starts), PostgreSQL database (Neon). User sees 503 errors on module/case/summary/course pages. Automatic retry solution coded and deployed but may not be active yet.",
+    
+    "tasks": {
+      "task_1": {
+        "id": "VERIFY_LOCAL_ENVIRONMENT",
+        "priority": "CRITICAL",
+        "steps": [
+          "1. Navigate to project root: cd C:\\Users\\HAMDOUCHE Rami\\Desktop\\DrMiMi\\replit\\DrMiMiAnalysis",
+          "2. Check if .env.local exists: Get-Content .env.local",
+          "3. Verify contains: VITE_API_URL=https://drmimi-replit.onrender.com",
+          "4. Check if server running: netstat -ano | findstr ':5000'",
+          "5. If not running, start: npm run dev:frontend",
+          "6. Wait for 'VITE ready' message",
+          "7. Open browser to http://localhost:5000/modules",
+          "8. Open Console (F12)",
+          "9. Document console output exactly"
+        ],
+        "success_criteria": [
+          "Server starts without errors",
+          "Console shows either quick 200 OK or retry logs",
+          "Data eventually displays (12 modules)"
+        ]
+      },
+      
+      "task_2": {
+        "id": "VERIFY_CODE_DEPLOYMENT",
+        "priority": "HIGH",
+        "steps": [
+          "1. Check current git commit: git log --oneline -1",
+          "2. Should show a5e8a67 or later",
+          "3. Verify retry code exists: grep -n '503' src/config/api.ts",
+          "4. Should find 'Backend en veille (503)' in code",
+          "5. Verify warming integrated: grep -n 'useBackendWarming' src/App.tsx",
+          "6. Check last git push: git log origin/main..HEAD",
+          "7. Should show no unpushed commits"
+        ],
+        "success_criteria": [
+          "On commit a5e8a67 or later",
+          "Retry code present in api.ts",
+          "Warming hook called in App.tsx",
+          "All changes pushed to GitHub"
+        ]
+      },
+      
+      "task_3": {
+        "id": "TEST_BACKEND_DIRECTLY",
+        "priority": "HIGH",
+        "steps": [
+          "1. Test health: Invoke-WebRequest -Uri 'https://drmimi-replit.onrender.com/api/health'",
+          "2. Document StatusCode (expect 200)",
+          "3. Test modules: Invoke-WebRequest -Uri 'https://drmimi-replit.onrender.com/api/modules'",
+          "4. Document response (expect JSON array)",
+          "5. Measure response time",
+          "6. If 503, wait 30 seconds and retry",
+          "7. Document how many attempts needed"
+        ],
+        "success_criteria": [
+          "Health endpoint returns 200",
+          "Modules endpoint returns data (even after retry)",
+          "Response time reasonable (< 60s total)"
+        ]
+      },
+      
+      "task_4": {
+        "id": "VERIFY_BROWSER_BEHAVIOR",
+        "priority": "CRITICAL",
+        "steps": [
+          "1. Hard refresh page (Ctrl+Shift+R)",
+          "2. Monitor Network tab in DevTools",
+          "3. Click on /api/modules request",
+          "4. Check Request URL (should be https://drmimi-replit.onrender.com/api/modules)",
+          "5. Check Response status",
+          "6. Check Console tab for logs",
+          "7. Look specifically for: '⚠️ Backend en veille' OR '✅ 200 OK'",
+          "8. Screenshot console if seeing errors"
+        ],
+        "success_criteria": [
+          "Request goes to correct URL",
+          "Either succeeds quickly OR shows retry logs",
+          "Data eventually appears",
+          "No 'API URL not configured' error"
+        ]
+      },
+      
+      "task_5": {
+        "id": "CHECK_VERCEL_CONFIGURATION",
+        "priority": "HIGH",
+        "steps": [
+          "1. Go to https://vercel.com/dashboard",
+          "2. Select Dr.MiMi project",
+          "3. Go to Settings > Environment Variables",
+          "4. Look for VITE_API_URL",
+          "5. If exists: verify value is https://drmimi-replit.onrender.com",
+          "6. If missing: click Add New, add it",
+          "7. Ensure checked for Production, Preview, Development",
+          "8. Go to Deployments tab",
+          "9. Check latest deployment status (commit a5e8a67)",
+          "10. If not deployed yet, wait for completion",
+          "11. If variable was added, click Redeploy"
+        ],
+        "success_criteria": [
+          "VITE_API_URL exists with correct value",
+          "Variable applied to all environments",
+          "Latest commit deployed successfully"
+        ]
+      },
+      
+      "task_6": {
+        "id": "ANALYZE_LOGS",
+        "priority": "MEDIUM",
+        "steps": [
+          "1. Check browser console for errors",
+          "2. Check Vercel deployment logs",
+          "3. Check Render logs (if accessible)",
+          "4. Look for patterns:",
+          "   - Always 503? Backend issue",
+          "   - 503 then 200? Retry working",
+          "   - No request made? Frontend issue",
+          "5. Document exact error messages",
+          "6. Note timestamps",
+          "7. Correlate with backend uptime"
+        ]
+      }
+    },
+    
+    "expected_findings": {
+      "scenario_A": {
+        "finding": "Local server not restarted",
+        "evidence": "Port 5000 free, no Vite process",
+        "fix": "Run npm run dev:frontend",
+        "outcome": "After restart, retry logs appear, data loads"
+      },
+      
+      "scenario_B": {
+        "finding": "Browser showing cached old code",
+        "evidence": "No retry logs despite new code in git",
+        "fix": "Hard refresh (Ctrl+Shift+R), clear cache",
+        "outcome": "After refresh, retry logs appear"
+      },
+      
+      "scenario_C": {
+        "finding": "VITE_API_URL missing on Vercel",
+        "evidence": "Production shows 'API URL not configured'",
+        "fix": "Add variable on Vercel Dashboard, redeploy",
+        "outcome": "After redeploy, production works"
+      },
+      
+      "scenario_D": {
+        "finding": "Backend truly down",
+        "evidence": "Health endpoint fails even after 2 min",
+        "fix": "Check Render dashboard, restart service",
+        "outcome": "After restart, all pages work"
+      }
+    },
+    
+    "deliverables": {
+      "report": {
+        "sections": [
+          "1. Current State Analysis",
+          "2. Tests Performed",
+          "3. Findings",
+          "4. Root Cause",
+          "5. Fix Applied",
+          "6. Validation Results",
+          "7. Recommendations"
+        ]
+      },
+      
+      "screenshots": [
+        "Console output (with logs)",
+        "Network tab (showing request/response)",
+        "Vercel Environment Variables page",
+        "Terminal showing server running"
+      ],
+      
+      "commands_run": "Document every command with output",
+      
+      "final_verification": [
+        "✅ Local: All pages load data",
+        "✅ Production: All pages load data",
+        "✅ Console: Retry logs visible when backend sleeping",
+        "✅ No errors in console",
+        "✅ Performance acceptable"
+      ]
+    }
+  },
+
+  "reference_documentation": {
+    "internal_docs": [
+      "SOLUTION_503_COMPLETE.md - Complete solution explanation",
+      "TEST_503_RETRY_GUIDE.md - Testing procedures",
+      "ETAT_FINAL_503_SOLUTION.md - Current state summary",
+      "ACTION_URGENT_VERCEL_CONFIG.md - Vercel configuration steps",
+      "GUIDE_TEST_COMPLET.md - All pages test checklist"
+    ],
+    
+    "code_references": {
+      "retry_logic": "src/config/api.ts lines 29-72",
+      "warming_hook": "src/hooks/useBackendWarming.ts",
+      "warming_integration": "src/App.tsx line 81",
+      "modules_page": "src/pages/ModulesPage.tsx",
+      "api_routes": "server/routes-modules.ts"
+    },
+    
+    "external_links": {
+      "render_docs": "https://render.com/docs/free#free-web-services",
+      "vercel_env_vars": "https://vercel.com/docs/concepts/projects/environment-variables",
+      "vite_env": "https://vitejs.dev/guide/env-and-mode.html"
+    }
+  },
+
+  "success_metrics": {
+    "must_have": [
+      "✅ No visible 503 errors to end users",
+      "✅ Data loads automatically (even if 15-45s delay)",
+      "✅ Console shows informative logs",
+      "✅ All 9 pages functional (news, courses, summaries, modules, cases, quiz, premium, about, home)"
+    ],
+    
+    "nice_to_have": [
+      "✅ Backend stays awake during sessions (warming works)",
+      "✅ Fast load times when backend active (< 2s)",
+      "✅ Production matches local behavior"
+    ],
+    
+    "measurements": {
+      "success_rate": "> 95% (retry should handle most cold starts)",
+      "max_load_time": "< 60 seconds total (with 3 retries)",
+      "user_frustration": "Minimal (transparent retry, no error messages)"
+    }
+  }
+}
