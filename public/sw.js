@@ -125,13 +125,11 @@ async function networkFirstStrategy(request, cacheName) {
       return cachedResponse;
     }
     
-    if (request.url.includes('/api/')) {
-      return new Response(
-        JSON.stringify({ error: 'Network unavailable', offline: true }),
-        { status: 503, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    // ❌ REMOVED: Service Worker was blocking API requests with fake 503
+    // This prevented apiFetch() retry logic from working properly
+    // Let the application handle API errors and retry logic
     
+    // Only return offline page for non-API requests
     const offlinePage = await caches.match('/');
     return offlinePage || new Response('Offline', { status: 503 });
   }
