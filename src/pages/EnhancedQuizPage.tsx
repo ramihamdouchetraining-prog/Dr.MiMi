@@ -11,6 +11,7 @@ import {
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { QuizComponent } from '../components/QuizComponent';
+import { QuizCreator } from '../components/QuizCreator';
 import { medicalModules, getQuizByModule } from '../data/medicalContent';
 
 // Import game components
@@ -125,6 +126,7 @@ export function EnhancedQuizPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showQuizCreator, setShowQuizCreator] = useState(false);
   const [userStats, setUserStats] = useState({
     totalQuizzes: 245,
     averageScore: 78,
@@ -460,7 +462,10 @@ export function EnhancedQuizPage() {
                   </div>
                 </div>
                 
-                <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all">
+                <button 
+                  onClick={() => setShowQuizCreator(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
+                >
                   <PlusCircle className="w-4 h-4 inline mr-2" />
                   Créer un Quiz
                 </button>
@@ -705,6 +710,21 @@ export function EnhancedQuizPage() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Quiz Creator Modal */}
+      <AnimatePresence>
+        {showQuizCreator && (
+          <QuizCreator
+            onClose={() => setShowQuizCreator(false)}
+            onSave={(quiz) => {
+              console.log('Nouveau quiz créé:', quiz);
+              // TODO: Sauvegarder le quiz dans la base de données via API
+              alert('Quiz créé avec succès ! 🎉\nTitre: ' + quiz.title + '\nQuestions: ' + quiz.questions.length);
+              setShowQuizCreator(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
