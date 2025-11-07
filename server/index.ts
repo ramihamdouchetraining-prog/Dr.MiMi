@@ -47,8 +47,8 @@ app.use((req, res, next) => {
     'https://dr-mimi.netlify.app',
   ];
 
-  // Pattern pour tous les previews Vercel
-  const vercelPreviewPattern = /^https:\/\/dr-mi-mi-.*\.vercel\.app$/;
+  // Pattern pour tous les previews Vercel (incluant URLs avec hash aléatoire)
+  const vercelPreviewPattern = /^https:\/\/(dr-mi-|dr-mi-mi-).*ramis-projects.*\.vercel\.app$/;
   const replitPattern = /^https:\/\/.*\.replit\.(dev|app|co)$/;
 
   // Vérifier si l'origin est autorisée
