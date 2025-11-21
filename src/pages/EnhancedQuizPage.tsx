@@ -1,69 +1,50 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  BookOpen, Clock, Trophy, Target, Brain, Heart,
-  FlaskConical, Microscope, Users, TrendingUp, Star, Lock,
-const quizTypes = [
-    { id: 'qcm', name: 'QCM Classique', icon: CheckCircle, color: 'from-blue-500 to-cyan-500', description: 'Questions à choix multiples traditionnelles' },
-    { id: 'cas-clinique', name: 'Cas Cliniques', icon: Heart, color: 'from-red-500 to-pink-500', description: 'Résolvez des cas médicaux réalistes' },
-    { id: 'image', name: 'Quiz Images', icon: Microscope, color: 'from-purple-500 to-indigo-500', description: 'Identifiez structures et pathologies' },
-    { id: 'flashcards', name: 'Flashcards', icon: Zap, color: 'from-yellow-500 to-orange-500', description: 'Révision rapide avec cartes' },
-    { id: 'vrai-faux', name: 'Vrai ou Faux', icon: Target, color: 'from-green-500 to-teal-500', description: 'Testez vos connaissances rapidement' },
-    { id: 'progression', name: 'Quiz Progressif', icon: TrendingUp, color: 'from-indigo-500 to-purple-500', description: 'Difficulté adaptative selon vos réponses' }
-  ];
-
-// Enhanced Games
-const enhancedGames = [
-  {
-    id: 'anatomie_puzzle_3d',
-    title: 'Puzzle Anatomique 3D',
-    description: 'Assemblez le corps humain en 3D avec rotation et zoom',
+title: 'Puzzle Anatomique 3D',
+  description: 'Assemblez le corps humain en 3D avec rotation et zoom',
     icon: Brain,
-    color: 'from-purple-600 to-pink-600',
-    difficulty: 'moyen',
-    xpReward: 150,
-    timeLimit: 300,
-    players: '1-4',
-    unlocked: true,
-    hot: true
+      color: 'from-purple-600 to-pink-600',
+        difficulty: 'moyen',
+          xpReward: 150,
+            timeLimit: 300,
+              players: '1-4',
+                unlocked: true,
+                  hot: true
   },
-  {
-    id: 'escape_room_hopital',
+{
+  id: 'escape_room_hopital',
     title: 'Escape Room Hôpital',
-    description: 'Échappez-vous en résolvant des énigmes médicales',
-    icon: Lock,
-    color: 'from-gray-600 to-gray-800',
-    difficulty: 'difficile',
-    xpReward: 250,
-    timeLimit: 1800,
-    players: '1-6',
-    unlocked: true
-  },
-  {
-    id: 'pharmacologie_tower_defense',
+      description: 'Échappez-vous en résolvant des énigmes médicales',
+        icon: Lock,
+          color: 'from-gray-600 to-gray-800',
+            difficulty: 'difficile',
+              xpReward: 250,
+                timeLimit: 1800,
+                  players: '1-6',
+                    unlocked: true
+},
+{
+  id: 'pharmacologie_tower_defense',
     title: 'Défense Pharmacologique',
-    description: 'Défendez l\'organisme avec les bons médicaments',
-    icon: Shield,
-    color: 'from-green-500 to-emerald-500',
-    difficulty: 'moyen',
-    xpReward: 200,
-    timeLimit: null,
-    players: '1',
-    unlocked: true
-  },
-  {
-    id: 'memory_medical',
+      description: 'Défendez l\'organisme avec les bons médicaments',
+        icon: Shield,
+          color: 'from-green-500 to-emerald-500',
+            difficulty: 'moyen',
+              xpReward: 200,
+                timeLimit: null,
+                  players: '1',
+                    unlocked: true
+},
+{
+  id: 'memory_medical',
     title: 'Memory Médical',
-    description: 'Trouvez les paires d\'organes et de fonctions',
-    icon: Brain,
-    color: 'from-blue-500 to-indigo-500',
-    difficulty: 'facile',
-    xpReward: 100,
-    timeLimit: 180,
-    players: '1-2',
-    unlocked: true
-  }
+      description: 'Trouvez les paires d\'organes et de fonctions',
+        icon: Brain,
+          color: 'from-blue-500 to-indigo-500',
+            difficulty: 'facile',
+              xpReward: 100,
+                timeLimit: 180,
+                  players: '1-2',
+                    unlocked: true
+}
 ];
 
 // Composant principal amélioré
@@ -171,75 +152,62 @@ export function EnhancedQuizPage() {
     if (GameComponent) {
       return (
         <div className="min-h-screen">
-          <GameComponent />
-        </div>
-      );
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
-      {/* Header amélioré */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-premium shadow-lg sticky top-0 z-40"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
 
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Centre d'Apprentissage Interactif
-              </h1>
-            </div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Centre d'Apprentissage Interactif
+                </h1>
+              </div>
 
-            {/* Statistiques rapides */}
-            <div className="hidden lg:flex items-center space-x-6">
+              {/* Statistiques rapides */}
+              <div className="hidden lg:flex items-center space-x-6">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="w-5 h-5 text-yellow-500" />
+                  <span className="text-sm font-medium">{userStats.rank}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                  <span className="text-sm font-medium">{userStats.streak} jours</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Star className="w-5 h-5 text-purple-500" />
+                  <span className="text-sm font-medium">Niveau {userStats.level}</span>
+                </div>
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium">
+                  {userStats.xp.toLocaleString()} XP
+                </div>
+              </div>
+
+              {/* Contrôles */}
               <div className="flex items-center space-x-2">
-                <Trophy className="w-5 h-5 text-yellow-500" />
-                <span className="text-sm font-medium">{userStats.rank}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Flame className="w-5 h-5 text-orange-500" />
-                <span className="text-sm font-medium">{userStats.streak} jours</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-purple-500" />
-                <span className="text-sm font-medium">Niveau {userStats.level}</span>
-              </div>
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium">
-                {userStats.xp.toLocaleString()} XP
-              </div>
-            </div>
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                </button>
 
-            {/* Contrôles */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-              </button>
-
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.header>
+        </motion.header>
 
-      {/* Navigation par onglets améliorée */}
+      {/* Navigation par onglets améliorée */ }
       <div className="bg-white dark:bg-gray-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -306,7 +274,7 @@ export function EnhancedQuizPage() {
         </div>
       </div>
 
-      {/* Contenu principal */}
+      {/* Contenu principal */ }
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
           {activeTab === 'quiz' ? (
@@ -652,7 +620,7 @@ export function EnhancedQuizPage() {
         </AnimatePresence>
       </main>
 
-      {/* Quiz Creator Modal */}
+      {/* Quiz Creator Modal */ }
       <AnimatePresence>
         {showQuizCreator && (
           <QuizCreator
@@ -666,8 +634,8 @@ export function EnhancedQuizPage() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
-}
+    }
 
-export default EnhancedQuizPage;
+    export default EnhancedQuizPage;
