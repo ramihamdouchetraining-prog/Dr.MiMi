@@ -44,7 +44,7 @@ export const users = pgTable("users", {
   role: varchar("role", { enum: ["owner", "admin", "editor", "viewer", "consultant"] }).default("viewer"),
   customPermissions: jsonb("custom_permissions"), // For any custom permission overrides
   locale: varchar("locale", { length: 10 }).default("fr"),
-  yearOfStudy: varchar("year_of_study", { enum: ["Y1","Y2","Y3","Y4","Y5","Y6","Intern"] }),
+  yearOfStudy: varchar("year_of_study", { enum: ["Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Intern"] }),
   isBlacklisted: boolean("is_blacklisted").default(false),
   blacklistReason: text("blacklist_reason"),
   isSuspended: boolean("is_suspended").default(false),
@@ -97,7 +97,10 @@ export const courses = pgTable("courses", {
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_courses_module").on(table.moduleId),
+  index("idx_courses_status").on(table.status),
+]);
 
 // Lessons within courses
 export const lessons = pgTable("lessons", {
@@ -133,7 +136,10 @@ export const summaries = pgTable("summaries", {
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_summaries_module").on(table.moduleId),
+  index("idx_summaries_status").on(table.status),
+]);
 
 // Quizzes
 export const quizzes = pgTable("quizzes", {
@@ -150,7 +156,10 @@ export const quizzes = pgTable("quizzes", {
   status: varchar("status", { enum: ["draft", "review", "published", "archived"] }).default("draft"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_quizzes_module").on(table.moduleId),
+  index("idx_quizzes_difficulty").on(table.difficulty),
+]);
 
 // Quiz questions
 export const questions = pgTable("questions", {
@@ -208,7 +217,10 @@ export const cases = pgTable("cases", {
   status: varchar("status", { enum: ["draft", "review", "published", "archived"] }).default("draft"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_cases_module").on(table.moduleId),
+  index("idx_cases_difficulty").on(table.difficulty),
+]);
 
 // News items
 export const newsItems = pgTable("news_items", {
@@ -252,7 +264,11 @@ export const blogPosts = pgTable("blog_posts", {
   updatedBy: varchar("updated_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_blog_posts_category").on(table.category),
+  index("idx_blog_posts_status").on(table.status),
+  index("idx_blog_posts_featured").on(table.featured),
+]);
 
 // Blog post versions for versioning/history
 export const blogPostVersions = pgTable("blog_post_versions", {
@@ -296,7 +312,11 @@ export const articles = pgTable("articles", {
   publishedAt: timestamp("published_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_articles_module").on(table.moduleId),
+  index("idx_articles_status").on(table.status),
+  index("idx_articles_author").on(table.authorId),
+]);
 
 // Article versions for version history
 export const articleVersions = pgTable("article_versions", {
@@ -349,7 +369,10 @@ export const comments = pgTable("comments", {
   parentId: uuid("parent_id").references(() => comments.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_comments_entity").on(table.entityType, table.entityId),
+  index("idx_comments_status").on(table.status),
+]);
 
 // Blacklist entries
 export const blacklistEntries = pgTable("blacklist_entries", {
@@ -606,8 +629,8 @@ export const supportTickets = pgTable("support_tickets", {
 export const gameScores = pgTable("game_scores", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  gameType: varchar("game_type", { 
-    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider"] 
+  gameType: varchar("game_type", {
+    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider"]
   }).notNull(),
   score: integer("score").notNull(),
   timeSpent: integer("time_spent").notNull(), // in seconds
@@ -625,8 +648,8 @@ export const gameScores = pgTable("game_scores", {
 export const gameProgress = pgTable("game_progress", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  gameType: varchar("game_type", { 
-    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider"] 
+  gameType: varchar("game_type", {
+    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider"]
   }).notNull(),
   currentLevel: integer("current_level").default(1),
   maxLevel: integer("max_level").default(1),
@@ -744,8 +767,8 @@ export const chemicalFormulas = pgTable("chemical_formulas", {
 export const gameLeaderboard = pgTable("game_leaderboard", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  gameType: varchar("game_type", { 
-    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider", "overall"] 
+  gameType: varchar("game_type", {
+    enum: ["anatomie_puzzle", "diagnostic_detective", "medicament_match", "urgence_chrono", "formule_chimique", "cytologie_slider", "overall"]
   }).notNull(),
   period: varchar("period", { enum: ["daily", "weekly", "monthly", "alltime"] }).notNull(),
   score: integer("score").notNull(),
@@ -919,8 +942,8 @@ export const userBadges = pgTable("user_badges", {
 export const libraryCategories = pgTable("library_categories", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   // Section-specific categories
-  section: varchar("section", { 
-    enum: ["islamic", "diverse", "palestine"] 
+  section: varchar("section", {
+    enum: ["islamic", "diverse", "palestine"]
   }).notNull(),
   // Category details
   name: varchar("name").notNull(),
@@ -953,8 +976,8 @@ export const libraryCategories = pgTable("library_categories", {
 export const libraryItems = pgTable("library_items", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   // Section identifier
-  section: varchar("section", { 
-    enum: ["islamic", "diverse", "palestine"] 
+  section: varchar("section", {
+    enum: ["islamic", "diverse", "palestine"]
   }).notNull(),
   // Core content
   title: varchar("title").notNull(),
@@ -981,8 +1004,8 @@ export const libraryItems = pgTable("library_items", {
   translator: varchar("translator"),
   publicationDate: varchar("publication_date"), // Hijri or Gregorian
   // Content format and files
-  format: varchar("format", { 
-    enum: ["pdf", "epub", "audio", "video", "image", "article", "link"] 
+  format: varchar("format", {
+    enum: ["pdf", "epub", "audio", "video", "image", "article", "link"]
   }).notNull(),
   fileUrl: varchar("file_url"), // Main file URL
   coverImage: varchar("cover_image"),
@@ -1001,8 +1024,8 @@ export const libraryItems = pgTable("library_items", {
   viewCount: integer("view_count").default(0),
   favoriteCount: integer("favorite_count").default(0),
   // Moderation and approval
-  status: varchar("status", { 
-    enum: ["pending", "approved", "rejected", "archived"] 
+  status: varchar("status", {
+    enum: ["pending", "approved", "rejected", "archived"]
   }).default("pending"),
   rejectionReason: text("rejection_reason"),
   moderationNotes: text("moderation_notes"), // Internal notes for moderators
@@ -1160,8 +1183,8 @@ export const fileDownloadsRelations = relations(fileDownloads, ({ one }) => ({
 export const contracts = pgTable("contracts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   title: varchar("title").notNull(), // e.g., "Contrat Owner-Admin 2025"
-  contractType: varchar("contract_type", { 
-    enum: ["owner_admin", "admin_editor", "editor_consultant", "custom"] 
+  contractType: varchar("contract_type", {
+    enum: ["owner_admin", "admin_editor", "editor_consultant", "custom"]
   }).notNull(),
   // Parties involved
   partyAId: varchar("party_a_id").references(() => users.id).notNull(), // e.g., Owner
@@ -1173,8 +1196,8 @@ export const contracts = pgTable("contracts", {
   revenueSharePercentageB: decimal("revenue_share_percentage_b", { precision: 5, scale: 2 }), // Party B percentage
   fixedPayment: decimal("fixed_payment", { precision: 10, scale: 2 }), // Optional fixed payment
   currency: varchar("currency", { length: 3 }).default("DZD"),
-  paymentFrequency: varchar("payment_frequency", { 
-    enum: ["monthly", "quarterly", "annual", "per_sale", "one_time"] 
+  paymentFrequency: varchar("payment_frequency", {
+    enum: ["monthly", "quarterly", "annual", "per_sale", "one_time"]
   }),
   // Contract details
   description: text("description"),
@@ -1182,8 +1205,8 @@ export const contracts = pgTable("contracts", {
   endDate: timestamp("end_date"), // null = indefinite
   autoRenew: boolean("auto_renew").default(false),
   // Status and signatures
-  status: varchar("status", { 
-    enum: ["draft", "pending_signature_a", "pending_signature_b", "active", "expired", "terminated"] 
+  status: varchar("status", {
+    enum: ["draft", "pending_signature_a", "pending_signature_b", "active", "expired", "terminated"]
   }).default("draft"),
   signedByAAt: timestamp("signed_by_a_at"),
   signedByBAt: timestamp("signed_by_b_at"),
@@ -1202,8 +1225,8 @@ export const contractClauses = pgTable("contract_clauses", {
   clauseNumber: varchar("clause_number").notNull(), // e.g., "1.1", "2.3"
   title: varchar("title").notNull(), // e.g., "Obligations de l'Administrateur"
   content: text("content").notNull(), // Detailed clause text
-  clauseType: varchar("clause_type", { 
-    enum: ["financial", "responsibilities", "confidentiality", "termination", "liability", "other"] 
+  clauseType: varchar("clause_type", {
+    enum: ["financial", "responsibilities", "confidentiality", "termination", "liability", "other"]
   }).default("other"),
   isMandatory: boolean("is_mandatory").default(true),
   orderIndex: integer("order_index").default(0),
@@ -1216,8 +1239,8 @@ export const contractSignatures = pgTable("contract_signatures", {
   contractId: uuid("contract_id").references(() => contracts.id, { onDelete: 'cascade' }).notNull(),
   userId: varchar("user_id").references(() => users.id).notNull(),
   userRole: varchar("user_role", { enum: ["owner", "admin", "editor", "viewer", "consultant"] }).notNull(),
-  signatureType: varchar("signature_type", { 
-    enum: ["electronic", "digital_certificate", "manual_upload"] 
+  signatureType: varchar("signature_type", {
+    enum: ["electronic", "digital_certificate", "manual_upload"]
   }).default("electronic"),
   signatureData: text("signature_data"), // Base64 signature image or certificate data
   ipAddress: varchar("ip_address"),
@@ -1234,7 +1257,7 @@ export const contractSignatures = pgTable("contract_signatures", {
 export const learningAnalytics = pgTable("learning_analytics", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  
+
   // Overall Performance Metrics
   totalStudyTime: integer("total_study_time").default(0), // in minutes
   averageSessionDuration: integer("average_session_duration").default(0), // in minutes
@@ -1244,28 +1267,28 @@ export const learningAnalytics = pgTable("learning_analytics", {
   totalQuizzesPassed: integer("total_quizzes_passed").default(0),
   totalCasesCompleted: integer("total_cases_completed").default(0),
   totalSummariesDownloaded: integer("total_summaries_downloaded").default(0),
-  
+
   // Performance Indicators
   overallAverageScore: decimal("overall_average_score", { precision: 5, scale: 2 }).default("0"), // percentage
   courseCompletionRate: decimal("course_completion_rate", { precision: 5, scale: 2 }).default("0"), // percentage
   quizSuccessRate: decimal("quiz_success_rate", { precision: 5, scale: 2 }).default("0"), // percentage
   averageQuizScore: decimal("average_quiz_score", { precision: 5, scale: 2 }).default("0"), // percentage
-  
+
   // Engagement Metrics
   totalLoginDays: integer("total_login_days").default(0),
   currentStreak: integer("current_streak").default(0), // consecutive days
   longestStreak: integer("longest_streak").default(0),
   lastActivityAt: timestamp("last_activity_at"),
-  
+
   // Learning Velocity
   averageCoursesPerWeek: decimal("average_courses_per_week", { precision: 5, scale: 2 }).default("0"),
   averageQuizzesPerWeek: decimal("average_quizzes_per_week", { precision: 5, scale: 2 }).default("0"),
   learningVelocityTrend: varchar("learning_velocity_trend", { enum: ["accelerating", "stable", "declining"] }).default("stable"),
-  
+
   // Weak Areas (JSON array of module IDs where user struggles)
   weakModules: jsonb("weak_modules"), // [{ moduleId: "cardiology", score: 45, attempts: 3 }]
   strongModules: jsonb("strong_modules"), // [{ moduleId: "anatomy", score: 95, attempts: 5 }]
-  
+
   // Metadata
   lastCalculatedAt: timestamp("last_calculated_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -1279,38 +1302,38 @@ export const learningAnalytics = pgTable("learning_analytics", {
 export const studyPatterns = pgTable("study_patterns", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  
+
   // Time Patterns
-  preferredStudyTime: varchar("preferred_study_time", { 
-    enum: ["morning", "afternoon", "evening", "night"] 
+  preferredStudyTime: varchar("preferred_study_time", {
+    enum: ["morning", "afternoon", "evening", "night"]
   }), // AI-detected preferred time
   studyDaysPattern: jsonb("study_days_pattern"), // { "monday": 120, "tuesday": 90, ... } in minutes
   peakProductivityHour: integer("peak_productivity_hour"), // 0-23 hour when most productive
-  
+
   // Session Patterns
   averageSessionsPerDay: decimal("average_sessions_per_day", { precision: 5, scale: 2 }).default("0"),
   shortSessionsCount: integer("short_sessions_count").default(0), // < 15 min
   mediumSessionsCount: integer("medium_sessions_count").default(0), // 15-45 min
   longSessionsCount: integer("long_sessions_count").default(0), // > 45 min
-  
+
   // Learning Style Indicators
-  preferredContentType: varchar("preferred_content_type", { 
-    enum: ["courses", "summaries", "quizzes", "cases", "mixed"] 
+  preferredContentType: varchar("preferred_content_type", {
+    enum: ["courses", "summaries", "quizzes", "cases", "mixed"]
   }).default("mixed"),
   visualLearnerScore: integer("visual_learner_score").default(0), // 0-100
   practicalLearnerScore: integer("practical_learner_score").default(0), // 0-100
   theoreticalLearnerScore: integer("theoretical_learner_score").default(0), // 0-100
-  
+
   // Engagement Patterns
   cramStudyDetected: boolean("cram_study_detected").default(false), // Last-minute studying before exams
   consistentLearnerScore: integer("consistent_learner_score").default(0), // 0-100
   procrastinationScore: integer("procrastination_score").default(0), // 0-100
-  
+
   // Focus & Retention
   averageRetentionRate: decimal("average_retention_rate", { precision: 5, scale: 2 }), // Based on quiz retakes
   focusScore: integer("focus_score").default(0), // 0-100 based on completion rates
   distractionIndicators: jsonb("distraction_indicators"), // Patterns suggesting distractions
-  
+
   // Metadata
   dataPoints: integer("data_points").default(0), // Number of sessions analyzed
   confidenceScore: integer("confidence_score").default(0), // 0-100, how reliable is this pattern
@@ -1325,40 +1348,40 @@ export const studyPatterns = pgTable("study_patterns", {
 export const aiRecommendations = pgTable("ai_recommendations", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  
+
   // Recommendation Details
-  recommendationType: varchar("recommendation_type", { 
-    enum: ["study_plan", "content_suggestion", "schedule_optimization", "weakness_focus", "exam_prep", "learning_style"] 
+  recommendationType: varchar("recommendation_type", {
+    enum: ["study_plan", "content_suggestion", "schedule_optimization", "weakness_focus", "exam_prep", "learning_style"]
   }).notNull(),
   priority: varchar("priority", { enum: ["high", "medium", "low"] }).default("medium"),
-  
+
   // Content
   title: varchar("title").notNull(), // e.g., "Focus on Cardiology This Week"
   description: text("description").notNull(), // Detailed recommendation
   actionItems: jsonb("action_items"), // [{ action: "Complete Cardiology Quiz 3", link: "/quiz/123" }]
-  
+
   // AI Analysis
   aiReasoning: text("ai_reasoning"), // Why this recommendation was made
-  expectedImpact: varchar("expected_impact", { 
-    enum: ["significant_improvement", "moderate_improvement", "minor_improvement"] 
+  expectedImpact: varchar("expected_impact", {
+    enum: ["significant_improvement", "moderate_improvement", "minor_improvement"]
   }),
   basedOnMetrics: jsonb("based_on_metrics"), // Which analytics triggered this
-  
+
   // Targeted Improvements
   targetedModules: jsonb("targeted_modules"), // Module IDs this recommendation addresses
   targetedSkills: jsonb("targeted_skills"), // Skills to improve
   estimatedTimeRequired: integer("estimated_time_required"), // minutes
-  
+
   // Status & Tracking
-  status: varchar("status", { 
-    enum: ["active", "in_progress", "completed", "dismissed", "expired"] 
+  status: varchar("status", {
+    enum: ["active", "in_progress", "completed", "dismissed", "expired"]
   }).default("active"),
   userFeedback: varchar("user_feedback", { enum: ["helpful", "not_helpful", "neutral"] }),
   feedbackComment: text("feedback_comment"),
   completedAt: timestamp("completed_at"),
   dismissedAt: timestamp("dismissed_at"),
   expiresAt: timestamp("expires_at"), // Recommendations can expire if not relevant anymore
-  
+
   // AI Model Info
   aiModel: varchar("ai_model").default("gpt-4"), // Which AI model generated this
   generatedAt: timestamp("generated_at").defaultNow(),
@@ -1375,43 +1398,43 @@ export const performanceMetrics = pgTable("performance_metrics", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
   moduleId: varchar("module_id").references(() => modules.id),
-  
+
   // Performance Data
   totalAttempts: integer("total_attempts").default(0),
   successfulAttempts: integer("successful_attempts").default(0),
   averageScore: decimal("average_score", { precision: 5, scale: 2 }).default("0"),
   highestScore: decimal("highest_score", { precision: 5, scale: 2 }).default("0"),
   lowestScore: decimal("lowest_score", { precision: 5, scale: 2 }).default("0"),
-  
+
   // Improvement Tracking
   firstAttemptScore: decimal("first_attempt_score", { precision: 5, scale: 2 }),
   latestAttemptScore: decimal("latest_attempt_score", { precision: 5, scale: 2 }),
   improvementRate: decimal("improvement_rate", { precision: 5, scale: 2 }), // percentage improvement
   trendDirection: varchar("trend_direction", { enum: ["improving", "stable", "declining"] }).default("stable"),
-  
+
   // Time Metrics
   totalTimeSpent: integer("total_time_spent").default(0), // minutes on this module
   averageTimePerAttempt: integer("average_time_per_attempt").default(0), // minutes
-  
+
   // Difficulty Assessment
-  perceivedDifficulty: varchar("perceived_difficulty", { 
-    enum: ["very_easy", "easy", "moderate", "difficult", "very_difficult"] 
+  perceivedDifficulty: varchar("perceived_difficulty", {
+    enum: ["very_easy", "easy", "moderate", "difficult", "very_difficult"]
   }),
-  masteryLevel: varchar("mastery_level", { 
-    enum: ["beginner", "intermediate", "advanced", "expert"] 
+  masteryLevel: varchar("mastery_level", {
+    enum: ["beginner", "intermediate", "advanced", "expert"]
   }).default("beginner"),
   masteryPercentage: decimal("mastery_percentage", { precision: 5, scale: 2 }).default("0"),
-  
+
   // Specific Skills within Module
   skillBreakdown: jsonb("skill_breakdown"), // { "diagnosis": 85, "treatment": 70, "anatomy": 95 }
   weakTopics: jsonb("weak_topics"), // ["ECG interpretation", "Cardiac medications"]
   strongTopics: jsonb("strong_topics"), // ["Cardiac anatomy", "Heart sounds"]
-  
+
   // Predictive Metrics
   predictedExamScore: decimal("predicted_exam_score", { precision: 5, scale: 2 }), // AI prediction
   readinessScore: integer("readiness_score").default(0), // 0-100, ready for exam?
   recommendedStudyTime: integer("recommended_study_time"), // minutes needed to master
-  
+
   // Metadata
   lastAttemptAt: timestamp("last_attempt_at"),
   lastUpdatedAt: timestamp("last_updated_at").defaultNow(),
@@ -1444,8 +1467,8 @@ export const contractSignaturesRelations = relations(contractSignatures, ({ one 
 // Content Sales - Track all content sales to trigger revenue sharing
 export const contentSales = pgTable("content_sales", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  contentType: varchar("content_type", { 
-    enum: ["course", "summary", "article", "quiz", "case", "blogPost", "driveFile"] 
+  contentType: varchar("content_type", {
+    enum: ["course", "summary", "article", "quiz", "case", "blogPost", "driveFile"]
   }).notNull(),
   contentId: varchar("content_id").notNull(), // ID of the sold content
   contentTitle: varchar("content_title"), // Cached for reporting
@@ -1467,8 +1490,8 @@ export const contentSales = pgTable("content_sales", {
 export const revenueShareAgreements = pgTable("revenue_share_agreements", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   contractId: uuid("contract_id").references(() => contracts.id, { onDelete: 'cascade' }).notNull(),
-  agreementType: varchar("agreement_type", { 
-    enum: ["owner_admin", "admin_editor", "editor_consultant", "custom"] 
+  agreementType: varchar("agreement_type", {
+    enum: ["owner_admin", "admin_editor", "editor_consultant", "custom"]
   }).notNull(),
   // Parties involved
   ownerId: varchar("owner_id").references(() => users.id), // Top of pyramid
@@ -1532,8 +1555,8 @@ export const revenueLedger = pgTable("revenue_ledger", {
   contentTitle: varchar("content_title"),
   originalAmount: decimal("original_amount", { precision: 10, scale: 2 }).notNull(), // Total sale amount
   // Payout tracking
-  payoutStatus: varchar("payout_status", { 
-    enum: ["pending", "processing", "completed", "failed", "on_hold"] 
+  payoutStatus: varchar("payout_status", {
+    enum: ["pending", "processing", "completed", "failed", "on_hold"]
   }).default("pending"),
   payoutMethod: varchar("payout_method", { enum: ["bank_transfer", "ccp", "paypal", "crypto", "other"] }),
   payoutReference: varchar("payout_reference"), // External payout transaction ID

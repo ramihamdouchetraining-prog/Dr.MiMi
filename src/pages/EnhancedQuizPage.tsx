@@ -1,57 +1,107 @@
-title: 'Puzzle Anatomique 3D',
-  description: 'Assemblez le corps humain en 3D avec rotation et zoom',
-    icon: Brain,
-      color: 'from-purple-600 to-pink-600',
-        difficulty: 'moyen',
-          xpReward: 150,
-            timeLimit: 300,
-              players: '1-4',
-                unlocked: true,
-                  hot: true
-  },
-{
-  id: 'escape_room_hopital',
-    title: 'Escape Room Hôpital',
-      description: 'Échappez-vous en résolvant des énigmes médicales',
-        icon: Lock,
-          color: 'from-gray-600 to-gray-800',
-            difficulty: 'difficile',
-              xpReward: 250,
-                timeLimit: 1800,
-                  players: '1-6',
-                    unlocked: true
-},
-{
-  id: 'pharmacologie_tower_defense',
-    title: 'Défense Pharmacologique',
-      description: 'Défendez l\'organisme avec les bons médicaments',
-        icon: Shield,
-          color: 'from-green-500 to-emerald-500',
-            difficulty: 'moyen',
-              xpReward: 200,
-                timeLimit: null,
-                  players: '1',
-                    unlocked: true
-},
-{
-  id: 'memory_medical',
-    title: 'Memory Médical',
-      description: 'Trouvez les paires d\'organes et de fonctions',
-        icon: Brain,
-          color: 'from-blue-500 to-indigo-500',
-            difficulty: 'facile',
-              xpReward: 100,
-                timeLimit: 180,
-                  players: '1-2',
-                    unlocked: true
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  BookOpen, Clock, Trophy, Target, Brain, Heart,
+  Microscope, Users, TrendingUp, Star, Lock,
+  Gamepad2, ArrowLeft, ChevronRight, Zap, Award, Shield, Flame,
+  Filter, Search, Play, Volume2, VolumeX,
+  CheckCircle, PlusCircle, Settings
+} from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { QuizComponent } from '../components/QuizComponent';
+import { QuizCreator } from '../components/QuizCreator';
+import { medicalModules, getQuizByModule } from '../data/medicalContent';
+import { SEO } from '../components/SEO';
+import AnatomiePuzzle from '../components/games/AnatomiePuzzle';
+
+const quizTypes = [
+  { id: 'qcm', name: 'QCM Classique', icon: CheckCircle, color: 'from-blue-500 to-cyan-500', description: 'Questions à choix multiples traditionnelles' },
+  { id: 'cas-clinique', name: 'Cas Cliniques', icon: Heart, color: 'from-red-500 to-pink-500', description: 'Résolvez des cas médicaux réalistes' },
+  { id: 'image', name: 'Quiz Images', icon: Microscope, color: 'from-purple-500 to-indigo-500', description: 'Identifiez structures et pathologies' },
+  { id: 'flashcards', name: 'Flashcards', icon: Zap, color: 'from-yellow-500 to-orange-500', description: 'Révision rapide avec cartes' },
+  { id: 'vrai-faux', name: 'Vrai ou Faux', icon: Target, color: 'from-green-500 to-teal-500', description: 'Testez vos connaissances rapidement' },
+  { id: 'progression', name: 'Quiz Progressif', icon: TrendingUp, color: 'from-indigo-500 to-purple-500', description: 'Difficulté adaptative selon vos réponses' }
+];
+
+interface Game {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  color: string;
+  difficulty: string;
+  xpReward: number;
+  timeLimit: number | null;
+  players: string;
+  unlocked: boolean;
+  hot?: boolean;
+  new?: boolean;
+  premium?: boolean;
 }
+
+// Enhanced Games
+const enhancedGames: Game[] = [
+  {
+    id: 'anatomie_puzzle_3d',
+    title: 'Puzzle Anatomique 3D',
+    description: 'Assemblez le corps humain en 3D avec rotation et zoom',
+    icon: Brain,
+    color: 'from-purple-600 to-pink-600',
+    difficulty: 'moyen',
+    xpReward: 150,
+    timeLimit: 300,
+    players: '1-4',
+    unlocked: true,
+    hot: true
+  },
+  {
+    id: 'escape_room_hopital',
+    title: 'Escape Room Hôpital',
+    description: 'Échappez-vous en résolvant des énigmes médicales',
+    icon: Lock,
+    color: 'from-gray-600 to-gray-800',
+    difficulty: 'difficile',
+    xpReward: 250,
+    timeLimit: 1800,
+    players: '1-6',
+    unlocked: true
+  },
+  {
+    id: 'pharmacologie_tower_defense',
+    title: 'Défense Pharmacologique',
+    description: 'Défendez l\'organisme avec les bons médicaments',
+    icon: Shield,
+    color: 'from-green-500 to-emerald-500',
+    difficulty: 'moyen',
+    xpReward: 200,
+    timeLimit: null,
+    players: '1',
+    unlocked: true
+  },
+  {
+    id: 'memory_medical',
+    title: 'Memory Médical',
+    description: 'Trouvez les paires d\'organes et de fonctions',
+    icon: Brain,
+    color: 'from-blue-500 to-indigo-500',
+    difficulty: 'facile',
+    xpReward: 100,
+    timeLimit: 180,
+    players: '1-2',
+    unlocked: true
+  }
 ];
 
 // Composant principal amélioré
 export function EnhancedQuizPage() {
-  const { isFeminine } = useTheme();
-  const emojis = useMedicalEmojis();
-  const { t, language } = useLanguage();
+  useTheme(); // Keep hook call if it has side effects, but destructuring was unused.
+  const { language } = useLanguage(); // Removed t if unused? t was used in original? Let's check.
+  // Original used t in: {t('nav.news')} in NewsPage, but here?
+  // I don't see t() usage in the code I have.
+  // I will keep language.
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -65,7 +115,7 @@ export function EnhancedQuizPage() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showQuizCreator, setShowQuizCreator] = useState(false);
-  const [userStats, setUserStats] = useState({
+  const [userStats] = useState({
     totalQuizzes: 245,
     averageScore: 78,
     streak: 12,
@@ -95,6 +145,16 @@ export function EnhancedQuizPage() {
     }
     return true;
   });
+
+  const getDifficultyStars = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'facile': return 2;
+      case 'moyen': return 3;
+      case 'difficile': return 4;
+      case 'expert': return 5;
+      default: return 3;
+    }
+  };
 
   // Si un module est sélectionné, afficher le quiz
   if (selectedModule) {
@@ -152,7 +212,38 @@ export function EnhancedQuizPage() {
     if (GameComponent) {
       return (
         <div className="min-h-screen">
+          <GameComponent
+            onComplete={(score: number) => {
+              console.log('Game completed with score:', score);
+              setSelectedGame(null);
+            }}
+            onExit={() => setSelectedGame(null)}
+          />
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <SEO
+        title="Centre d'Apprentissage Interactif"
+        description="Accédez à des quiz médicaux, des jeux éducatifs et suivez votre progression."
+        keywords={['quiz médecine', 'jeux médicaux', 'apprentissage interactif', 'anatomie', 'pharmacologie']}
+      />
+
+      {/* Header avec effet de parallaxe */}
+      <motion.header
+        initial={{ height: 300, opacity: 0 }}
+        animate={{ height: 200, opacity: 1 }}
+        className="relative overflow-hidden bg-gradient-to-r from-purple-900 to-indigo-900 text-white shadow-2xl"
       >
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay" />
+        </div>
+
+        <div className="relative z-10 h-full flex flex-col justify-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -205,9 +296,10 @@ export function EnhancedQuizPage() {
               </div>
             </div>
           </div>
-        </motion.header>
+        </div>
+      </motion.header>
 
-      {/* Navigation par onglets améliorée */ }
+      {/* Navigation par onglets améliorée */}
       <div className="bg-white dark:bg-gray-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -274,7 +366,7 @@ export function EnhancedQuizPage() {
         </div>
       </div>
 
-      {/* Contenu principal */ }
+      {/* Contenu principal */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
           {activeTab === 'quiz' ? (
@@ -413,7 +505,7 @@ export function EnhancedQuizPage() {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-4 h-4 ${i < module.difficulty
+                              className={`w-4 h-4 ${i < getDifficultyStars(module.difficulty)
                                 ? 'text-yellow-400 fill-current'
                                 : 'text-gray-300 dark:text-gray-600'
                                 }`}
@@ -620,7 +712,7 @@ export function EnhancedQuizPage() {
         </AnimatePresence>
       </main>
 
-      {/* Quiz Creator Modal */ }
+      {/* Quiz Creator Modal */}
       <AnimatePresence>
         {showQuizCreator && (
           <QuizCreator
@@ -634,8 +726,8 @@ export function EnhancedQuizPage() {
           />
         )}
       </AnimatePresence>
-    </div >
+    </div>
   );
-    }
+}
 
-    export default EnhancedQuizPage;
+export default EnhancedQuizPage;

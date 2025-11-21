@@ -6,15 +6,10 @@ import {
   Calendar,
   Clock,
   User,
-  Heart,
   MessageCircle,
   Share2,
   Bookmark,
-  TrendingUp,
-  Filter,
   Search,
-  Tag,
-  Globe,
   Award,
   AlertCircle,
   ChevronRight,
@@ -22,7 +17,7 @@ import {
   ThumbsUp,
   Bell
 } from 'lucide-react';
-import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { apiFetch } from '../config/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
@@ -60,7 +55,7 @@ interface NewsArticle {
 
 const NewsPage: React.FC = () => {
   const { isFeminine } = useTheme();
-  const emojis = useMedicalEmojis();
+
   const { t, language, isRTL } = useLanguage();
   const { isAuthenticated } = useAuth();
 

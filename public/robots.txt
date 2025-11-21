@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://drmimi.netlify.app/sitemap.xml
