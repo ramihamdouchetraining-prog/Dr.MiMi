@@ -4,28 +4,14 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   BookOpen, Clock, Trophy, Target, Brain, Heart,
   FlaskConical, Microscope, Users, TrendingUp, Star, Lock,
-  Gamepad2, ArrowLeft, ChevronRight, Zap, Award, Shield, Flame,
-  Filter, Search, Play, Volume2, VolumeX,
-  CheckCircle, PlusCircle, Settings
-} from 'lucide-react';
-import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
-import { useLanguage } from '../contexts/LanguageContext';
-import { QuizComponent } from '../components/QuizComponent';
-import { QuizCreator } from '../components/QuizCreator';
-import { medicalModules, getQuizByModule } from '../data/medicalContent';
-
-// Import game components
-import AnatomiePuzzle from '../components/games/AnatomiePuzzle';
-
-// Enhanced Quiz Types
 const quizTypes = [
-  { id: 'qcm', name: 'QCM Classique', icon: CheckCircle, color: 'from-blue-500 to-cyan-500', description: 'Questions à choix multiples traditionnelles' },
-  { id: 'cas-clinique', name: 'Cas Cliniques', icon: Heart, color: 'from-red-500 to-pink-500', description: 'Résolvez des cas médicaux réalistes' },
-  { id: 'image', name: 'Quiz Images', icon: Microscope, color: 'from-purple-500 to-indigo-500', description: 'Identifiez structures et pathologies' },
-  { id: 'flashcards', name: 'Flashcards', icon: Zap, color: 'from-yellow-500 to-orange-500', description: 'Révision rapide avec cartes' },
-  { id: 'vrai-faux', name: 'Vrai ou Faux', icon: Target, color: 'from-green-500 to-teal-500', description: 'Testez vos connaissances rapidement' },
-  { id: 'progression', name: 'Quiz Progressif', icon: TrendingUp, color: 'from-indigo-500 to-purple-500', description: 'Difficulté adaptative selon vos réponses' }
-];
+    { id: 'qcm', name: 'QCM Classique', icon: CheckCircle, color: 'from-blue-500 to-cyan-500', description: 'Questions à choix multiples traditionnelles' },
+    { id: 'cas-clinique', name: 'Cas Cliniques', icon: Heart, color: 'from-red-500 to-pink-500', description: 'Résolvez des cas médicaux réalistes' },
+    { id: 'image', name: 'Quiz Images', icon: Microscope, color: 'from-purple-500 to-indigo-500', description: 'Identifiez structures et pathologies' },
+    { id: 'flashcards', name: 'Flashcards', icon: Zap, color: 'from-yellow-500 to-orange-500', description: 'Révision rapide avec cartes' },
+    { id: 'vrai-faux', name: 'Vrai ou Faux', icon: Target, color: 'from-green-500 to-teal-500', description: 'Testez vos connaissances rapidement' },
+    { id: 'progression', name: 'Quiz Progressif', icon: TrendingUp, color: 'from-indigo-500 to-purple-500', description: 'Difficulté adaptative selon vos réponses' }
+  ];
 
 // Enhanced Games
 const enhancedGames = [

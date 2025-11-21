@@ -27,6 +27,7 @@ import { apiFetch } from '../config/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, EmptyState, ErrorState } from '../components/EmptyState';
+import { SEO } from '../components/SEO';
 
 interface NewsArticle {
   id: string;
@@ -200,8 +201,14 @@ const NewsPage: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5 }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
+      <SEO
+        title={language === 'en' ? 'Medical News' : language === 'ar' ? 'الأخبار الطبية' : 'Actualités Médicales'}
+        description={language === 'en' ? 'Latest medical news and research updates' : language === 'ar' ? 'آخر الأخبار الطبية وتحديثات البحث' : 'Dernières actualités médicales et mises à jour de la recherche'}
+        keywords={['médecine', 'actualités', 'recherche', 'santé', 'news', 'medical']}
+      />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div

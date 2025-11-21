@@ -53,6 +53,7 @@ import { EducationalMarketplace } from './components/marketplace/EducationalMark
 import { AdvancedGamification } from './components/gamification/AdvancedGamification'
 import FeaturesXXLPage from './pages/FeaturesXXLPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { SEO } from './components/SEO'
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -79,7 +80,7 @@ function App() {
 function AppContent() {
   // Initialize backend warming to prevent 503 errors
   useBackendWarming();
-  
+
   // const { isFeminine } = useTheme();
   const { isRTL } = useLanguage();
   const location = useLocation();
@@ -88,7 +89,7 @@ function AppContent() {
   const [showLevelSelector, setShowLevelSelector] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
   // const { scrollY } = useScroll();
-  
+
   // Parallax transforms
   // const parallaxY = useTransform(scrollY, [0, 1000], [0, -200]);
   // const parallaxOpacity = useTransform(scrollY, [0, 300], [1, 0.5]);
@@ -110,7 +111,7 @@ function AppContent() {
     const handleKeyPress = (e: KeyboardEvent) => {
       const newCode = [...konamiCode, e.key].slice(-10);
       setKonamiCode(newCode);
-      
+
       if (newCode.join('') === konamiSequence.join('')) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
@@ -122,22 +123,24 @@ function AppContent() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [konamiCode]);
-  
+
   return (
-    <div className="min-h-screen transition-colors duration-300" 
-         style={{ backgroundColor: 'var(--color-background)' }} 
-         dir={isRTL ? 'rtl' : 'ltr'}>
-      
+    <div className="min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: 'var(--color-background)' }}
+      dir={isRTL ? 'rtl' : 'ltr'}>
+
+      <SEO />
+
       {/* Custom Cursor */}
       {showCustomCursor && <CustomCursor />}
-      
+
       {/* Background Effects */}
       <ParticleBackground />
       <FloatingMedicalIcons />
-      
+
       {/* Celebration Effects */}
       <CelebrationEffect trigger={showConfetti} />
-      
+
       {/* Advanced Dr.Mimi AI Chatbot - Bouton simple toujours visible */}
       <SimpleMimiButton />
 
@@ -148,25 +151,25 @@ function AppContent() {
       <main>
         <AnimatePresence mode="wait">
           {/* Allow admin/owner/auth/quiz/analytics/XXL routes to bypass level selector */}
-          {location.pathname.startsWith('/admin') || 
-           location.pathname.startsWith('/owner') ||
-           location.pathname.startsWith('/login') ||
-           location.pathname.startsWith('/register') ||
-           location.pathname.startsWith('/quiz') ||
-           location.pathname.startsWith('/analytics') ||
-           location.pathname.startsWith('/features-xxl') ||
-           location.pathname.startsWith('/lab-3d') ||
-           location.pathname.startsWith('/collaboration') ||
-           location.pathname.startsWith('/marketplace') ||
-           location.pathname.startsWith('/gamification') ? (
+          {location.pathname.startsWith('/admin') ||
+            location.pathname.startsWith('/owner') ||
+            location.pathname.startsWith('/login') ||
+            location.pathname.startsWith('/register') ||
+            location.pathname.startsWith('/quiz') ||
+            location.pathname.startsWith('/analytics') ||
+            location.pathname.startsWith('/features-xxl') ||
+            location.pathname.startsWith('/lab-3d') ||
+            location.pathname.startsWith('/collaboration') ||
+            location.pathname.startsWith('/marketplace') ||
+            location.pathname.startsWith('/gamification') ? (
             <Routes location={location} key={location.pathname}>
               {/* User Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              
+
               {/* Analytics Routes */}
               <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
-              
+
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminLayout />}>
@@ -179,17 +182,17 @@ function AppContent() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
-              
+
               {/* Owner Routes */}
               <Route path="/owner" element={<OwnerDashboard />} />
               <Route path="/owner/login" element={<OwnerLogin />} />
               <Route path="/owner/change-password" element={<OwnerChangePassword />} />
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-              
+
               {/* Quiz and Games Routes */}
               <Route path="/quiz" element={<EnhancedQuizPage />} />
               {/* Games Routes - redirect to quiz with games tab */}
-              
+
               {/* Routes XXL */}
               <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
               <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
@@ -197,7 +200,7 @@ function AppContent() {
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
               <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
-              
+
               {/* 404 - Must be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -227,7 +230,7 @@ function AppContent() {
               <Route path="/payment-dzd" element={<PaymentDZD />} />
               <Route path="/ai-tutor" element={<AITutor />} />
               <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
-              
+
               {/* Routes XXL */}
               <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
               <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
@@ -235,12 +238,12 @@ function AppContent() {
               <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
               <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
               <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
-              
+
               {/* Aliases et routes manquantes */}
               <Route path="/premium" element={<FeaturesXXLPage />} />
               <Route path="/a-propos" element={<AboutMimiDonation />} />
               <Route path="/actualites" element={<NewsPage />} />
-              
+
               {/* 404 - Must be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -257,10 +260,10 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
   const emojis = useMedicalEmojis();
   const { t } = useLanguage();
   const { scrollY } = useScroll();
-  
+
   const heroScale = useTransform(scrollY, [0, 300], [1, 1.2]);
   const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -272,14 +275,14 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
       {/* Hero Section with Parallax Background */}
       <section className="relative min-h-screen overflow-hidden">
         {/* Animated Hero Background */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 z-0"
-          style={{ 
+          style={{
             scale: heroScale,
             opacity: heroOpacity
           }}
         >
-          <div 
+          <div
             className="absolute inset-0 parallax"
             style={{
               backgroundImage: 'url(/images/heroes/medical-hero.png)',
@@ -293,20 +296,20 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
 
         {/* Hero Content */}
         <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
-          <motion.div 
+          <motion.div
             className="text-center max-w-5xl mx-auto"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
             {/* Floating Dr.Mimi */}
-            <motion.div 
+            <motion.div
               className="mb-8"
               animate={{ y: [0, -20, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              <EnhancedDrMimiAvatar 
-                size="xl" 
+              <EnhancedDrMimiAvatar
+                size="xl"
                 mood="happy"
                 showName={true}
                 showMessage={true}
@@ -314,7 +317,7 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
               />
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               className="text-7xl font-magic mb-6 rainbow-text text-glow"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -322,8 +325,8 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             >
               {t('home.title')} {isFeminine && '💕'}
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               className="text-2xl mb-10 font-fun text-white"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -331,17 +334,17 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             >
               {studyLevel && `Spécialement adapté pour ${studyLevel} ✨`}
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               className="flex gap-6 justify-center flex-wrap"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               <Link to="/courses">
-                <motion.button 
+                <motion.button
                   className="px-10 py-5 text-lg font-bold rounded-2xl shadow-2xl glow-hover neu"
-                  style={{ 
+                  style={{
                     background: 'var(--gradient-magic)',
                     color: 'white'
                   }}
@@ -355,11 +358,11 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
                   </span>
                 </motion.button>
               </Link>
-              
+
               <Link to="/features-xxl">
-                <motion.button 
+                <motion.button
                   className="px-10 py-5 text-lg font-bold rounded-2xl shadow-2xl glow-hover"
-                  style={{ 
+                  style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white'
                   }}
@@ -373,11 +376,11 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
                   </span>
                 </motion.button>
               </Link>
-              
+
               <Link to="/chatbot">
-                <motion.button 
+                <motion.button
                   className="px-10 py-5 text-lg font-bold rounded-2xl glass glow-hover"
-                  style={{ 
+                  style={{
                     color: 'white',
                     border: '2px solid rgba(255, 255, 255, 0.5)'
                   }}
@@ -393,7 +396,7 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             </motion.div>
 
             {/* Animated scroll indicator */}
-            <motion.div 
+            <motion.div
               className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
               animate={{ y: [0, 10, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -407,25 +410,25 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
       {/* Features Grid with 3D Cards */}
       <section className="py-20 px-6 relative">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <FeatureCard 
+          <FeatureCard
             icon={<BookOpen size={40} />}
             title={t('feature.structured_courses')}
             description="Cours organisés par modules et années d'études"
             delay={0}
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<FileText size={40} />}
             title={t('feature.visual_summaries')}
             description="Résumés imprimables avec schémas clairs"
             delay={0.1}
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<CheckCircle size={40} />}
             title={t('feature.explained_mcqs')}
             description="Questions variées avec corrections détaillées"
             delay={0.2}
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<Activity size={40} />}
             title={t('feature.clinical_cases')}
             description="Cas interactifs pour la pratique clinique"
@@ -437,9 +440,9 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
       {/* Avatar Carousel Section */}
       <section className="py-20 px-6 relative">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 
+          <motion.h2
             className="text-5xl font-magic text-center mb-12"
-            style={{ 
+            style={{
               background: 'var(--gradient-magic)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -451,9 +454,9 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
           >
             Découvrez Dr. Mimi sous toutes ses facettes ✨
           </motion.h2>
-          
+
           <FeaturedAvatarCarousel className="mb-12" dailyRotation={true} />
-          
+
           {/* Interactive Animated Mimi */}
           <div className="flex justify-center mt-12">
             <InteractiveMimi className="cursor-pointer" />
@@ -463,7 +466,7 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
 
       {/* Popular Modules with floating animations */}
       <section className="py-20 px-6 relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 z-0 opacity-10"
           style={{
             backgroundImage: 'url(/images/anatomy/brain-diagram.png)',
@@ -472,11 +475,11 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             filter: 'blur(3px)'
           }}
         />
-        
+
         <div className="max-w-6xl mx-auto relative z-10">
-          <motion.h2 
+          <motion.h2
             className="text-5xl font-magic text-center mb-12"
-            style={{ 
+            style={{
               background: 'var(--gradient-magic)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -488,7 +491,7 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
           >
             Modules populaires pour {studyLevel || 'tous les niveaux'}
           </motion.h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <ModuleCard emoji={emojis.heart} title="Cardiologie" count="24 cours" level={studyLevel} />
             <ModuleCard emoji={emojis.brain} title="Neurologie" count="18 cours" level={studyLevel} />
@@ -507,9 +510,9 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
 }
 
 // Enhanced Feature card with glassmorphism and 3D hover
-const FeatureCard: React.FC<{ 
-  icon: React.ReactNode; 
-  title: string; 
+const FeatureCard: React.FC<{
+  icon: React.ReactNode;
+  title: string;
   description: string;
   delay?: number;
 }> = ({ icon, title, description, delay = 0 }) => {
@@ -520,16 +523,16 @@ const FeatureCard: React.FC<{
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      whileHover={{ 
+      whileHover={{
         y: -10,
         scale: 1.05,
         rotateY: 10,
         rotateX: 5
       }}
     >
-      <motion.div 
+      <motion.div
         className="mb-6"
-        style={{ 
+        style={{
           color: 'var(--color-primary)',
           filter: 'drop-shadow(0 4px 8px rgba(255, 105, 180, 0.3))'
         }}
@@ -538,19 +541,19 @@ const FeatureCard: React.FC<{
       >
         {icon}
       </motion.div>
-      <h3 className="text-2xl font-bold mb-3 font-fun" 
-          style={{ 
-            background: 'var(--gradient-magic)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
+      <h3 className="text-2xl font-bold mb-3 font-fun"
+        style={{
+          background: 'var(--gradient-magic)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
         {title}
       </h3>
       <p style={{ color: 'var(--color-textSecondary)' }}>
         {description}
       </p>
-      
+
       {/* Floating sparkles on hover */}
       <motion.div
         className="absolute top-2 right-2"
@@ -565,19 +568,19 @@ const FeatureCard: React.FC<{
 }
 
 // Enhanced Module card with level-based styling
-const ModuleCard: React.FC<{ 
-  emoji: string; 
-  title: string; 
+const ModuleCard: React.FC<{
+  emoji: string;
+  title: string;
   count: string;
   level?: string;
 }> = ({ emoji, title, count, level }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <motion.div
       className="glass p-8 rounded-2xl shadow-xl cursor-pointer card-3d"
-      style={{ 
-        background: isHovered 
+      style={{
+        background: isHovered
           ? 'linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 105, 180, 0.2))'
           : 'rgba(255, 255, 255, 0.1)'
       }}
@@ -588,7 +591,7 @@ const ModuleCard: React.FC<{
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
     >
-      <motion.div 
+      <motion.div
         className="text-5xl mb-4"
         animate={isHovered ? { rotate: [0, -10, 10, 0] } : {}}
         transition={{ duration: 0.5 }}
@@ -602,9 +605,9 @@ const ModuleCard: React.FC<{
         {count}
       </p>
       {level && (
-        <motion.span 
+        <motion.span
           className="text-xs px-3 py-1 rounded-full badge-animated"
-          style={{ 
+          style={{
             background: 'var(--gradient-magic)',
             color: 'white'
           }}
@@ -615,7 +618,7 @@ const ModuleCard: React.FC<{
           {level}
         </motion.span>
       )}
-      
+
       {/* Progress indicator */}
       <div className="mt-4">
         <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
