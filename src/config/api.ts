@@ -10,66 +10,119 @@ export function getApiUrl(path: string): string {
   if (import.meta.env.DEV) {
     return path.startsWith('/api') ? path : `/api${path}`;
   }
-  
+
   // En production, utilise l'URL complète du backend Render
   // IMPORTANT: Ne pas utiliser window.location.origin (Vercel) mais le backend (Render)
   const baseUrl = API_BASE_URL;
-  
+
   // Si VITE_API_URL n'est pas défini, afficher une erreur claire
   if (!baseUrl) {
     console.error('❌ VITE_API_URL not configured! Please set it in Vercel environment variables.');
     console.error('Expected: https://drmimi-replit.onrender.com');
     throw new Error('API URL not configured. Please contact administrator.');
   }
-  
+
   const cleanPath = path.startsWith('/api') ? path : `/api${path}`;
   return `${baseUrl}${cleanPath}`;
 }
 
-// Helper pour les requêtes fetch avec gestion automatique du 503 (backend en veille)
-export async function apiFetch(path: string, options?: RequestInit, retryCount = 0): Promise<any> {
+// Cache simple pour les requêtes GET
+const apiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes par défaut
+
+// Map pour dédupliquer les requêtes en cours
+const pendingRequests = new Map<string, Promise<any>>();
+
+interface ApiOptions extends RequestInit {
+  useCache?: boolean;
+  cacheDuration?: number;
+}
+
+// Helper pour les requêtes fetch avec gestion automatique du 503, cache et déduplication
+export async function apiFetch(path: string, options: ApiOptions = {}, retryCount = 0): Promise<any> {
   const url = getApiUrl(path);
   const maxRetries = 2;
   const retryDelay = 15000; // 15 secondes entre les tentatives
-  
-  try {
-    const response = await fetch(url, {
-      ...options,
-      credentials: 'include', // Important pour les cookies de session
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-    });
-    
-    // Gestion spéciale du 503 (backend Render en veille)
-    if (response.status === 503 && retryCount < maxRetries) {
-      console.warn(`⚠️ Backend en veille (503) - Tentative ${retryCount + 1}/${maxRetries + 1}`);
-      console.log(`⏳ Attente de ${retryDelay / 1000}s pour réveil du backend...`);
-      
-      // Attendre que le backend se réveille
-      await new Promise(resolve => setTimeout(resolve, retryDelay));
-      
-      // Réessayer
-      console.log('🔄 Nouvelle tentative...');
-      return apiFetch(path, options, retryCount + 1);
+
+  // Clé de cache basée sur l'URL et les options (seulement pour GET)
+  const isGet = !options.method || options.method === 'GET';
+  const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
+
+  // 1. Vérifier le cache si activé (par défaut true pour GET)
+  const useCache = options.useCache !== false && isGet;
+  if (useCache) {
+    const cached = apiCache.get(cacheKey);
+    const duration = options.cacheDuration || CACHE_DURATION;
+    if (cached && Date.now() - cached.timestamp < duration) {
+      // console.log(`📦 Cache hit for ${path}`);
+      return cached.data;
     }
-    
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || `HTTP ${response.status}`);
-    }
-    
-    return response.json();
-  } catch (error) {
-    // Si erreur réseau et qu'on n'a pas épuisé les tentatives
-    if (error instanceof TypeError && error.message.includes('fetch') && retryCount < maxRetries) {
-      console.warn(`⚠️ Erreur réseau - Tentative ${retryCount + 1}/${maxRetries + 1}`);
-      await new Promise(resolve => setTimeout(resolve, retryDelay));
-      return apiFetch(path, options, retryCount + 1);
-    }
-    throw error;
   }
+
+  // 2. Déduplication des requêtes en cours
+  if (isGet && pendingRequests.has(cacheKey)) {
+    // console.log(`🔄 Deduplication for ${path}`);
+    return pendingRequests.get(cacheKey);
+  }
+
+  const requestPromise = (async () => {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        credentials: 'include', // Important pour les cookies de session
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+      });
+
+      // Gestion spéciale du 503 (backend Render en veille)
+      if (response.status === 503 && retryCount < maxRetries) {
+        console.warn(`⚠️ Backend en veille (503) - Tentative ${retryCount + 1}/${maxRetries + 1}`);
+        console.log(`⏳ Attente de ${retryDelay / 1000}s pour réveil du backend...`);
+
+        // Attendre que le backend se réveille
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+
+        // Réessayer
+        console.log('🔄 Nouvelle tentative...');
+        return apiFetch(path, options, retryCount + 1);
+      }
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Mise en cache si succès
+      if (useCache) {
+        apiCache.set(cacheKey, { data, timestamp: Date.now() });
+      }
+
+      return data;
+    } catch (error) {
+      // Si erreur réseau et qu'on n'a pas épuisé les tentatives
+      if (error instanceof TypeError && error.message.includes('fetch') && retryCount < maxRetries) {
+        console.warn(`⚠️ Erreur réseau - Tentative ${retryCount + 1}/${maxRetries + 1}`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        return apiFetch(path, options, retryCount + 1);
+      }
+      throw error;
+    } finally {
+      // Nettoyer la requête en cours
+      if (isGet) {
+        pendingRequests.delete(cacheKey);
+      }
+    }
+  })();
+
+  if (isGet) {
+    pendingRequests.set(cacheKey, requestPromise);
+  }
+
+  return requestPromise;
 }
 
 // Configuration

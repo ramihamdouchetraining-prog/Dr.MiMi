@@ -226,9 +226,8 @@ const NewsPage: React.FC = () => {
         {/* Breaking News Alert */}
         {newsArticles.some(a => a.isBreaking) && (
           <motion.div
-            className="mb-6 p-4 rounded-lg border-l-4"
+            className="mb-6 p-4 rounded-lg border-l-4 glass"
             style={{
-              backgroundColor: 'var(--color-surface)',
               borderLeftColor: 'var(--color-error)',
             }}
             initial={{ x: -20, opacity: 0 }}
@@ -340,9 +339,8 @@ const NewsPage: React.FC = () => {
         {/* Featured Article */}
         {featuredArticle && !showFeaturedOnly && (
           <motion.div
-            className="mb-8 rounded-xl overflow-hidden shadow-lg"
+            className="mb-8 rounded-xl overflow-hidden shadow-lg glass-premium"
             style={{
-              backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -498,9 +496,8 @@ const ArticleCard: React.FC<{
 
   return (
     <motion.div
-      className="rounded-xl overflow-hidden shadow-lg cursor-pointer h-full flex flex-col"
+      className="rounded-xl overflow-hidden shadow-lg cursor-pointer h-full flex flex-col glass"
       style={{
-        backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
       }}
       initial={{ opacity: 0, scale: 0.9 }}

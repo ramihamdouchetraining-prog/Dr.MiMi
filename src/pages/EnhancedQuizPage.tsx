@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { 
-  BookOpen, Clock, Trophy, Target, Brain, Heart, Pill, AlertCircle,
-  FlaskConical, Microscope, Timer, Users, TrendingUp, Star, Lock,
+import {
+  BookOpen, Clock, Trophy, Target, Brain, Heart,
+  FlaskConical, Microscope, Users, TrendingUp, Star, Lock,
   Gamepad2, ArrowLeft, ChevronRight, Zap, Award, Shield, Flame,
-  Download, Share2, Filter, Search, Play, Pause, Volume2, VolumeX,
-  CheckCircle, XCircle, RotateCw, PlusCircle, MinusCircle, Settings
+  Filter, Search, Play, Volume2, VolumeX,
+  CheckCircle, PlusCircle, Settings
 } from 'lucide-react';
 import { useTheme, useMedicalEmojis } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -16,9 +16,6 @@ import { medicalModules, getQuizByModule } from '../data/medicalContent';
 
 // Import game components
 import AnatomiePuzzle from '../components/games/AnatomiePuzzle';
-import DiagnosticDetective from '../components/games/DiagnosticDetective';
-import MedicamentMatch from '../components/games/MedicamentMatch';
-import UrgenceChrono from '../components/games/UrgenceChrono';
 
 // Enhanced Quiz Types
 const quizTypes = [
@@ -42,32 +39,6 @@ const enhancedGames = [
     xpReward: 150,
     timeLimit: 300,
     players: '1-4',
-    unlocked: true,
-    new: true
-  },
-  {
-    id: 'chirurgie_simulator',
-    title: 'Simulateur de Chirurgie',
-    description: 'Pratiquez des procédures chirurgicales virtuelles',
-    icon: FlaskConical,
-    color: 'from-red-500 to-orange-500',
-    difficulty: 'expert',
-    xpReward: 300,
-    timeLimit: 600,
-    players: '1',
-    unlocked: true,
-    premium: true
-  },
-  {
-    id: 'battle_royale_medical',
-    title: 'Battle Royale Médical',
-    description: 'Affrontez d\'autres étudiants en temps réel',
-    icon: Trophy,
-    color: 'from-yellow-500 to-amber-500',
-    difficulty: 'tous',
-    xpReward: 500,
-    timeLimit: null,
-    players: '2-100',
     unlocked: true,
     hot: true
   },
@@ -113,10 +84,10 @@ const enhancedGames = [
 export function EnhancedQuizPage() {
   const { isFeminine } = useTheme();
   const emojis = useMedicalEmojis();
-  const { t, locale } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   // États
   const [activeTab, setActiveTab] = useState<'quiz' | 'jeux'>('quiz');
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
@@ -150,7 +121,7 @@ export function EnhancedQuizPage() {
   const filteredGames = enhancedGames.filter(game => {
     if (searchTerm) {
       return game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             game.description.toLowerCase().includes(searchTerm.toLowerCase());
+        game.description.toLowerCase().includes(searchTerm.toLowerCase());
     }
     if (selectedDifficulty !== 'all') {
       return game.difficulty === selectedDifficulty || game.difficulty === 'tous';
@@ -162,7 +133,7 @@ export function EnhancedQuizPage() {
   if (selectedModule) {
     const module = availableModules.find(m => m.id === selectedModule);
     const quiz = getQuizByModule(selectedModule);
-    
+
     if (quiz && module) {
       return (
         <div className="min-h-screen">
@@ -179,22 +150,18 @@ export function EnhancedQuizPage() {
     }
   }
 
-  // Si un jeu est sélectionné, afficher le jeu
+  // Si un jeu est sélectionné
   if (selectedGame) {
     let GameComponent;
     switch (selectedGame) {
       case 'anatomie_puzzle_3d':
         GameComponent = AnatomiePuzzle;
         break;
-      case 'chirurgie_simulator':
-      case 'battle_royale_medical':
-      case 'escape_room_hopital':
-      case 'pharmacologie_tower_defense':
-      case 'memory_medical':
-        // Pour les autres jeux, afficher un message temporaire
+      default:
+        // Placeholder pour les jeux en développement
         return (
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-purple-900 flex items-center justify-center p-6">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+            <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md mx-4">
               <div className="mb-6">
                 <Gamepad2 className="w-16 h-16 mx-auto text-purple-500" />
               </div>
@@ -213,8 +180,6 @@ export function EnhancedQuizPage() {
             </div>
           </div>
         );
-      default:
-        GameComponent = null;
     }
 
     if (GameComponent) {
@@ -229,10 +194,10 @@ export function EnhancedQuizPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
       {/* Header amélioré */}
-      <motion.header 
+      <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg sticky top-0 z-40"
+        className="glass-premium shadow-lg sticky top-0 z-40"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -243,12 +208,12 @@ export function EnhancedQuizPage() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              
+
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Centre d'Apprentissage Interactif
               </h1>
             </div>
-            
+
             {/* Statistiques rapides */}
             <div className="hidden lg:flex items-center space-x-6">
               <div className="flex items-center space-x-2">
@@ -267,7 +232,7 @@ export function EnhancedQuizPage() {
                 {userStats.xp.toLocaleString()} XP
               </div>
             </div>
-            
+
             {/* Contrôles */}
             <div className="flex items-center space-x-2">
               <button
@@ -276,7 +241,7 @@ export function EnhancedQuizPage() {
               >
                 {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
               </button>
-              
+
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -295,11 +260,10 @@ export function EnhancedQuizPage() {
             <div className="flex">
               <button
                 onClick={() => setActiveTab('quiz')}
-                className={`relative px-6 py-4 font-medium transition-all ${
-                  activeTab === 'quiz'
-                    ? 'text-purple-600 dark:text-purple-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`relative px-6 py-4 font-medium transition-all ${activeTab === 'quiz'
+                  ? 'text-purple-600 dark:text-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
               >
                 <div className="flex items-center space-x-2">
                   <BookOpen className="w-5 h-5" />
@@ -316,14 +280,13 @@ export function EnhancedQuizPage() {
                   />
                 )}
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('jeux')}
-                className={`relative px-6 py-4 font-medium transition-all ${
-                  activeTab === 'jeux'
-                    ? 'text-purple-600 dark:text-purple-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                }`}
+                className={`relative px-6 py-4 font-medium transition-all ${activeTab === 'jeux'
+                  ? 'text-purple-600 dark:text-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  }`}
               >
                 <div className="flex items-center space-x-2">
                   <Gamepad2 className="w-5 h-5" />
@@ -341,7 +304,7 @@ export function EnhancedQuizPage() {
                 )}
               </button>
             </div>
-            
+
             {/* Barre de recherche */}
             <div className="relative">
               <input
@@ -384,7 +347,7 @@ export function EnhancedQuizPage() {
                           <span>{userStats.totalQuizzes}/500</span>
                         </div>
                         <div className="bg-white/20 rounded-full h-2">
-                          <div className="bg-white rounded-full h-2" style={{ width: `${(userStats.totalQuizzes/500)*100}%` }} />
+                          <div className="bg-white rounded-full h-2" style={{ width: `${(userStats.totalQuizzes / 500) * 100}%` }} />
                         </div>
                       </div>
                       <div>
@@ -404,7 +367,7 @@ export function EnhancedQuizPage() {
                     </div>
                   </motion.div>
                 </div>
-                
+
                 {/* Sélection de type de quiz */}
                 <div className="lg:w-2/3">
                   <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Types de Quiz</h3>
@@ -415,23 +378,19 @@ export function EnhancedQuizPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedQuizType(type.id)}
-                        className={`relative p-4 rounded-xl transition-all ${
-                          selectedQuizType === type.id
-                            ? 'bg-gradient-to-br ' + type.color + ' text-white shadow-lg'
-                            : 'bg-white dark:bg-gray-800 hover:shadow-md'
-                        }`}
+                        className={`relative p-4 rounded-xl transition-all ${selectedQuizType === type.id
+                          ? 'bg-gradient-to-br ' + type.color + ' text-white shadow-lg'
+                          : 'bg-white dark:bg-gray-800 hover:shadow-md'
+                          }`}
                       >
-                        <type.icon className={`w-8 h-8 mb-2 ${
-                          selectedQuizType === type.id ? 'text-white' : 'text-gray-600 dark:text-gray-400'
-                        }`} />
-                        <h4 className={`font-semibold ${
-                          selectedQuizType === type.id ? 'text-white' : 'text-gray-900 dark:text-white'
-                        }`}>
+                        <type.icon className={`w-8 h-8 mb-2 ${selectedQuizType === type.id ? 'text-white' : 'text-gray-600 dark:text-gray-400'
+                          }`} />
+                        <h4 className={`font-semibold ${selectedQuizType === type.id ? 'text-white' : 'text-gray-900 dark:text-white'
+                          }`}>
                           {type.name}
                         </h4>
-                        <p className={`text-xs mt-1 ${
-                          selectedQuizType === type.id ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
-                        }`}>
+                        <p className={`text-xs mt-1 ${selectedQuizType === type.id ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
+                          }`}>
                           {type.description}
                         </p>
                       </motion.button>
@@ -439,7 +398,7 @@ export function EnhancedQuizPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Filtres de difficulté */}
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -450,19 +409,18 @@ export function EnhancedQuizPage() {
                       <button
                         key={level}
                         onClick={() => setSelectedDifficulty(level)}
-                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                          selectedDifficulty === level
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${selectedDifficulty === level
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
                       >
                         {level === 'all' ? 'Tous' : level.charAt(0).toUpperCase() + level.slice(1)}
                       </button>
                     ))}
                   </div>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => setShowQuizCreator(true)}
                   className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
                 >
@@ -470,14 +428,14 @@ export function EnhancedQuizPage() {
                   Créer un Quiz
                 </button>
               </div>
-              
+
               {/* Liste des modules */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {availableModules.map((module) => (
                   <motion.div
                     key={module.id}
                     whileHover={{ y: -5 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden cursor-pointer"
+                    className="glass rounded-xl shadow-lg overflow-hidden cursor-pointer"
                     onClick={() => setSelectedModule(module.id)}
                   >
                     <div className={`h-2 bg-gradient-to-r ${module.color}`} />
@@ -501,11 +459,10 @@ export function EnhancedQuizPage() {
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-4 h-4 ${
-                                i < module.difficulty 
-                                  ? 'text-yellow-400 fill-current' 
-                                  : 'text-gray-300 dark:text-gray-600'
-                              }`}
+                              className={`w-4 h-4 ${i < module.difficulty
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-gray-300 dark:text-gray-600'
+                                }`}
                             />
                           ))}
                         </div>
@@ -544,7 +501,7 @@ export function EnhancedQuizPage() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Catégories de jeux */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
@@ -564,7 +521,7 @@ export function EnhancedQuizPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Grille de jeux */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredGames.map((game) => (
@@ -592,12 +549,12 @@ export function EnhancedQuizPage() {
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Header avec gradient */}
                     <div className={`h-32 bg-gradient-to-br ${game.color} p-6 flex items-center justify-center`}>
                       <game.icon className="w-16 h-16 text-white" />
                     </div>
-                    
+
                     {/* Contenu */}
                     <div className="p-6">
                       <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
@@ -606,7 +563,7 @@ export function EnhancedQuizPage() {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                         {game.description}
                       </p>
-                      
+
                       {/* Infos du jeu */}
                       <div className="flex items-center justify-between text-sm mb-4">
                         <div className="flex items-center space-x-4">
@@ -621,17 +578,16 @@ export function EnhancedQuizPage() {
                             </span>
                           )}
                         </div>
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          game.difficulty === 'facile' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${game.difficulty === 'facile' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
                           game.difficulty === 'moyen' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                          game.difficulty === 'difficile' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
-                          game.difficulty === 'expert' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
-                          'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
-                        }`}>
+                            game.difficulty === 'difficile' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                              game.difficulty === 'expert' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
+                                'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
+                          }`}>
                           {game.difficulty}
                         </span>
                       </div>
-                      
+
                       {/* Récompenses */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
@@ -657,7 +613,7 @@ export function EnhancedQuizPage() {
                   </motion.div>
                 ))}
               </div>
-              
+
               {/* Classement */}
               <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -668,7 +624,7 @@ export function EnhancedQuizPage() {
                     Voir tout →
                   </button>
                 </div>
-                
+
                 <div className="space-y-3">
                   {[
                     { rank: 1, name: 'Sarah B.', xp: 3450, avatar: '👩‍⚕️', medal: '🥇' },
@@ -679,11 +635,10 @@ export function EnhancedQuizPage() {
                   ].map((player) => (
                     <div
                       key={player.rank}
-                      className={`flex items-center justify-between p-3 rounded-lg ${
-                        player.highlight 
-                          ? 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-300 dark:border-purple-700' 
-                          : 'bg-gray-50 dark:bg-gray-700/50'
-                      }`}
+                      className={`flex items-center justify-between p-3 rounded-lg ${player.highlight
+                        ? 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-300 dark:border-purple-700'
+                        : 'bg-gray-50 dark:bg-gray-700/50'
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="text-2xl">{player.medal || player.rank}</div>

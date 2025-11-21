@@ -78,11 +78,10 @@ export const ModernNavbar: React.FC = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
-            ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl shadow-2xl border-b-2 border-pink-300/50 dark:border-pink-700/50'
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+            ? 'glass-premium border-b-0 rounded-none'
             : 'bg-gradient-to-r from-pink-50/90 via-purple-50/90 to-blue-50/90 dark:from-gray-900/90 dark:via-purple-900/50 dark:to-blue-900/50 backdrop-blur-xl shadow-xl'
-        }`}
+          }`}
       >
         {/* Magical Particles - Only on fine pointer devices (mouse) */}
         {hasFinePointer && (
@@ -269,11 +268,9 @@ export const ModernNavbar: React.FC = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: isRTL ? 400 : -400, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`fixed top-16 ${
-                isRTL ? 'right-0' : 'left-0'
-              } bottom-0 w-80 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 backdrop-blur-xl shadow-2xl z-40 overflow-y-auto ${hasFinePointer ? 'lg:hidden' : 'block'} ${
-                isRTL ? 'border-l-4' : 'border-r-4'
-              } border-pink-300 dark:border-pink-700`}
+              className={`fixed top-16 ${isRTL ? 'right-0' : 'left-0'
+                } bottom-0 w-80 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 backdrop-blur-xl shadow-2xl z-40 overflow-y-auto ${hasFinePointer ? 'lg:hidden' : 'block'} ${isRTL ? 'border-l-4' : 'border-r-4'
+                } border-pink-300 dark:border-pink-700`}
             >
               <div className="p-6 space-y-6">
                 {/* Dr. MiMi Avatar */}
@@ -293,8 +290,8 @@ export const ModernNavbar: React.FC = () => {
                       {language === 'en'
                         ? 'Welcome!'
                         : language === 'ar'
-                        ? 'مرحباً!'
-                        : 'Bienvenue!'}
+                          ? 'مرحباً!'
+                          : 'Bienvenue!'}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">
                       Dr. MiMi 💕
@@ -356,14 +353,13 @@ const MagicalNavButton: React.FC<{
   return (
     <Link to={item.href} onMouseEnter={onHover} onMouseLeave={onLeave}>
       <motion.div
-        className={`relative flex items-center gap-2 px-3 py-2 rounded-xl font-medium transition-all ${
-          isActive
+        className={`relative flex items-center gap-2 px-3 py-2 rounded-xl font-medium transition-all ${isActive
             ? `bg-gradient-to-r ${item.color || 'from-pink-500 to-purple-600'} text-white shadow-lg`
             : item.highlight
-            ? 'bg-gradient-to-r from-amber-400 to-pink-500 text-white'
-            : 'text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-800/80'
-        }`}
-        whileHover={{ 
+              ? 'bg-gradient-to-r from-amber-400 to-pink-500 text-white'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-800/80'
+          }`}
+        whileHover={{
           scale: 1.05,
           y: -2,
         }}
@@ -451,20 +447,18 @@ const MobileNavItem: React.FC<{ item: NavItem; index: number }> = ({ item, index
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: index * 0.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-          isActive
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${isActive
             ? `bg-gradient-to-r ${item.color || 'from-pink-500 to-purple-600'} text-white shadow-lg scale-105`
             : item.highlight
-            ? 'bg-gradient-to-r from-amber-400 to-pink-500 text-white hover:shadow-lg'
-            : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60'
-        }`}
+              ? 'bg-gradient-to-r from-amber-400 to-pink-500 text-white hover:shadow-lg'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-800/60'
+          }`}
       >
         <div
-          className={`p-2 rounded-lg ${
-            isActive || item.highlight
+          className={`p-2 rounded-lg ${isActive || item.highlight
               ? 'bg-white/20'
               : 'bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30'
-          }`}
+            }`}
         >
           <Icon className="w-5 h-5" />
         </div>
