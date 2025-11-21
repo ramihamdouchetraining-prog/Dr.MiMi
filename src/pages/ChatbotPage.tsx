@@ -59,12 +59,12 @@ const welcomeMessages = {
 
 export function ChatbotPage() {
   const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
-  const { locale } = useLanguage();
+  const { isDark } = useTheme();
+  const { language } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: welcomeMessages[locale as keyof typeof welcomeMessages] || welcomeMessages.fr,
+      content: welcomeMessages[language as keyof typeof welcomeMessages] || welcomeMessages.fr,
       sender: 'bot',
       timestamp: new Date(),
       suggestions: [
@@ -216,7 +216,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
   const speakMessage = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-US' : 'fr-FR';
+      utterance.lang = language === 'ar' ? 'ar-SA' : language === 'en' ? 'en-US' : 'fr-FR';
       utterance.rate = 0.9;
       speechSynthesis.speak(utterance);
       setIsSpeaking(true);
@@ -225,7 +225,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${isDark ? 'dark' : ''}`}>
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
         {/* Header */}
         <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg sticky top-0 z-40">
@@ -317,8 +317,8 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                     <div className={`max-w-[80%] ${message.sender === 'user' ? 'order-2' : ''}`}>
                       <div className={`flex items-start space-x-3 ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${message.sender === 'user'
-                            ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
-                            : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                          ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
+                          : 'bg-gradient-to-br from-purple-500 to-pink-500'
                           }`}>
                           {message.sender === 'user' ? (
                             <User className="w-6 h-6 text-white" />
@@ -329,8 +329,8 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
 
                         <div className="flex-1">
                           <div className={`rounded-2xl px-5 py-3 ${message.sender === 'user'
-                              ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                             }`}>
                             {message.sender === 'bot' ? (
                               <div className="prose dark:prose-invert prose-sm max-w-none">
@@ -472,8 +472,8 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   <button
                     onClick={() => setIsRecording(!isRecording)}
                     className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${isRecording
-                        ? 'bg-red-500 text-white animate-pulse'
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                   >
                     {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
