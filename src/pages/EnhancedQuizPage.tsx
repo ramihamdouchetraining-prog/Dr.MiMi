@@ -216,91 +216,65 @@ export function EnhancedQuizPage() {
             onComplete={(score: number) => {
               console.log('Game completed with score:', score);
               setSelectedGame(null);
-            }}
-            onExit={() => setSelectedGame(null)}
-          />
-        </div>
-      );
-    }
-  }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <SEO
-        title="Centre d'Apprentissage Interactif"
-        description="Accédez à des quiz médicaux, des jeux éducatifs et suivez votre progression."
-        keywords={['quiz médecine', 'jeux médicaux', 'apprentissage interactif', 'anatomie', 'pharmacologie']}
-      />
+              <div className="relative z-10 h-full flex flex-col justify-center">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                      </button>
 
-      {/* Header avec effet de parallaxe */}
-      <motion.header
-        initial={{ height: 300, opacity: 0 }}
-        animate={{ height: 200, opacity: 1 }}
-        className="relative overflow-hidden bg-gradient-to-r from-purple-900 to-indigo-900 text-white shadow-2xl"
-      >
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay" />
-        </div>
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        Centre d'Apprentissage Interactif
+                      </h1>
+                    </div>
 
-        <div className="relative z-10 h-full flex flex-col justify-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
+                    {/* Statistiques rapides */}
+                    <div className="hidden lg:flex items-center space-x-6">
+                      <div className="flex items-center space-x-2">
+                        <Trophy className="w-5 h-5 text-yellow-500" />
+                        <span className="text-sm font-medium">{userStats.rank}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Flame className="w-5 h-5 text-orange-500" />
+                        <span className="text-sm font-medium">{userStats.streak} jours</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-5 h-5 text-purple-500" />
+                        <span className="text-sm font-medium">Niveau {userStats.level}</span>
+                      </div>
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium">
+                        {userStats.xp.toLocaleString()} XP
+                      </div>
+                    </div>
 
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Centre d'Apprentissage Interactif
-                </h1>
-              </div>
+                    {/* Contrôles */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setSoundEnabled(!soundEnabled)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+                      </button>
 
-              {/* Statistiques rapides */}
-              <div className="hidden lg:flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="w-5 h-5 text-yellow-500" />
-                  <span className="text-sm font-medium">{userStats.rank}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Flame className="w-5 h-5 text-orange-500" />
-                  <span className="text-sm font-medium">{userStats.streak} jours</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Star className="w-5 h-5 text-purple-500" />
-                  <span className="text-sm font-medium">Niveau {userStats.level}</span>
-                </div>
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium">
-                  {userStats.xp.toLocaleString()} XP
+                      <button
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <Settings className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+      </motion.header >
 
-              {/* Contrôles */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-                </button>
-
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <Settings className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.header>
-
-      {/* Navigation par onglets améliorée */}
-      <div className="bg-white dark:bg-gray-800 shadow-md">
+      {/* Navigation par onglets améliorée */ }
+      < div className="bg-white dark:bg-gray-800 shadow-md" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex">
@@ -364,10 +338,10 @@ export function EnhancedQuizPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
 
-      {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Contenu principal */ }
+      < main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" >
         <AnimatePresence mode="wait">
           {activeTab === 'quiz' ? (
             <motion.div
@@ -710,24 +684,26 @@ export function EnhancedQuizPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </main >
 
-      {/* Quiz Creator Modal */}
+      {/* Quiz Creator Modal */ }
       <AnimatePresence>
-        {showQuizCreator && (
-          <QuizCreator
-            onClose={() => setShowQuizCreator(false)}
-            onSave={(quiz) => {
-              console.log('Nouveau quiz créé:', quiz);
-              // TODO: Sauvegarder le quiz dans la base de données via API
-              alert('Quiz créé avec succès ! 🎉\nTitre: ' + quiz.title + '\nQuestions: ' + quiz.questions.length);
-              setShowQuizCreator(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        {
+          showQuizCreator && (
+            <QuizCreator
+              onClose={() => setShowQuizCreator(false)}
+              onSave={(quiz) => {
+                console.log('Nouveau quiz créé:', quiz);
+                // TODO: Sauvegarder le quiz dans la base de données via API
+                alert('Quiz créé avec succès ! 🎉\nTitre: ' + quiz.title + '\nQuestions: ' + quiz.questions.length);
+                setShowQuizCreator(false);
+              }}
+            />
+          )
+        }
+      </AnimatePresence >
+    </div >
   );
-}
+    }
 
-export default EnhancedQuizPage;
+    export default EnhancedQuizPage;

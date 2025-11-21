@@ -13,6 +13,7 @@ interface SEOProps {
     modifiedTime?: string;
     section?: string;
     tags?: string[];
+    schema?: object; // New prop for custom structured data
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -26,6 +27,7 @@ export const SEO: React.FC<SEOProps> = ({
     modifiedTime,
     section,
     tags = [],
+    schema, // Destructure new prop
 }) => {
     const location = useLocation();
     const siteUrl = 'https://drmimi.netlify.app';
@@ -38,8 +40,8 @@ export const SEO: React.FC<SEOProps> = ({
     const fullDescription = description || defaultDescription;
     const fullImage = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : defaultImage;
 
-    // Structured Data (JSON-LD)
-    const structuredData = {
+    // Default Structured Data (JSON-LD)
+    const defaultStructuredData = {
         '@context': 'https://schema.org',
         '@type': type === 'article' ? 'Article' : 'WebSite',
         url: currentUrl,
@@ -70,6 +72,9 @@ export const SEO: React.FC<SEOProps> = ({
             keywords: tags.join(', '),
         }),
     };
+
+    // Merge default with custom schema
+    const structuredData = schema ? { ...defaultStructuredData, ...schema } : defaultStructuredData;
 
     return (
         <Helmet>
