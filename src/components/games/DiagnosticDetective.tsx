@@ -154,7 +154,7 @@ const HintCard: React.FC<HintProps> = ({ hint, onUse, disabled, revealed }) => {
 export function DiagnosticDetective() {
   const { isFeminine } = useTheme();
   const navigate = useNavigate();
-  
+
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'guessing' | 'result'>('intro');
   const [currentCase, setCurrentCase] = useState<any>(null);
   const [revealedHints, setRevealedHints] = useState<number[]>([]);
@@ -188,7 +188,7 @@ export function DiagnosticDetective() {
     setShowLabResults(false);
   };
 
-  const useHint = (index: number, cost: number) => {
+  const handleUseHint = (index: number, cost: number) => {
     if (!revealedHints.includes(index)) {
       setRevealedHints([...revealedHints, index]);
       setScore(Math.max(0, score - cost));
@@ -203,19 +203,19 @@ export function DiagnosticDetective() {
   const submitGuess = () => {
     const normalizedGuess = guess.toLowerCase().trim();
     const normalizedDiagnosis = currentCase.diagnosis.toLowerCase();
-    
-    setIsCorrect(normalizedGuess.includes(normalizedDiagnosis) || 
-                 normalizedDiagnosis.includes(normalizedGuess));
-    
+
+    setIsCorrect(normalizedGuess.includes(normalizedDiagnosis) ||
+      normalizedDiagnosis.includes(normalizedGuess));
+
     // Calculate final score with time bonus
     const timeBonus = Math.max(0, 100 - timeElapsed);
     const finalScore = isCorrect ? score + timeBonus : 0;
-    
+
     setScore(finalScore);
     setTotalScore(totalScore + finalScore);
     setCasesCompleted(casesCompleted + 1);
     setGameState('result');
-    
+
     // Save score
     saveScore(finalScore);
   };
@@ -274,22 +274,22 @@ export function DiagnosticDetective() {
             <ChevronRight size={20} className="rotate-180" />
             Retour
           </button>
-          
+
           <div className="flex items-center gap-4">
             <div className="px-4 py-2 rounded-lg font-medium"
-                 style={{
-                   backgroundColor: 'var(--color-surface)',
-                   color: 'var(--color-text)',
-                 }}>
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+              }}>
               <Timer size={16} className="inline mr-2" />
               {formatTime(timeElapsed)}
             </div>
-            
+
             <div className="px-4 py-2 rounded-lg font-medium"
-                 style={{
-                   backgroundColor: 'var(--color-primary)',
-                   color: 'white',
-                 }}>
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+              }}>
               <Trophy size={16} className="inline mr-2" />
               {score} pts
             </div>
@@ -313,7 +313,7 @@ export function DiagnosticDetective() {
               <p className="text-lg mb-8" style={{ color: 'var(--color-textSecondary)' }}>
                 Analysez les symptômes et trouvez le bon diagnostic
               </p>
-              
+
               <div className="max-w-md mx-auto mb-8 text-left">
                 <h3 className="font-bold mb-3" style={{ color: 'var(--color-text)' }}>
                   Comment jouer :
@@ -337,7 +337,7 @@ export function DiagnosticDetective() {
                   </li>
                 </ul>
               </div>
-              
+
               <motion.button
                 onClick={startGame}
                 className="px-8 py-4 text-lg font-bold rounded-xl text-white"
@@ -363,12 +363,12 @@ export function DiagnosticDetective() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Patient symptoms */}
                 <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--color-surface)' }}>
-                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2" 
-                      style={{ color: 'var(--color-text)' }}>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2"
+                    style={{ color: 'var(--color-text)' }}>
                     <Heart className="text-red-500" />
                     Présentation du patient
                   </h2>
-                  
+
                   <div className="space-y-3 mb-6">
                     {currentCase.symptoms.map((symptom: string, index: number) => (
                       <motion.div
@@ -431,16 +431,16 @@ export function DiagnosticDetective() {
                 <div>
                   <div className="p-6 rounded-xl mb-6" style={{ backgroundColor: 'var(--color-surface)' }}>
                     <h2 className="text-xl font-bold mb-4 flex items-center gap-2"
-                        style={{ color: 'var(--color-text)' }}>
+                      style={{ color: 'var(--color-text)' }}>
                       <Lightbulb className="text-yellow-500" />
                       Indices disponibles
                     </h2>
-                    
+
                     {currentCase.hints.map((hint: any, index: number) => (
                       <HintCard
                         key={index}
                         hint={hint}
-                        onUse={() => useHint(index, hint.cost)}
+                        onUse={() => handleUseHint(index, hint.cost)}
                         disabled={false}
                         revealed={revealedHints.includes(index)}
                       />
@@ -452,7 +452,7 @@ export function DiagnosticDetective() {
                     <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
                       Votre diagnostic
                     </h2>
-                    
+
                     <input
                       type="text"
                       value={guess}
@@ -465,7 +465,7 @@ export function DiagnosticDetective() {
                         border: '2px solid var(--color-border)',
                       }}
                     />
-                    
+
                     <motion.button
                       onClick={submitGuess}
                       disabled={!guess.trim()}
@@ -503,13 +503,13 @@ export function DiagnosticDetective() {
                   <XCircle size={80} className="mx-auto mb-6 text-red-500" />
                 )}
               </motion.div>
-              
+
               <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
                 {isCorrect ? `Excellent diagnostic ! ${isFeminine ? '🎉💕' : '🎉'}` : 'Diagnostic incorrect'}
               </h1>
-              
+
               <div className="max-w-2xl mx-auto mb-8 p-6 rounded-xl"
-                   style={{ backgroundColor: 'var(--color-surface)' }}>
+                style={{ backgroundColor: 'var(--color-surface)' }}>
                 <div className="mb-6">
                   <p className="text-sm mb-2" style={{ color: 'var(--color-textSecondary)' }}>
                     Diagnostic correct :
@@ -518,9 +518,9 @@ export function DiagnosticDetective() {
                     {currentCase.diagnosis}
                   </p>
                 </div>
-                
+
                 <div className="text-left mb-6 p-4 rounded-lg"
-                     style={{ backgroundColor: 'var(--color-background)' }}>
+                  style={{ backgroundColor: 'var(--color-background)' }}>
                   <h3 className="font-bold mb-2" style={{ color: 'var(--color-text)' }}>
                     Explication :
                   </h3>
@@ -528,7 +528,7 @@ export function DiagnosticDetective() {
                     {currentCase.explanation}
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm" style={{ color: 'var(--color-textSecondary)' }}>
@@ -556,7 +556,7 @@ export function DiagnosticDetective() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex gap-4 justify-center">
                 <motion.button
                   onClick={startGame}
@@ -570,7 +570,7 @@ export function DiagnosticDetective() {
                 >
                   Nouveau cas
                 </motion.button>
-                
+
                 <motion.button
                   onClick={() => navigate('/games')}
                   className="px-6 py-3 rounded-lg font-medium"

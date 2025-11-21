@@ -67,11 +67,46 @@ const NewsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('recent');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
-  
+
   // API State
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Filter articles
+  const filteredArticles = useMemo(() => {
+    let filtered = newsArticles;
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(a => a.category === selectedCategory);
+    }
+
+    if (showFeaturedOnly) {
+      filtered = filtered.filter(a => a.isFeatured);
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(a =>
+        a.title.toLowerCase().includes(term) ||
+        a.titleEn.toLowerCase().includes(term) ||
+        a.titleAr.includes(term) ||
+        a.subtitle.toLowerCase().includes(term) ||
+        a.tags.some(tag => tag.toLowerCase().includes(term))
+      );
+    }
+
+    // Sort
+    if (sortBy === 'recent') {
+      filtered.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    } else if (sortBy === 'popular') {
+      filtered.sort((a, b) => b.views - a.views);
+    } else if (sortBy === 'trending') {
+      filtered.sort((a, b) => (b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares));
+    }
+
+    return filtered;
+  }, [newsArticles, selectedCategory, showFeaturedOnly, searchTerm, sortBy]);
 
   // Fetch news from API
   useEffect(() => {
@@ -79,7 +114,7 @@ const NewsPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const data = await apiFetch('/api/news');
         setNewsArticles(data);
       } catch (err: any) {
@@ -117,8 +152,8 @@ const NewsPage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
-        <ErrorState 
-          message={error} 
+        <ErrorState
+          message={error}
           onRetry={() => window.location.reload()}
         />
       </div>
@@ -129,7 +164,7 @@ const NewsPage: React.FC = () => {
   if (newsArticles.length === 0) {
     return (
       <div className="min-h-screen" style={{ background: 'var(--gradient-bg)' }}>
-        <EmptyState 
+        <EmptyState
           icon="mimi"
           title={language === 'en' ? 'No news available' : language === 'ar' ? 'لا توجد أخبار' : 'Aucune actualité disponible'}
           message={language === 'en' ? 'Check back later for medical news updates' : language === 'ar' ? 'تحقق لاحقًا من تحديثات الأخبار الطبية' : 'Revenez plus tard pour les actualités médicales'}
@@ -140,40 +175,7 @@ const NewsPage: React.FC = () => {
 
 
 
-  // Filter articles
-  const filteredArticles = useMemo(() => {
-    let filtered = newsArticles;
 
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(a => a.category === selectedCategory);
-    }
-
-    if (showFeaturedOnly) {
-      filtered = filtered.filter(a => a.isFeatured);
-    }
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(a =>
-        a.title.toLowerCase().includes(term) ||
-        a.titleEn.toLowerCase().includes(term) ||
-        a.titleAr.includes(term) ||
-        a.subtitle.toLowerCase().includes(term) ||
-        a.tags.some(tag => tag.toLowerCase().includes(term))
-      );
-    }
-
-    // Sort
-    if (sortBy === 'recent') {
-      filtered.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-    } else if (sortBy === 'popular') {
-      filtered.sort((a, b) => b.views - a.views);
-    } else if (sortBy === 'trending') {
-      filtered.sort((a, b) => (b.likes + b.comments + b.shares) - (a.likes + a.comments + a.shares));
-    }
-
-    return filtered;
-  }, [selectedCategory, showFeaturedOnly, searchTerm, sortBy]);
 
   // Get article title based on language
   const getArticleTitle = (article: NewsArticle) => {
@@ -216,8 +218,8 @@ const NewsPage: React.FC = () => {
             {language === 'en'
               ? 'Stay updated with the latest medical news and breakthroughs'
               : language === 'ar'
-              ? 'ابق على اطلاع بآخر الأخبار والاكتشافات الطبية'
-              : 'Restez informé des dernières actualités et avancées médicales'}
+                ? 'ابق على اطلاع بآخر الأخبار والاكتشافات الطبية'
+                : 'Restez informé des dernières actualités et avancées médicales'}
           </p>
         </motion.div>
 
@@ -251,9 +253,8 @@ const NewsPage: React.FC = () => {
               <motion.button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-lg transition-all whitespace-nowrap ${
-                  selectedCategory === cat.id ? 'font-semibold' : ''
-                }`}
+                className={`px-4 py-2 rounded-lg transition-all whitespace-nowrap ${selectedCategory === cat.id ? 'font-semibold' : ''
+                  }`}
                 style={{
                   backgroundColor: selectedCategory === cat.id
                     ? 'var(--color-primary)'
@@ -287,8 +288,8 @@ const NewsPage: React.FC = () => {
               placeholder={language === 'en'
                 ? 'Search articles...'
                 : language === 'ar'
-                ? 'البحث عن المقالات...'
-                : 'Rechercher articles...'}
+                  ? 'البحث عن المقالات...'
+                  : 'Rechercher articles...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 rounded-lg border`}
@@ -318,10 +319,10 @@ const NewsPage: React.FC = () => {
 
           {/* Featured Filter */}
           <div className="flex items-center gap-2 px-4 py-3 rounded-lg border"
-               style={{
-                 backgroundColor: 'var(--color-surface)',
-                 borderColor: 'var(--color-border)',
-               }}>
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              borderColor: 'var(--color-border)',
+            }}>
             <input
               type="checkbox"
               id="featured"
@@ -429,8 +430,8 @@ const NewsPage: React.FC = () => {
               {language === 'en'
                 ? 'Try adjusting your search criteria'
                 : language === 'ar'
-                ? 'حاول تعديل معايير البحث'
-                : 'Essayez de modifier vos critères de recherche'}
+                  ? 'حاول تعديل معايير البحث'
+                  : 'Essayez de modifier vos critères de recherche'}
             </p>
           </motion.div>
         )}
@@ -454,8 +455,8 @@ const NewsPage: React.FC = () => {
               {language === 'en'
                 ? 'Get the latest medical news delivered to your inbox'
                 : language === 'ar'
-                ? 'احصل على آخر الأخبار الطبية في بريدك الإلكتروني'
-                : 'Recevez les dernières actualités médicales dans votre boîte mail'}
+                  ? 'احصل على آخر الأخبار الطبية في بريدك الإلكتروني'
+                  : 'Recevez les dernières actualités médicales dans votre boîte mail'}
             </p>
             <button
               className="px-6 py-3 rounded-lg font-medium"

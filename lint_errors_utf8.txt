@@ -1,0 +1,31 @@
+﻿
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\AdvancedChatbot.tsx
+  160:16  error  Unexpected constant condition  no-constant-condition
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\BackendWakeupStatus.tsx
+  21:5  error  'timer' is never reassigned. Use 'const' instead  prefer-const
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\Confetti.tsx
+  112:19  error  Empty block statement  no-empty
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\LanguageSelector.tsx
+  58:11  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\ParticleBackground.tsx
+   99:11  error  Unexpected lexical declaration in case block  no-case-declarations
+  100:11  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\ThemeToggle.tsx
+  131:11  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\components\games\DiagnosticDetective.tsx
+  443:38  error  React Hook "useHint" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\pages\ChatbotPage.tsx
+  124:14  error  Unexpected constant condition  no-constant-condition
+
+C:\Users\HAMDOUCHE Rami\Desktop\DrMiMi\replit\DrMiMiAnalysis\src\pages\NewsPage.tsx
+  144:28  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+Ô£û 10 problems (10 errors, 0 warnings)
+

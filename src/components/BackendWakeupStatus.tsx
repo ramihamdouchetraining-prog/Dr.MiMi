@@ -14,11 +14,10 @@ export function BackendWakeupStatus({ show, onReady }: BackendStatusProps) {
   useEffect(() => {
     if (!show) return;
 
-    let timer: NodeJS.Timeout;
     const startTime = Date.now();
 
     // Update elapsed time every second
-    timer = setInterval(() => {
+    const timer = setInterval(() => {
       setElapsed(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
 

@@ -20,7 +20,7 @@ export const ParticleBackground: React.FC = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -35,7 +35,7 @@ export const ParticleBackground: React.FC = () => {
     // Initialize particles
     const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#F0E68C', '#98FB98', '#87CEEB'];
     const types: Particle['type'][] = ['cell', 'dna', 'molecule', 'heart', 'star'];
-    
+
     for (let i = 0; i < 50; i++) {
       particlesRef.current.push({
         id: i,
@@ -52,7 +52,7 @@ export const ParticleBackground: React.FC = () => {
     const drawParticle = (particle: Particle) => {
       ctx.save();
       ctx.globalAlpha = 0.6;
-      
+
       switch (particle.type) {
         case 'cell':
           ctx.beginPath();
@@ -63,7 +63,7 @@ export const ParticleBackground: React.FC = () => {
           ctx.lineWidth = 1;
           ctx.stroke();
           break;
-          
+
         case 'dna':
           ctx.strokeStyle = particle.color;
           ctx.lineWidth = 2;
@@ -76,7 +76,7 @@ export const ParticleBackground: React.FC = () => {
           }
           ctx.stroke();
           break;
-          
+
         case 'molecule':
           // Draw simple molecule structure
           ctx.fillStyle = particle.color;
@@ -92,8 +92,8 @@ export const ParticleBackground: React.FC = () => {
           ctx.lineTo(particle.x + 10, particle.y + 5);
           ctx.stroke();
           break;
-          
-        case 'heart':
+
+        case 'heart': {
           ctx.fillStyle = particle.color;
           ctx.beginPath();
           const x = particle.x;
@@ -105,7 +105,8 @@ export const ParticleBackground: React.FC = () => {
           ctx.bezierCurveTo(x + 5, y, x, y, x, y + 3);
           ctx.fill();
           break;
-          
+        }
+
         case 'star':
           ctx.fillStyle = particle.color;
           ctx.beginPath();
@@ -120,34 +121,34 @@ export const ParticleBackground: React.FC = () => {
           ctx.fill();
           break;
       }
-      
+
       ctx.restore();
     };
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       particlesRef.current.forEach(particle => {
         particle.x += particle.vx;
         particle.y += particle.vy;
-        
+
         // Bounce off walls
         if (particle.x <= 0 || particle.x >= canvas.width) particle.vx *= -1;
         if (particle.y <= 0 || particle.y >= canvas.height) particle.vy *= -1;
-        
+
         drawParticle(particle);
       });
 
       // Draw connections between nearby particles
       ctx.strokeStyle = 'rgba(255, 182, 193, 0.1)';
       ctx.lineWidth = 0.5;
-      
+
       for (let i = 0; i < particlesRef.current.length; i++) {
         for (let j = i + 1; j < particlesRef.current.length; j++) {
           const dx = particlesRef.current[i].x - particlesRef.current[j].x;
           const dy = particlesRef.current[i].y - particlesRef.current[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          
+
           if (distance < 100) {
             ctx.beginPath();
             ctx.moveTo(particlesRef.current[i].x, particlesRef.current[i].y);
@@ -156,7 +157,7 @@ export const ParticleBackground: React.FC = () => {
           }
         }
       }
-      
+
       animationRef.current = requestAnimationFrame(animate);
     };
 
@@ -182,7 +183,7 @@ export const ParticleBackground: React.FC = () => {
 // Floating medical icons
 export const FloatingMedicalIcons: React.FC = () => {
   const icons = ['🧬', '💊', '🩺', '🧪', '🫀', '🧠', '🦷', '💉', '🔬', '🩹'];
-  
+
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {icons.map((icon, index) => (

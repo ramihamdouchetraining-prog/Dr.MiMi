@@ -53,7 +53,7 @@ export const LanguageSelector: React.FC = () => {
           e.preventDefault();
           setFocusIndex((prev) => (prev - 1 + languages.length) % languages.length);
           break;
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
           const selectedLanguage = languages[focusIndex];
           if (selectedLanguage) {
@@ -62,6 +62,7 @@ export const LanguageSelector: React.FC = () => {
             buttonRef.current?.focus();
           }
           break;
+        }
         case 'Tab':
           if (e.shiftKey) {
             e.preventDefault();
@@ -141,8 +142,8 @@ export const LanguageSelector: React.FC = () => {
           {isOpen && (
             <>
               {/* Click outside overlay */}
-              <div 
-                className="fixed inset-0" 
+              <div
+                className="fixed inset-0"
                 style={{ zIndex: 'calc(var(--z-dropdown) - 1)' }}
                 onClick={() => setIsOpen(false)}
                 aria-hidden="true"
@@ -168,13 +169,13 @@ export const LanguageSelector: React.FC = () => {
                 }}
               >
                 <div className="p-2 space-y-1">
-                  <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider" 
-                       style={{ color: 'var(--color-textSecondary)' }}>
-                    {language === 'fr' ? 'Choisir la langue' : 
-                     language === 'en' ? 'Choose language' : 
-                     'اختر اللغة'}
+                  <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--color-textSecondary)' }}>
+                    {language === 'fr' ? 'Choisir la langue' :
+                      language === 'en' ? 'Choose language' :
+                        'اختر اللغة'}
                   </div>
-                  
+
                   {languages.map((lang, index) => (
                     <motion.button
                       key={lang.code}
@@ -191,14 +192,14 @@ export const LanguageSelector: React.FC = () => {
                         ${focusIndex === index ? 'ring-2 ring-offset-1' : ''}
                       `}
                       style={{
-                        backgroundColor: 
-                          language === lang.code 
-                            ? 'var(--color-primary-light)' 
-                            : focusIndex === index 
-                              ? 'var(--color-primary-light)' 
+                        backgroundColor:
+                          language === lang.code
+                            ? 'var(--color-primary-light)'
+                            : focusIndex === index
+                              ? 'var(--color-primary-light)'
                               : 'transparent',
-                        color: 
-                          language === lang.code 
+                        color:
+                          language === lang.code
                             ? 'var(--color-primary)'
                             : 'var(--color-text)',
                         '--tw-ring-color': 'var(--color-primary)',

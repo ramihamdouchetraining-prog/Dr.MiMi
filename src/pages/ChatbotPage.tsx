@@ -121,18 +121,19 @@ export function ChatbotPage() {
         throw new Error('Impossible de lire la réponse');
       }
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n');
-        
+
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
             if (data === '[DONE]') continue;
-            
+
             try {
               const parsed = JSON.parse(data);
               if (parsed.content) {
@@ -185,7 +186,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
     // Appeler l'API Gemini
     try {
       const responseContent = await fetchBotResponse(inputMessage);
-      
+
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: responseContent,
@@ -196,7 +197,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
           severity: 'info'
         }
       };
-      
+
       setMessages(prev => [...prev, botResponse]);
     } catch (error) {
       console.error('Erreur lors de l\'envoi du message:', error);
@@ -237,7 +238,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                
+
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                     <Bot className="w-7 h-7 text-white" />
@@ -252,7 +253,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setShowHistory(!showHistory)}
@@ -260,14 +261,14 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                 >
                   <History className="w-5 h-5" />
                 </button>
-                
+
                 <button
                   onClick={() => setIsFullscreen(!isFullscreen)}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
                 </button>
-                
+
                 <button
                   onClick={() => setShowSettings(!showSettings)}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -315,24 +316,22 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   >
                     <div className={`max-w-[80%] ${message.sender === 'user' ? 'order-2' : ''}`}>
                       <div className={`flex items-start space-x-3 ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          message.sender === 'user' 
-                            ? 'bg-gradient-to-br from-blue-500 to-cyan-500' 
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${message.sender === 'user'
+                            ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
                             : 'bg-gradient-to-br from-purple-500 to-pink-500'
-                        }`}>
+                          }`}>
                           {message.sender === 'user' ? (
                             <User className="w-6 h-6 text-white" />
                           ) : (
                             <Sparkles className="w-6 h-6 text-white" />
                           )}
                         </div>
-                        
+
                         <div className="flex-1">
-                          <div className={`rounded-2xl px-5 py-3 ${
-                            message.sender === 'user'
+                          <div className={`rounded-2xl px-5 py-3 ${message.sender === 'user'
                               ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                          }`}>
+                            }`}>
                             {message.sender === 'bot' ? (
                               <div className="prose dark:prose-invert prose-sm max-w-none">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -343,7 +342,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                               <p>{message.content}</p>
                             )}
                           </div>
-                          
+
                           {/* Suggestions */}
                           {message.suggestions && (
                             <div className="mt-3 space-y-2">
@@ -360,13 +359,13 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                               ))}
                             </div>
                           )}
-                          
+
                           {/* Actions */}
                           <div className="flex items-center space-x-2 mt-2">
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                               {message.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                             </span>
-                            
+
                             {message.sender === 'bot' && (
                               <>
                                 <button
@@ -375,7 +374,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                                 >
                                   <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                                 </button>
-                                
+
                                 <button
                                   onClick={() => speakMessage(message.content)}
                                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
@@ -386,11 +385,11 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                                     <Volume2 className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                                   )}
                                 </button>
-                                
+
                                 <button className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors">
                                   <ThumbsUp className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                                 </button>
-                                
+
                                 <button className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors">
                                   <ThumbsDown className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                                 </button>
@@ -403,7 +402,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               {/* Typing Indicator */}
               {isTyping && (
                 <motion.div
@@ -435,7 +434,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   </div>
                 </motion.div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -448,7 +447,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                 >
                   <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 </button>
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -459,7 +458,7 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                     console.log(e.target.files);
                   }}
                 />
-                
+
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -469,19 +468,18 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                     onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                     className="w-full px-4 py-3 pr-12 bg-gray-100 dark:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                  
+
                   <button
                     onClick={() => setIsRecording(!isRecording)}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${
-                      isRecording 
-                        ? 'bg-red-500 text-white animate-pulse' 
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${isRecording
+                        ? 'bg-red-500 text-white animate-pulse'
                         : 'hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
+                      }`}
                   >
                     {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                   </button>
                 </div>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -492,9 +490,9 @@ Posez-moi votre question et je ferai de mon mieux pour vous aider!`;
                   <Send className="w-5 h-5" />
                 </motion.button>
               </div>
-              
+
               <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3">
-                Dr. MiMi utilise l'IA pour fournir des informations médicales éducatives. 
+                Dr. MiMi utilise l'IA pour fournir des informations médicales éducatives.
                 Ne remplace pas un avis médical professionnel.
               </p>
             </div>

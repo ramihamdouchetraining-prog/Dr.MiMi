@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   X, Send, Paperclip, Moon, Sun,
   FileText, Image as ImageIcon, File, Trash2,
   Minimize2, Maximize2, Loader2
@@ -100,7 +100,7 @@ export const AdvancedChatbot: React.FC = () => {
 
   const removeAttachment = async (index: number) => {
     const attachment = attachments[index];
-    
+
     // Delete file from server
     try {
       await fetch(`/api/chat/upload/${attachment.filename}`, {
@@ -109,7 +109,7 @@ export const AdvancedChatbot: React.FC = () => {
     } catch (error) {
       console.error('Error deleting file:', error);
     }
-    
+
     // Remove from local state
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
@@ -157,6 +157,7 @@ export const AdvancedChatbot: React.FC = () => {
       setMessages(prev => [...prev, assistantMessage]);
 
       if (reader) {
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -171,23 +172,23 @@ export const AdvancedChatbot: React.FC = () => {
 
               try {
                 const parsed = JSON.parse(data);
-                
+
                 // Handle errors from backend
                 if (parsed.error) {
                   assistantContent = `❌ Erreur: ${parsed.error}`;
-                  setMessages(prev => prev.map(m => 
-                    m.id === assistantMessage.id 
+                  setMessages(prev => prev.map(m =>
+                    m.id === assistantMessage.id
                       ? { ...m, content: assistantContent }
                       : m
                   ));
                   break;
                 }
-                
+
                 // Only append if content exists
                 if (parsed.content) {
                   assistantContent += parsed.content;
-                  setMessages(prev => prev.map(m => 
-                    m.id === assistantMessage.id 
+                  setMessages(prev => prev.map(m =>
+                    m.id === assistantMessage.id
                       ? { ...m, content: assistantContent }
                       : m
                   ));
@@ -238,7 +239,7 @@ export const AdvancedChatbot: React.FC = () => {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         >
-          <img 
+          <img
             src="/images/logos/logo-hijab.png"
             alt="Dr. MiMi"
             className="w-full h-full object-cover"
@@ -271,15 +272,15 @@ export const AdvancedChatbot: React.FC = () => {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {/* Header */}
-            <div 
+            <div
               className="flex items-center justify-between p-4"
-              style={{ 
+              style={{
                 background: 'linear-gradient(135deg, #D4AF37 0%, #9333EA 100%)',
                 color: 'white'
               }}
             >
               <div className="flex items-center gap-3">
-                <img 
+                <img
                   src="/images/logos/logo-hijab.png"
                   alt="Dr. MiMi"
                   className="w-10 h-10 rounded-full border-2 border-white"
@@ -289,7 +290,7 @@ export const AdvancedChatbot: React.FC = () => {
                   <p className="text-xs opacity-90">Assistante Médicale IA</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 {/* Language Selector */}
                 <select
@@ -334,9 +335,9 @@ export const AdvancedChatbot: React.FC = () => {
             {/* Messages */}
             {!isMinimized && (
               <>
-                <div 
+                <div
                   className="flex-1 overflow-y-auto p-4 space-y-4"
-                  style={{ 
+                  style={{
                     backgroundColor: chatTheme === 'light' ? '#F8FAFC' : '#0F172A',
                     direction: language === 'ar' ? 'rtl' : 'ltr'
                   }}
@@ -349,13 +350,12 @@ export const AdvancedChatbot: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                     >
                       <div
-                        className={`max-w-[80%] rounded-2xl p-3 ${
-                          msg.role === 'user'
+                        className={`max-w-[80%] rounded-2xl p-3 ${msg.role === 'user'
                             ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                            : chatTheme === 'light' 
-                              ? 'bg-white text-gray-800 shadow-sm' 
+                            : chatTheme === 'light'
+                              ? 'bg-white text-gray-800 shadow-sm'
                               : 'bg-slate-700 text-gray-100'
-                        }`}
+                          }`}
                       >
                         <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                         {msg.attachments && msg.attachments.length > 0 && (
@@ -369,9 +369,9 @@ export const AdvancedChatbot: React.FC = () => {
                           </div>
                         )}
                         <p className="text-xs opacity-60 mt-1">
-                          {msg.timestamp.toLocaleTimeString(language === 'ar' ? 'ar-SA' : language, { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                          {msg.timestamp.toLocaleTimeString(language === 'ar' ? 'ar-SA' : language, {
+                            hour: '2-digit',
+                            minute: '2-digit'
                           })}
                         </p>
                       </div>
@@ -379,9 +379,8 @@ export const AdvancedChatbot: React.FC = () => {
                   ))}
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className={`rounded-2xl p-3 ${
-                        chatTheme === 'light' ? 'bg-white' : 'bg-slate-700'
-                      }`}>
+                      <div className={`rounded-2xl p-3 ${chatTheme === 'light' ? 'bg-white' : 'bg-slate-700'
+                        }`}>
                         <Loader2 className="animate-spin" size={20} style={{ color: textColor }} />
                       </div>
                     </div>
@@ -391,7 +390,7 @@ export const AdvancedChatbot: React.FC = () => {
 
                 {/* Attachments Preview */}
                 {attachments.length > 0 && (
-                  <div 
+                  <div
                     className="px-4 py-2 border-t"
                     style={{ borderColor, backgroundColor: bgColor }}
                   >
@@ -400,7 +399,7 @@ export const AdvancedChatbot: React.FC = () => {
                         <div
                           key={idx}
                           className="flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-                          style={{ 
+                          style={{
                             backgroundColor: chatTheme === 'light' ? '#F1F5F9' : '#334155',
                             color: textColor
                           }}
@@ -419,13 +418,13 @@ export const AdvancedChatbot: React.FC = () => {
                 )}
 
                 {/* Input */}
-                <div 
+                <div
                   className="p-4 border-t"
                   style={{ borderColor, backgroundColor: bgColor }}
                 >
-                  <div 
+                  <div
                     className="flex items-end gap-2 p-2 rounded-xl"
-                    style={{ 
+                    style={{
                       backgroundColor: chatTheme === 'light' ? '#F1F5F9' : '#1E293B',
                       border: `1px solid ${borderColor}`
                     }}
@@ -456,7 +455,7 @@ export const AdvancedChatbot: React.FC = () => {
                       }}
                       placeholder={language === 'ar' ? 'اكتب رسالتك...' : language === 'en' ? 'Type your message...' : 'Écris ton message...'}
                       className="flex-1 bg-transparent border-none outline-none resize-none text-sm py-2"
-                      style={{ 
+                      style={{
                         color: textColor,
                         direction: language === 'ar' ? 'rtl' : 'ltr'
                       }}
@@ -475,11 +474,11 @@ export const AdvancedChatbot: React.FC = () => {
                     </button>
                   </div>
                   <p className="text-xs mt-2 opacity-60" style={{ color: textColor }}>
-                    {language === 'ar' 
+                    {language === 'ar'
                       ? 'أنا لا أحل محل الطبيب الحقيقي 🩺'
                       : language === 'en'
-                      ? 'I do not replace a real doctor 🩺'
-                      : 'Je ne remplace pas un vrai médecin 🩺'}
+                        ? 'I do not replace a real doctor 🩺'
+                        : 'Je ne remplace pas un vrai médecin 🩺'}
                   </p>
                 </div>
               </>

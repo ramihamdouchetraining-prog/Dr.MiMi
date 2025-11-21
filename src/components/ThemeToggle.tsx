@@ -26,84 +26,84 @@ export const ThemeToggle: React.FC = () => {
     onOpenChange: setIsOpen
   });
 
-  const themes: Array<{ 
+  const themes: Array<{
     key: ThemeType;
     icon: React.ElementType;
     label: string;
     color: string;
     emoji: string;
   }> = [
-    { 
-      key: 'classique-clair', 
-      icon: Sun, 
-      label: 'Classique Clair', 
-      color: '#FFB6C1',
-      emoji: '☀️'
-    },
-    { 
-      key: 'sombre-pro', 
-      icon: Moon, 
-      label: 'Sombre Pro', 
-      color: '#60A5FA',
-      emoji: '🌙'
-    },
-    { 
-      key: 'emeraude', 
-      icon: Droplets, 
-      label: 'Émeraude', 
-      color: '#10B981',
-      emoji: '💚'
-    },
-    { 
-      key: 'rose-sante', 
-      icon: Heart, 
-      label: 'Rose Santé', 
-      color: '#EC4899',
-      emoji: '💕'
-    },
-    { 
-      key: 'sepia-lecture', 
-      icon: BookOpen, 
-      label: 'Sépia Lecture', 
-      color: '#92400E',
-      emoji: '📚'
-    },
-    { 
-      key: 'nuit-profonde', 
-      icon: Sparkles, 
-      label: 'Nuit Profonde', 
-      color: '#3B82F6',
-      emoji: '🌃'
-    },
-    { 
-      key: 'jardin-rose', 
-      icon: Flower, 
-      label: 'Jardin Rose', 
-      color: '#F472B6',
-      emoji: '🌸'
-    },
-    { 
-      key: 'ocean-medical', 
-      icon: Waves, 
-      label: 'Océan Médical', 
-      color: '#0EA5E9',
-      emoji: '🌊'
-    },
-    { 
-      key: 'sunset-wellness', 
-      icon: Sunset, 
-      label: 'Sunset Wellness', 
-      color: '#FB923C',
-      emoji: '🌅'
-    },
-    { 
-      key: 'ramadan-lunar', 
-      icon: Star, 
-      label: 'Ramadan Lunaire', 
-      color: '#D4AF37',
-      emoji: '🌙'
-    },
-  ];
+      {
+        key: 'classique-clair',
+        icon: Sun,
+        label: 'Classique Clair',
+        color: '#FFB6C1',
+        emoji: '☀️'
+      },
+      {
+        key: 'sombre-pro',
+        icon: Moon,
+        label: 'Sombre Pro',
+        color: '#60A5FA',
+        emoji: '🌙'
+      },
+      {
+        key: 'emeraude',
+        icon: Droplets,
+        label: 'Émeraude',
+        color: '#10B981',
+        emoji: '💚'
+      },
+      {
+        key: 'rose-sante',
+        icon: Heart,
+        label: 'Rose Santé',
+        color: '#EC4899',
+        emoji: '💕'
+      },
+      {
+        key: 'sepia-lecture',
+        icon: BookOpen,
+        label: 'Sépia Lecture',
+        color: '#92400E',
+        emoji: '📚'
+      },
+      {
+        key: 'nuit-profonde',
+        icon: Sparkles,
+        label: 'Nuit Profonde',
+        color: '#3B82F6',
+        emoji: '🌃'
+      },
+      {
+        key: 'jardin-rose',
+        icon: Flower,
+        label: 'Jardin Rose',
+        color: '#F472B6',
+        emoji: '🌸'
+      },
+      {
+        key: 'ocean-medical',
+        icon: Waves,
+        label: 'Océan Médical',
+        color: '#0EA5E9',
+        emoji: '🌊'
+      },
+      {
+        key: 'sunset-wellness',
+        icon: Sunset,
+        label: 'Sunset Wellness',
+        color: '#FB923C',
+        emoji: '🌅'
+      },
+      {
+        key: 'ramadan-lunar',
+        icon: Star,
+        label: 'Ramadan Lunaire',
+        color: '#D4AF37',
+        emoji: '🌙'
+      },
+    ];
 
   const currentTheme = themes.find(t => t.key === theme) || themes[0];
   const currentThemeIndex = themes.findIndex(t => t.key === theme);
@@ -126,7 +126,7 @@ export const ThemeToggle: React.FC = () => {
           e.preventDefault();
           setFocusIndex((prev) => (prev - 1 + themes.length) % themes.length);
           break;
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
           const selectedTheme = themes[focusIndex];
           if (selectedTheme) {
@@ -135,6 +135,7 @@ export const ThemeToggle: React.FC = () => {
             buttonRef.current?.focus();
           }
           break;
+        }
         case 'Tab':
           if (e.shiftKey) {
             e.preventDefault();
@@ -176,7 +177,7 @@ export const ThemeToggle: React.FC = () => {
 
   const handleThemeChange = (newTheme: ThemeType) => {
     setTheme(newTheme);
-    
+
     // Add magical effect when changing to magical themes
     if (['emeraude', 'rose-sante'].includes(newTheme)) {
       createMagicalEffect();
@@ -186,7 +187,7 @@ export const ThemeToggle: React.FC = () => {
   const createMagicalEffect = () => {
     const effects = magicalEffects.magic;
     const container = document.body;
-    
+
     for (let i = 0; i < 12; i++) {
       const effect = document.createElement('div');
       effect.textContent = effects[Math.floor(Math.random() * effects.length)];
@@ -197,9 +198,9 @@ export const ThemeToggle: React.FC = () => {
       effect.style.pointerEvents = 'none';
       effect.style.zIndex = 'var(--z-toast)';
       effect.style.animation = 'magicalFloat 3s ease-out forwards';
-      
+
       container.appendChild(effect);
-      
+
       setTimeout(() => {
         container.removeChild(effect);
       }, 3000);
@@ -240,13 +241,13 @@ export const ThemeToggle: React.FC = () => {
           {isOpen && (
             <>
               {/* Click outside overlay */}
-              <div 
-                className="fixed inset-0" 
+              <div
+                className="fixed inset-0"
                 style={{ zIndex: 'calc(var(--z-dropdown) - 1)' }}
                 onClick={() => setIsOpen(false)}
                 aria-hidden="true"
               />
-              
+
               {/* Dropdown menu */}
               <motion.div
                 ref={refs.setFloating}
@@ -254,9 +255,9 @@ export const ThemeToggle: React.FC = () => {
                 role="listbox"
                 aria-label="Sélecteur de thème"
                 className="min-w-48 rounded-xl shadow-2xl border backdrop-blur-lg"
-                style={{ 
+                style={{
                   ...floatingStyles,
-                  backgroundColor: 'var(--color-surface)', 
+                  backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
                   backdropFilter: 'blur(20px)',
                   zIndex: 'var(--z-dropdown)'
@@ -270,7 +271,7 @@ export const ThemeToggle: React.FC = () => {
                   <div className="px-3 py-2 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
                     Choisir un thème {isMagical && '✨'}
                   </div>
-                  
+
                   {themes.map(({ key, icon: Icon, label, color, emoji }, index) => (
                     <motion.button
                       key={key}
@@ -283,8 +284,8 @@ export const ThemeToggle: React.FC = () => {
                       onMouseEnter={() => setFocusIndex(index)}
                       className={`
                         w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
-                        ${theme === key 
-                          ? 'text-white shadow-md font-semibold' 
+                        ${theme === key
+                          ? 'text-white shadow-md font-semibold'
                           : 'hover:bg-opacity-10'
                         }
                         ${focusIndex === index ? 'ring-2 ring-offset-1' : ''}
