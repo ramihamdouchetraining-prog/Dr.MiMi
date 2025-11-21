@@ -9,7 +9,7 @@ interface Particle {
   vy: number;
   size: number;
   color: string;
-  type: 'cell' | 'dna' | 'molecule' | 'heart' | 'star';
+  type: 'cell' | 'dna' | 'molecule' | 'heart' | 'star' | 'sparkle';
 }
 
 export const ParticleBackground: React.FC = () => {
@@ -32,18 +32,25 @@ export const ParticleBackground: React.FC = () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Initialize particles
-    const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#F0E68C', '#98FB98', '#87CEEB'];
-    const types: Particle['type'][] = ['cell', 'dna', 'molecule', 'heart', 'star'];
+    // Initialize particles with Premium XXL Palette
+    const colors = [
+      '#0EA5E9', // Primary
+      '#6366F1', // Secondary
+      '#F59E0B', // Accent
+      '#FF69B4', // Pink
+      '#A78BFA', // Purple
+      '#34D399', // Green
+    ];
+    const types: Particle['type'][] = ['cell', 'dna', 'molecule', 'heart', 'star', 'sparkle'];
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) { // Increased particle count
       particlesRef.current.push({
         id: i,
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 3 + 2,
+        vx: (Math.random() - 0.5) * 0.8, // Slightly faster
+        vy: (Math.random() - 0.5) * 0.8,
+        size: Math.random() * 4 + 2,
         color: colors[Math.floor(Math.random() * colors.length)],
         type: types[Math.floor(Math.random() * types.length)]
       });

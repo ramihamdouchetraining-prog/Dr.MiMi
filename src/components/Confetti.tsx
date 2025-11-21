@@ -21,7 +21,7 @@ export const Confetti: React.FC<ConfettiProps> = ({ trigger, onComplete }) => {
 
   useEffect(() => {
     if (trigger) {
-      const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#F0E68C', '#98FB98', '#87CEEB', '#FFD700'];
+      const colors = ['#0EA5E9', '#6366F1', '#F59E0B', '#FF69B4', '#A78BFA', '#34D399', '#FFD700'];
       const newPieces: ConfettiPiece[] = [];
 
       for (let i = 0; i < 100; i++) {
@@ -134,7 +134,7 @@ export const CelebrationEffect: React.FC<{ trigger: boolean }> = ({ trigger }) =
             role="status"
             aria-live="polite"
           >
-            <div className="px-6 py-3 rounded-full shadow-2xl backdrop-blur-md bg-gradient-to-r from-pink-400 to-purple-400 text-white font-semibold text-lg flex items-center gap-2">
+            <div className="glass-premium px-8 py-4 rounded-full text-white font-bold text-xl flex items-center gap-3 shadow-[0_0_30px_rgba(255,105,180,0.5)] border border-white/30 backdrop-blur-xl">
               <span>{messageText}</span>
               <motion.div
                 className="h-0.5 w-16 bg-white/50 rounded-full overflow-hidden"
