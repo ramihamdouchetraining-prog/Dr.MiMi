@@ -30,79 +30,10 @@ import { WebRTCSignalingServer } from "./webrtc-signaling";
 const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
-
-// 🚨 CRITICAL FIX: CORS Preflight Handler - MUST BE FIRST
-// This ensures OPTIONS requests get CORS headers even during cold starts
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  
-  // Liste des origines autorisées
-  const allowedOrigins = [
-    'https://dr-mi-mi-five.vercel.app',
-    'https://dr-mi-mi-git-main-ramis-projects-7dac3957.vercel.app',
-    'https://dr-mi-qfyexlxeu-ramis-projects-7dac3957.vercel.app',
-    'https://dr-mi-8gb8utcxc-ramis-projects-7dac3957.vercel.app',
-    'http://localhost:5000',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5000',
-    'https://dr-mimi.netlify.app',
-  ];
-
-  // Pattern pour tous les previews Vercel (incluant URLs avec hash aléatoire)
-  const vercelPreviewPattern = /^https:\/\/(dr-mi-|dr-mi-mi-).*ramis-projects.*\.vercel\.app$/;
-  // Pattern ultra-permissif pour tous les déploiements Vercel du projet
-  const vercelWildcardPattern = /^https:\/\/.*\.vercel\.app$/;
-  const replitPattern = /^https:\/\/.*\.replit\.(dev|app|co)$/;
-
-  // Vérifier si l'origin est autorisée - ULTRA PERMISSIVE FOR VERCEL
-  let isAllowed = false;
-  
-  if (!origin) {
-    isAllowed = true; // Pas d'origin = OK
-  } else if (allowedOrigins.includes(origin)) {
-    isAllowed = true; // Dans la liste = OK
-    console.log(`✅ CORS: Origin dans liste blanche: ${origin}`);
-  } else if (origin.includes('.vercel.app')) {
-    isAllowed = true; // Tous les .vercel.app = OK
-    console.log(`✅ CORS: Origin Vercel autorisée: ${origin}`);
-  } else if (replitPattern.test(origin)) {
-    isAllowed = true; // Replit = OK
-    console.log(`✅ CORS: Origin Replit autorisée: ${origin}`);
-  } else {
-    console.warn(`⚠️ CORS: Origin NON autorisée: ${origin}`);
-  }
-
-  // TOUJOURS ajouter les headers CORS si origin présente et autorisée
-  if (isAllowed) {
-    if (origin) {
-      res.header('Access-Control-Allow-Origin', origin);
-    } else {
-      res.header('Access-Control-Allow-Origin', '*');
-    }
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
-    res.header('Access-Control-Max-Age', '86400');
-    res.header('Vary', 'Origin');
-  }
-
-  // Réponse immédiate pour les requêtes OPTIONS (préflight)
-  if (req.method === 'OPTIONS') {
-    console.log(`✅ CORS Preflight: ${req.path} pour ${origin || 'no-origin'}`);
-    return res.status(204).end();
-  }
-
-  next();
-});
-
-// 🔥 COMPRESSION - avant tout le reste
-app.use(compression({
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) return false;
-    return compression.filter(req, res);
+if (req.headers['x-no-compression']) return false;
+return compression.filter(req, res);
   },
-  level: 6
+level: 6
 }));
 
 // 🛡️ RATE LIMITING - Protection anti-spam
@@ -189,10 +120,10 @@ app.get('/api/health', (req, res) => {
 
   res.set({
     'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache', 
+    'Pragma': 'no-cache',
     'Expires': '0'
   });
-  
+
   res.json(healthData);
 });
 
@@ -200,7 +131,7 @@ app.get('/api/health', (req, res) => {
 app.get("/", (req, res) => {
   res.json({
     name: "🩺 Dr.MiMi API Server",
-    version: "2.1.0", 
+    version: "2.1.0",
     status: "running",
     environment: process.env.NODE_ENV || "development",
     message: "API Backend pour la plateforme d'éducation médicale Dr.MiMi",
@@ -211,7 +142,7 @@ app.get("/", (req, res) => {
     uptime: `${Math.floor(process.uptime())} secondes`,
     endpoints: {
       health: "/api/health - État du serveur",
-      auth: "/api/auth/* - Authentification", 
+      auth: "/api/auth/* - Authentification",
       admin: "/api/admin/* - Administration",
       articles: "/api/articles - Articles médicaux",
       courses: "/api/courses - Cours",
@@ -271,7 +202,7 @@ async function startServer() {
     console.log('🗺️ Enregistrement des routes...');
     await registerRoutes(app);
     setupNewsRoutes(app);
-    setupCoursesRoutes(app); 
+    setupCoursesRoutes(app);
     setupSummariesRoutes(app);
     setupModulesRoutes(app);
     setupCasesRoutes(app);
@@ -334,7 +265,7 @@ async function startServer() {
 Support: Merieme BENNAMANE - Boumerdès 🌟
 =======================================
       `);
-      
+
       // Auto warm-up pour éviter les cold starts
       setTimeout(async () => {
         try {
@@ -395,7 +326,7 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   const isDev = process.env.NODE_ENV === 'development';
   res.status(500).json({
     error: 'Erreur interne Dr.MiMi',
-    message: isDev 
+    message: isDev
       ? `Détail technique: ${error.message}`
       : 'Une erreur inattendue est survenue. L\'équipe Dr.MiMi a été notifiée.',
     timestamp: new Date().toISOString(),
@@ -419,7 +350,7 @@ app.use('*', (req, res) => {
     method: req.method,
     availableEndpoints: [
       'GET /api/health - État du serveur',
-      'GET /api/warmup - Réveil du serveur', 
+      'GET /api/warmup - Réveil du serveur',
       'GET /api/articles - Articles médicaux',
       'GET /api/courses - Cours',
       'GET /api/quizzes - Quiz',
