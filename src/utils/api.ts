@@ -1,7 +1,7 @@
 // 🌐 CLIENT API ULTIMATE Dr.MiMi - Gestion complète des erreurs, cold starts et retry
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = import.meta.env.PROD 
+const API_BASE_URL = import.meta.env.PROD
   ? import.meta.env.VITE_API_URL || 'https://drmimi-replit.onrender.com'
   : 'http://localhost:5001';
 
@@ -50,11 +50,11 @@ class DrMiMiApiClient {
     this.warmupPromise = (async () => {
       try {
         console.log('🔥 Dr.MiMi: Réchauffage du serveur...');
-        
+
         // Tentative de réveil avec health check
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute max
-        
+
         const response = await fetch(`${this.baseURL}/api/warmup`, {
           method: 'GET',
           signal: controller.signal,
@@ -63,9 +63,9 @@ class DrMiMiApiClient {
             'User-Agent': 'Dr.MiMi-Frontend-Warmup/1.0'
           }
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         if (response.ok) {
           console.log('✅ Dr.MiMi: Serveur réchauffé avec succès');
           this.isServerWarmedUp = true;
@@ -88,11 +88,11 @@ class DrMiMiApiClient {
     endpoint: string,
     config: RequestConfig = {}
   ): Promise<T> {
-    const { 
-      timeout = this.defaultTimeout, 
-      retries = this.defaultRetries, 
+    const {
+      timeout = this.defaultTimeout,
+      retries = this.defaultRetries,
       skipWarmup = false,
-      ...options 
+      ...options
     } = config;
 
     // Réchauffer le serveur si pas encore fait (sauf si skipé)
@@ -108,10 +108,10 @@ class DrMiMiApiClient {
     if (this.abortController) {
       this.abortController.abort();
     }
-    
+
     this.abortController = new AbortController();
     const url = `${this.baseURL}${endpoint}`;
-    
+
     const defaultOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ class DrMiMiApiClient {
       try {
         const method = finalOptions.method || 'GET';
         console.log(`🌐 Dr.MiMi API (${attempt}/${retries}): ${method} ${endpoint}`);
-        
+
         // Promise de timeout
         const timeoutPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
@@ -146,7 +146,7 @@ class DrMiMiApiClient {
         // Gérer les réponses d'erreur
         if (!response.ok) {
           let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-          
+
           try {
             const errorText = await response.text();
             if (errorText) {
@@ -156,7 +156,7 @@ class DrMiMiApiClient {
           } catch {
             // Pas JSON, garder le message HTTP
           }
-          
+
           // Messages spéciaux pour les erreurs courantes
           if (response.status === 503) {
             errorMessage = 'Serveur Dr.MiMi en cours de démarrage - Veuillez patienter';
@@ -167,26 +167,35 @@ class DrMiMiApiClient {
           } else if (response.status === 403) {
             errorMessage = 'Accès refusé - Vérifiez vos permissions Dr.MiMi';
           }
-          
+
           throw new Error(errorMessage);
         }
 
         // Parser la réponse
         const contentType = response.headers.get('content-type');
-        
+
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
           console.log(`✅ Dr.MiMi API Success: ${endpoint} (${attempt}/${retries})`);
           return data;
         } else {
           const text = await response.text();
+
+          // Détection HTML (erreur déguisée)
+          if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+            throw new Error(
+              `API Error: Expected JSON but received HTML from ${url}. ` +
+              `Check VITE_API_URL configuration.`
+            );
+          }
+
           console.log(`✅ Dr.MiMi API Success (text): ${endpoint} (${attempt}/${retries})`);
           return text as unknown as T;
         }
 
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Erreur inconnue');
-        
+
         if (error instanceof Error && error.name === 'AbortError') {
           throw new Error('Requête Dr.MiMi annulée');
         }
@@ -194,7 +203,7 @@ class DrMiMiApiClient {
         const isTimeoutError = error instanceof Error && error.message.includes('Timeout');
         const is503Error = error instanceof Error && error.message.includes('503');
         const isCorsError = error instanceof Error && error.message.includes('CORS');
-        
+
         if (isTimeoutError || is503Error) {
           console.warn(`⏰ Dr.MiMi Cold Start (${attempt}/${retries}): ${endpoint} - Serveur se réveille...`);
         } else if (isCorsError) {
@@ -209,7 +218,7 @@ class DrMiMiApiClient {
           const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 15000);
           console.log(`⏳ Dr.MiMi Retry dans ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
-          
+
           // Si c'était un cold start, marquer le serveur comme non réchauffé
           if (isTimeoutError || is503Error) {
             this.isServerWarmedUp = false;
@@ -239,7 +248,7 @@ class DrMiMiApiClient {
   async put<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
     return this.requestWithRetry<T>(endpoint, {
       ...config,
-      method: 'PUT', 
+      method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
@@ -384,22 +393,22 @@ export interface ChatMessage {
 
 // APIs spécialisées Dr.MiMi avec gestion d'erreurs
 export const articlesApi = {
-  getAll: (category?: string) => 
+  getAll: (category?: string) =>
     apiClient.get<Article[]>(`/api/articles${category ? `?category=${category}` : ''}`),
-  
-  getById: (id: number) => 
+
+  getById: (id: number) =>
     apiClient.get<Article>(`/api/articles/${id}`),
-  
-  getBySlug: (slug: string) => 
+
+  getBySlug: (slug: string) =>
     apiClient.get<Article>(`/api/articles/slug/${slug}`),
-  
-  create: (article: Partial<Article>) => 
+
+  create: (article: Partial<Article>) =>
     apiClient.post<Article>('/api/articles', article),
-  
-  update: (id: number, article: Partial<Article>) => 
+
+  update: (id: number, article: Partial<Article>) =>
     apiClient.put<Article>(`/api/articles/${id}`, article),
-  
-  delete: (id: number) => 
+
+  delete: (id: number) =>
     apiClient.delete<void>(`/api/articles/${id}`),
 };
 
@@ -421,7 +430,7 @@ export const quizzesApi = {
   getAll: () => apiClient.get<Quiz[]>('/api/quizzes'),
   getById: (id: number) => apiClient.get<Quiz>(`/api/quizzes/${id}`),
   create: (quiz: Partial<Quiz>) => apiClient.post<Quiz>('/api/quizzes', quiz),
-  submitAnswers: (quizId: number, answers: number[]) => 
+  submitAnswers: (quizId: number, answers: number[]) =>
     apiClient.post<{ score: number; correctAnswers: number[]; totalQuestions: number }>(`/api/quizzes/${quizId}/submit`, { answers }),
 };
 
@@ -433,17 +442,17 @@ export const casesApi = {
 };
 
 export const chatApi = {
-  sendMessage: (message: string) => 
+  sendMessage: (message: string) =>
     apiClient.post<{ response: string; timestamp: string }>('/api/chat', { message }, { timeout: 30000 }),
-  
-  getHistory: () => 
+
+  getHistory: () =>
     apiClient.get<ChatMessage[]>('/api/chat/history'),
 };
 
 export const libraryApi = {
-  getCategories: (section?: string) => 
+  getCategories: (section?: string) =>
     apiClient.get<any[]>(`/api/library/categories${section ? `?section=${section}` : ''}`),
-  
+
   getItems: (params: { section?: string; page?: number; limit?: number } = {}) => {
     const query = new URLSearchParams();
     if (params.section) query.set('section', params.section);
@@ -454,30 +463,30 @@ export const libraryApi = {
 };
 
 export const authApi = {
-  login: (username: string, password: string) => 
+  login: (username: string, password: string) =>
     apiClient.post<{ user: User; token?: string; success: boolean }>('/api/auth/login', { username, password }),
-  
-  logout: () => 
+
+  logout: () =>
     apiClient.post<void>('/api/auth/logout'),
-  
-  getMe: () => 
+
+  getMe: () =>
     apiClient.get<{ user: User | null; authenticated: boolean }>('/api/auth/me'),
-  
-  changePassword: (currentPassword: string, newPassword: string) => 
+
+  changePassword: (currentPassword: string, newPassword: string) =>
     apiClient.post<{ success: boolean; message: string }>('/api/auth/change-password', { currentPassword, newPassword }),
 };
 
 export const adminApi = {
-  login: (username: string, password: string) => 
+  login: (username: string, password: string) =>
     apiClient.post<{ user: User; success: boolean; role: string }>('/api/admin/login', { username, password }),
-  
-  checkAccess: () => 
+
+  checkAccess: () =>
     apiClient.get<{ hasAccess: boolean; user: User | null }>('/api/admin/check'),
-  
-  getUsers: () => 
+
+  getUsers: () =>
     apiClient.get<User[]>('/api/admin/users'),
-  
-  getDashboardStats: () => 
+
+  getDashboardStats: () =>
     apiClient.get<any>('/api/admin/dashboard/stats'),
 };
 
@@ -491,7 +500,7 @@ export const useDrMiMiApi = () => {
     setLoading(true);
     setError(null);
     setData(null);
-    
+
     try {
       const result = await apiCall();
       setData(result);
@@ -518,7 +527,7 @@ export const useDrMiMiApi = () => {
 // Gestion des erreurs avec messages utilisateur
 export const handleApiError = (error: Error): string => {
   const message = error.message.toLowerCase();
-  
+
   if (message.includes('404')) {
     return 'Contenu non trouvé sur Dr.MiMi - Il est peut-être en cours de chargement';
   }
@@ -546,7 +555,7 @@ export const handleApiError = (error: Error): string => {
   if (message.includes('network') || message.includes('fetch')) {
     return 'Problème de connexion - Vérifiez votre internet';
   }
-  
+
   return error.message || 'Une erreur inattendue est survenue sur Dr.MiMi';
 };
 
@@ -558,10 +567,10 @@ export const initializeDrMiMi = async (): Promise<{
   version?: string;
 }> => {
   console.log('🩺 Initialisation complète de Dr.MiMi...');
-  
+
   try {
     const status = await apiClient.getServerStatus();
-    
+
     if (status.isHealthy) {
       console.log(`✅ Dr.MiMi API opérationnelle (${status.responseTime}ms)`);
       return {
