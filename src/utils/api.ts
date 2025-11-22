@@ -1,258 +1,252 @@
-skipWarmup ?: boolean;
-}
-
-class DrMiMiApiClient {
-  private baseURL: string;
-  private abortController: AbortController | null = null;
   private defaultTimeout = 45000; // 45s pour cold start Render
   private defaultRetries = 3;
   private isServerWarmedUp = false;
   private warmupPromise: Promise<void> | null = null;
 
-  constructor(baseURL: string) {
-    this.baseURL = baseURL;
-    this.initializeApi();
-  }
+constructor(baseURL: string) {
+  this.baseURL = baseURL;
+  this.initializeApi();
+}
 
   private async initializeApi() {
-    console.log('🩺 Dr.MiMi API: Initialisation...');
-    try {
-      await this.warmUpServer();
+  console.log('🩺 Dr.MiMi API: Initialisation...');
+  try {
+    await this.warmUpServer();
+    this.isServerWarmedUp = true;
+    console.log('✅ Dr.MiMi API: Serveur prêt !');
+  } catch (error) {
+    console.warn('⚠️ Dr.MiMi API: Initialisation partielle (cold start possible)');
+  }
+}
+
+  private async warmUpServer(): Promise < void> {
+  if(this.warmupPromise) {
+  return this.warmupPromise;
+}
+
+this.warmupPromise = (async () => {
+  try {
+    console.log('🔥 Dr.MiMi: Réchauffage du serveur...');
+
+    // Tentative de réveil avec health check
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute max
+
+    const response = await fetch(`${this.baseURL}/api/warmup`, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Dr.MiMi-Frontend-Warmup/1.0'
+      }
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      console.log('✅ Dr.MiMi: Serveur réchauffé avec succès');
       this.isServerWarmedUp = true;
-      console.log('✅ Dr.MiMi API: Serveur prêt !');
-    } catch (error) {
-      console.warn('⚠️ Dr.MiMi API: Initialisation partielle (cold start possible)');
+    } else {
+      console.warn('⚠️ Dr.MiMi: Réchauffage partiel (serveur répond mais pas optimal)');
+    }
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('⏰ Dr.MiMi: Réchauffage timeout - serveur endormi');
+    } else {
+      console.warn('⚠️ Dr.MiMi: Échec du réchauffage:', error.message);
     }
   }
+})();
 
-  private async warmUpServer(): Promise<void> {
-    if (this.warmupPromise) {
-      return this.warmupPromise;
-    }
-
-    this.warmupPromise = (async () => {
-      try {
-        console.log('🔥 Dr.MiMi: Réchauffage du serveur...');
-
-        // Tentative de réveil avec health check
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute max
-
-        const response = await fetch(`${this.baseURL}/api/warmup`, {
-          method: 'GET',
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Dr.MiMi-Frontend-Warmup/1.0'
-          }
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          console.log('✅ Dr.MiMi: Serveur réchauffé avec succès');
-          this.isServerWarmedUp = true;
-        } else {
-          console.warn('⚠️ Dr.MiMi: Réchauffage partiel (serveur répond mais pas optimal)');
-        }
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          console.warn('⏰ Dr.MiMi: Réchauffage timeout - serveur endormi');
-        } else {
-          console.warn('⚠️ Dr.MiMi: Échec du réchauffage:', error.message);
-        }
-      }
-    })();
-
-    return this.warmupPromise;
+return this.warmupPromise;
   }
 
   private async requestWithRetry<T>(
-    endpoint: string,
-    config: RequestConfig = {}
-  ): Promise<T> {
-    const {
-      timeout = this.defaultTimeout,
-      retries = this.defaultRetries,
-      skipWarmup = false,
-      ...options
-    } = config;
+  endpoint: string,
+  config: RequestConfig = {}
+): Promise < T > {
+  const {
+    timeout = this.defaultTimeout,
+    retries = this.defaultRetries,
+    skipWarmup = false,
+    ...options
+  } = config;
 
-    // Réchauffer le serveur si pas encore fait (sauf si skipé)
-    if (!this.isServerWarmedUp && !skipWarmup) {
+  // Réchauffer le serveur si pas encore fait (sauf si skipé)
+  if(!this.isServerWarmedUp && !skipWarmup) {
+  try {
+    await this.warmUpServer();
+  } catch {
+    console.log('🌊 Dr.MiMi: Tentative sans réchauffage...');
+  }
+}
+
+// Annuler requête précédente
+if (this.abortController) {
+  this.abortController.abort();
+}
+
+this.abortController = new AbortController();
+const url = `${this.baseURL}${endpoint}`;
+
+const defaultOptions: RequestInit = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'User-Agent': 'Dr.MiMi-Frontend/2.0',
+    'X-Requested-With': 'XMLHttpRequest'
+  },
+  credentials: 'include',
+  signal: this.abortController.signal,
+};
+
+const finalOptions = { ...defaultOptions, ...options };
+let lastError: Error;
+
+// Système de retry avec backoff exponentiel
+for (let attempt = 1; attempt <= retries; attempt++) {
+  try {
+    const method = finalOptions.method || 'GET';
+    console.log(`🌐 Dr.MiMi API (${attempt}/${retries}): ${method} ${endpoint}`);
+
+    // Promise de timeout
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Timeout après ${timeout}ms - Serveur Dr.MiMi potentiellement endormi`));
+      }, timeout);
+    });
+
+    // Requête réelle
+    const fetchPromise = fetch(url, finalOptions);
+    const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+    // Gérer les réponses d'erreur
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
       try {
-        await this.warmUpServer();
+        const errorText = await response.text();
+        if (errorText) {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || errorJson.error || errorMessage;
+        }
       } catch {
-        console.log('🌊 Dr.MiMi: Tentative sans réchauffage...');
+        // Pas JSON, garder le message HTTP
       }
-    }
 
-    // Annuler requête précédente
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-
-    this.abortController = new AbortController();
-    const url = `${this.baseURL}${endpoint}`;
-
-    const defaultOptions: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'Dr.MiMi-Frontend/2.0',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'include',
-      signal: this.abortController.signal,
-    };
-
-    const finalOptions = { ...defaultOptions, ...options };
-    let lastError: Error;
-
-    // Système de retry avec backoff exponentiel
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const method = finalOptions.method || 'GET';
-        console.log(`🌐 Dr.MiMi API (${attempt}/${retries}): ${method} ${endpoint}`);
-
-        // Promise de timeout
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => {
-            reject(new Error(`Timeout après ${timeout}ms - Serveur Dr.MiMi potentiellement endormi`));
-          }, timeout);
-        });
-
-        // Requête réelle
-        const fetchPromise = fetch(url, finalOptions);
-        const response = await Promise.race([fetchPromise, timeoutPromise]);
-
-        // Gérer les réponses d'erreur
-        if (!response.ok) {
-          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-
-          try {
-            const errorText = await response.text();
-            if (errorText) {
-              const errorJson = JSON.parse(errorText);
-              errorMessage = errorJson.message || errorJson.error || errorMessage;
-            }
-          } catch {
-            // Pas JSON, garder le message HTTP
-          }
-
-          // Messages spéciaux pour les erreurs courantes
-          if (response.status === 503) {
-            errorMessage = 'Serveur Dr.MiMi en cours de démarrage - Veuillez patienter';
-          } else if (response.status === 502) {
-            errorMessage = 'Serveur Dr.MiMi temporairement indisponible';
-          } else if (response.status === 401) {
-            errorMessage = 'Authentification requise - Connectez-vous à Dr.MiMi';
-          } else if (response.status === 403) {
-            errorMessage = 'Accès refusé - Vérifiez vos permissions Dr.MiMi';
-          }
+      // Messages spéciaux pour les erreurs courantes
+      if (response.status === 503) {
+        errorMessage = 'Serveur Dr.MiMi en cours de démarrage - Veuillez patienter';
+      } else if (response.status === 502) {
+        errorMessage = 'Serveur Dr.MiMi temporairement indisponible';
+      } else if (response.status === 401) {
+        errorMessage = 'Authentification requise - Connectez-vous à Dr.MiMi';
+      } else if (response.status === 403) {
+        errorMessage = 'Accès refusé - Vérifiez vos permissions Dr.MiMi';
+      }
 
 
-          const isTimeoutError = error instanceof Error && error.message.includes('Timeout');
-          const is503Error = error instanceof Error && error.message.includes('503');
-          const isCorsError = error instanceof Error && error.message.includes('CORS');
+      const isTimeoutError = error instanceof Error && error.message.includes('Timeout');
+      const is503Error = error instanceof Error && error.message.includes('503');
+      const isCorsError = error instanceof Error && error.message.includes('CORS');
 
-          if (isTimeoutError || is503Error) {
-            console.warn(`⏰ Dr.MiMi Cold Start (${attempt}/${retries}): ${endpoint} - Serveur se réveille...`);
-          } else if (isCorsError) {
-            console.error(`🚫 Dr.MiMi CORS Error (${attempt}/${retries}): ${endpoint}`);
-          } else {
-            console.warn(`❌ Dr.MiMi API Error (${attempt}/${retries}): ${endpoint}`, error.message);
-          }
+      if (isTimeoutError || is503Error) {
+        console.warn(`⏰ Dr.MiMi Cold Start (${attempt}/${retries}): ${endpoint} - Serveur se réveille...`);
+      } else if (isCorsError) {
+        console.error(`🚫 Dr.MiMi CORS Error (${attempt}/${retries}): ${endpoint}`);
+      } else {
+        console.warn(`❌ Dr.MiMi API Error (${attempt}/${retries}): ${endpoint}`, error.message);
+      }
 
-          if (attempt < retries) {
-            // Backoff exponentiel plus long pour cold starts
-            const baseDelay = isTimeoutError || is503Error ? 3000 : 1000;
-            const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 15000);
-            console.log(`⏳ Dr.MiMi Retry dans ${delay}ms...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
+      if (attempt < retries) {
+        // Backoff exponentiel plus long pour cold starts
+        const baseDelay = isTimeoutError || is503Error ? 3000 : 1000;
+        const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 15000);
+        console.log(`⏳ Dr.MiMi Retry dans ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
 
-            // Si c'était un cold start, marquer le serveur comme non réchauffé
-            if (isTimeoutError || is503Error) {
-              this.isServerWarmedUp = false;
-            }
-          }
+        // Si c'était un cold start, marquer le serveur comme non réchauffé
+        if (isTimeoutError || is503Error) {
+          this.isServerWarmedUp = false;
         }
       }
+    }
+  }
 
     // Si tous les retries ont échoué
     console.error(`💥 Dr.MiMi API: Échec définitif après ${retries} tentatives: ${endpoint}`);
-      throw lastError!;
-    }
+  throw lastError!;
+}
 
   // Méthodes HTTP standard
   async get<T>(endpoint: string, config: RequestConfig = {}): Promise < T > {
-      return this.requestWithRetry<T>(endpoint, { ...config, method: 'GET' });
-    }
+  return this.requestWithRetry<T>(endpoint, { ...config, method: 'GET' });
+}
 
   async post<T>(endpoint: string, data ?: any, config: RequestConfig = {}): Promise < T > {
-      return this.requestWithRetry<T>(endpoint, {
-        ...config,
-        method: 'POST',
-        body: data ? JSON.stringify(data) : undefined,
-      });
-    }
+  return this.requestWithRetry<T>(endpoint, {
+    ...config,
+    method: 'POST',
+    body: data ? JSON.stringify(data) : undefined,
+  });
+}
 
   async put<T>(endpoint: string, data ?: any, config: RequestConfig = {}): Promise < T > {
-      return this.requestWithRetry<T>(endpoint, {
-        ...config,
-        method: 'PUT',
-        body: data ? JSON.stringify(data) : undefined,
-      });
-    }
+  return this.requestWithRetry<T>(endpoint, {
+    ...config,
+    method: 'PUT',
+    body: data ? JSON.stringify(data) : undefined,
+  });
+}
 
   async delete <T>(endpoint: string, config: RequestConfig = {}): Promise < T > {
-      return this.requestWithRetry<T>(endpoint, { ...config, method: 'DELETE' });
-    }
+  return this.requestWithRetry<T>(endpoint, { ...config, method: 'DELETE' });
+}
 
   // Health check spécialisé
   async healthCheck(): Promise < boolean > {
-      try {
-        await this.get('/api/health', { timeout: 60000, skipWarmup: true });
-        return true;
-      } catch(error) {
-        console.error('❌ Dr.MiMi Health Check failed:', error);
-        return false;
-      }
-    }
+  try {
+    await this.get('/api/health', { timeout: 60000, skipWarmup: true });
+    return true;
+  } catch(error) {
+    console.error('❌ Dr.MiMi Health Check failed:', error);
+    return false;
+  }
+}
 
   // État complet du serveur
   async getServerStatus(): Promise < {
-      isHealthy: boolean;
-      responseTime: number;
-      endpoint: string;
-      version?: string;
-    } > {
-      const startTime = Date.now();
-      try {
-        const healthData = await this.get<any>('/api/health', { timeout: 30000, skipWarmup: true });
-        const responseTime = Date.now() - startTime;
-        return {
-          isHealthy: true,
-          responseTime,
-          endpoint: this.baseURL,
-          version: healthData.version || 'unknown'
-        };
-      } catch(error) {
-        const responseTime = Date.now() - startTime;
-        return {
-          isHealthy: false,
-          responseTime,
-          endpoint: this.baseURL,
-        };
-      }
-    }
+  isHealthy: boolean;
+  responseTime: number;
+  endpoint: string;
+  version?: string;
+} > {
+  const startTime = Date.now();
+  try {
+    const healthData = await this.get<any>('/api/health', { timeout: 30000, skipWarmup: true });
+    const responseTime = Date.now() - startTime;
+    return {
+      isHealthy: true,
+      responseTime,
+      endpoint: this.baseURL,
+      version: healthData.version || 'unknown'
+    };
+  } catch(error) {
+    const responseTime = Date.now() - startTime;
+    return {
+      isHealthy: false,
+      responseTime,
+      endpoint: this.baseURL,
+    };
+  }
+}
 
-    // Annuler toutes les requêtes
-    cancelAll(): void {
-      if(this.abortController) {
-      this.abortController.abort();
-      this.abortController = null;
-    }
+// Annuler toutes les requêtes
+cancelAll(): void {
+  if(this.abortController) {
+  this.abortController.abort();
+  this.abortController = null;
+}
   }
 }
 
