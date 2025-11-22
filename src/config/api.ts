@@ -99,9 +99,11 @@ export async function apiFetch(path: string, options: ApiOptions = {}, retryCoun
 
       if (!response.ok) {
         const errorText = await response.text();
+        const lowerErrorText = errorText.trim().toLowerCase();
 
         // Détecter si on reçoit du HTML au lieu de JSON (ex: page 404)
-        if (errorText.trim().startsWith('<!DOCTYPE') || errorText.trim().startsWith('<html')) {
+        if (lowerErrorText.startsWith('<!doctype') || lowerErrorText.startsWith('<html')) {
+          console.error(`❌ API Error (HTML response) for ${url}. BaseURL: ${API_BASE_URL}`);
           throw new Error(
             `API endpoint not found: ${url}. Received HTML instead of JSON. ` +
             `Check if VITE_API_URL is correctly configured (current: ${API_BASE_URL})`
@@ -115,8 +117,11 @@ export async function apiFetch(path: string, options: ApiOptions = {}, retryCoun
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
+        const lowerText = text.trim().toLowerCase();
+
         // Si c'est du HTML, c'est probablement une erreur 404/500 déguisée ou une redirection SPA
-        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+        if (lowerText.startsWith('<!doctype') || lowerText.startsWith('<html')) {
+          console.error(`❌ API Error (HTML content-type) for ${url}. BaseURL: ${API_BASE_URL}`);
           throw new Error(
             `API Error: Expected JSON but received HTML from ${url}. ` +
             `Check VITE_API_URL configuration.`

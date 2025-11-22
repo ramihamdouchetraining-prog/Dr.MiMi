@@ -168,136 +168,105 @@ class DrMiMiApiClient {
             errorMessage = 'Accès refusé - Vérifiez vos permissions Dr.MiMi';
           }
 
-          throw new Error(errorMessage);
-        }
 
-        // Parser la réponse
-        const contentType = response.headers.get('content-type');
+          const isTimeoutError = error instanceof Error && error.message.includes('Timeout');
+          const is503Error = error instanceof Error && error.message.includes('503');
+          const isCorsError = error instanceof Error && error.message.includes('CORS');
 
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          console.log(`✅ Dr.MiMi API Success: ${endpoint} (${attempt}/${retries})`);
-          return data;
-        } else {
-          const text = await response.text();
-
-          // Détection HTML (erreur déguisée)
-          if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-            throw new Error(
-              `API Error: Expected JSON but received HTML from ${url}. ` +
-              `Check VITE_API_URL configuration.`
-            );
+          if (isTimeoutError || is503Error) {
+            console.warn(`⏰ Dr.MiMi Cold Start (${attempt}/${retries}): ${endpoint} - Serveur se réveille...`);
+          } else if (isCorsError) {
+            console.error(`🚫 Dr.MiMi CORS Error (${attempt}/${retries}): ${endpoint}`);
+          } else {
+            console.warn(`❌ Dr.MiMi API Error (${attempt}/${retries}): ${endpoint}`, error.message);
           }
 
-          console.log(`✅ Dr.MiMi API Success (text): ${endpoint} (${attempt}/${retries})`);
-          return text as unknown as T;
-        }
+          if (attempt < retries) {
+            // Backoff exponentiel plus long pour cold starts
+            const baseDelay = isTimeoutError || is503Error ? 3000 : 1000;
+            const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 15000);
+            console.log(`⏳ Dr.MiMi Retry dans ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
 
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Erreur inconnue');
-
-        if (error instanceof Error && error.name === 'AbortError') {
-          throw new Error('Requête Dr.MiMi annulée');
-        }
-
-        const isTimeoutError = error instanceof Error && error.message.includes('Timeout');
-        const is503Error = error instanceof Error && error.message.includes('503');
-        const isCorsError = error instanceof Error && error.message.includes('CORS');
-
-        if (isTimeoutError || is503Error) {
-          console.warn(`⏰ Dr.MiMi Cold Start (${attempt}/${retries}): ${endpoint} - Serveur se réveille...`);
-        } else if (isCorsError) {
-          console.error(`🚫 Dr.MiMi CORS Error (${attempt}/${retries}): ${endpoint}`);
-        } else {
-          console.warn(`❌ Dr.MiMi API Error (${attempt}/${retries}): ${endpoint}`, error.message);
-        }
-
-        if (attempt < retries) {
-          // Backoff exponentiel plus long pour cold starts
-          const baseDelay = isTimeoutError || is503Error ? 3000 : 1000;
-          const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 15000);
-          console.log(`⏳ Dr.MiMi Retry dans ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-
-          // Si c'était un cold start, marquer le serveur comme non réchauffé
-          if (isTimeoutError || is503Error) {
-            this.isServerWarmedUp = false;
+            // Si c'était un cold start, marquer le serveur comme non réchauffé
+            if (isTimeoutError || is503Error) {
+              this.isServerWarmedUp = false;
+            }
           }
         }
       }
-    }
 
     // Si tous les retries ont échoué
     console.error(`💥 Dr.MiMi API: Échec définitif après ${retries} tentatives: ${endpoint}`);
-    throw lastError!;
-  }
+      throw lastError!;
+    }
 
   // Méthodes HTTP standard
-  async get<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    return this.requestWithRetry<T>(endpoint, { ...config, method: 'GET' });
-  }
+  async get<T>(endpoint: string, config: RequestConfig = {}): Promise < T > {
+      return this.requestWithRetry<T>(endpoint, { ...config, method: 'GET' });
+    }
 
-  async post<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
-    return this.requestWithRetry<T>(endpoint, {
-      ...config,
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
+  async post<T>(endpoint: string, data ?: any, config: RequestConfig = {}): Promise < T > {
+      return this.requestWithRetry<T>(endpoint, {
+        ...config,
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+      });
+    }
 
-  async put<T>(endpoint: string, data?: any, config: RequestConfig = {}): Promise<T> {
-    return this.requestWithRetry<T>(endpoint, {
-      ...config,
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
+  async put<T>(endpoint: string, data ?: any, config: RequestConfig = {}): Promise < T > {
+      return this.requestWithRetry<T>(endpoint, {
+        ...config,
+        method: 'PUT',
+        body: data ? JSON.stringify(data) : undefined,
+      });
+    }
 
-  async delete<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    return this.requestWithRetry<T>(endpoint, { ...config, method: 'DELETE' });
-  }
+  async delete <T>(endpoint: string, config: RequestConfig = {}): Promise < T > {
+      return this.requestWithRetry<T>(endpoint, { ...config, method: 'DELETE' });
+    }
 
   // Health check spécialisé
-  async healthCheck(): Promise<boolean> {
-    try {
-      await this.get('/api/health', { timeout: 60000, skipWarmup: true });
-      return true;
-    } catch (error) {
-      console.error('❌ Dr.MiMi Health Check failed:', error);
-      return false;
+  async healthCheck(): Promise < boolean > {
+      try {
+        await this.get('/api/health', { timeout: 60000, skipWarmup: true });
+        return true;
+      } catch(error) {
+        console.error('❌ Dr.MiMi Health Check failed:', error);
+        return false;
+      }
     }
-  }
 
   // État complet du serveur
-  async getServerStatus(): Promise<{
-    isHealthy: boolean;
-    responseTime: number;
-    endpoint: string;
-    version?: string;
-  }> {
-    const startTime = Date.now();
-    try {
-      const healthData = await this.get<any>('/api/health', { timeout: 30000, skipWarmup: true });
-      const responseTime = Date.now() - startTime;
-      return {
-        isHealthy: true,
-        responseTime,
-        endpoint: this.baseURL,
-        version: healthData.version || 'unknown'
-      };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      return {
-        isHealthy: false,
-        responseTime,
-        endpoint: this.baseURL,
-      };
+  async getServerStatus(): Promise < {
+      isHealthy: boolean;
+      responseTime: number;
+      endpoint: string;
+      version?: string;
+    } > {
+      const startTime = Date.now();
+      try {
+        const healthData = await this.get<any>('/api/health', { timeout: 30000, skipWarmup: true });
+        const responseTime = Date.now() - startTime;
+        return {
+          isHealthy: true,
+          responseTime,
+          endpoint: this.baseURL,
+          version: healthData.version || 'unknown'
+        };
+      } catch(error) {
+        const responseTime = Date.now() - startTime;
+        return {
+          isHealthy: false,
+          responseTime,
+          endpoint: this.baseURL,
+        };
+      }
     }
-  }
 
-  // Annuler toutes les requêtes
-  cancelAll(): void {
-    if (this.abortController) {
+    // Annuler toutes les requêtes
+    cancelAll(): void {
+      if(this.abortController) {
       this.abortController.abort();
       this.abortController = null;
     }
