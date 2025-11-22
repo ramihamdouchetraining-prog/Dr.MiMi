@@ -196,7 +196,6 @@ const NewsPage: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      transition={{ duration: 0.5 }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <SEO

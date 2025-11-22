@@ -2,7 +2,8 @@
 
 // En développement: utilise le proxy Vite (/api -> http://localhost:5001)
 // En production: utilise VITE_API_URL depuis .env.production
-export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Fallback: URL du backend Render pour éviter les erreurs de configuration
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://drmimi-replit.onrender.com';
 
 // Helper pour construire les URLs d'API
 export function getApiUrl(path: string): string {
@@ -90,8 +91,17 @@ export async function apiFetch(path: string, options: ApiOptions = {}, retryCoun
       }
 
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || `HTTP ${response.status}`);
+        const errorText = await response.text();
+
+        // Détecter si on reçoit du HTML au lieu de JSON (ex: page 404)
+        if (errorText.trim().startsWith('<!DOCTYPE') || errorText.trim().startsWith('<html')) {
+          throw new Error(
+            `API endpoint not found: ${url}. Received HTML instead of JSON. ` +
+            `Check if VITE_API_URL is correctly configured (current: ${API_BASE_URL})`
+          );
+        }
+
+        throw new Error(errorText || `HTTP ${response.status}`);
       }
 
       const data = await response.json();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Sparkles, Heart, BookOpen, FileText, CheckCircle, Activity } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -15,45 +15,48 @@ import { SimpleMimiButton } from './components/SimpleMimiButton'
 import { FeaturedAvatarCarousel } from './components/AvatarCarousel'
 import { InteractiveMimi } from './components/MimiAnimated'
 import { useBackendWarming } from './hooks/useBackendWarming'
-import EnhancedQuizPage from './pages/EnhancedQuizPage'
-import MedicalLibraryPage from './pages/MedicalLibraryPage'
-import MimiLibrary from './pages/MimiLibrary'
-import ChatbotPage from './pages/ChatbotPage'
-import AdminDashboardOptimized from './pages/AdminDashboardOptimized'
-import AdminArticles from './pages/AdminArticles'
-import AdminLayout from './pages/Admin/AdminLayout'
-import AdminUsers from './pages/Admin/AdminUsers'
-import AdminSettings from './pages/Admin/AdminSettings'
-import AdminLogin from './pages/Admin/AdminLogin'
-import AdminCMS from './pages/Admin/AdminCMS'
-import OwnerLogin from './pages/OwnerLogin'
-import OwnerDashboard from './pages/OwnerDashboard'
-import OwnerChangePassword from './pages/OwnerChangePassword'
-import CoursesPage from './pages/CoursesPage'
-import SummariesPage from './pages/SummariesPage'
-import ModulesPage from './pages/ModulesPage'
-import CasesPage from './pages/CasesPage'
-import NewsPage from './pages/NewsPage'
-import ProfilePage from './pages/ProfilePage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-// import AboutMimi from './pages/AboutMimi'
-import AboutMimiDonation from './pages/AboutMimiDonation'
-import PaymentDZD from './pages/PaymentDZD'
-import AITutor from './components/AITutor'
-import StudentAnalyticsDashboard from './pages/StudentAnalyticsDashboard'
-import AdminAnalyticsDashboard from './pages/AdminAnalyticsDashboard'
-import NotFound from './pages/NotFound'
-
-// Import XXL Components
-import { AdminDashboardAdvanced } from './components/dashboard/AdminDashboardAdvanced'
-import { VirtualLab3DWrapper } from './components/VirtualLab3DWrapper'
-import { CollaborativePlatform } from './components/CollaborativePlatform'
-import { EducationalMarketplace } from './components/marketplace/EducationalMarketplace'
-import { AdvancedGamification } from './components/gamification/AdvancedGamification'
-import FeaturesXXLPage from './pages/FeaturesXXLPage'
-import { ErrorBoundary } from './components/ErrorBoundary'
+import { LoadingSpinner } from './components/LoadingSpinner'
 import { SEO } from './components/SEO'
+
+// Lazy loaded pages
+const EnhancedQuizPage = React.lazy(() => import('./pages/EnhancedQuizPage'));
+const MedicalLibraryPage = React.lazy(() => import('./pages/MedicalLibraryPage'));
+const MimiLibrary = React.lazy(() => import('./pages/MimiLibrary'));
+const ChatbotPage = React.lazy(() => import('./pages/ChatbotPage'));
+const AdminDashboardOptimized = React.lazy(() => import('./pages/AdminDashboardOptimized'));
+const AdminArticles = React.lazy(() => import('./pages/AdminArticles'));
+const AdminLayout = React.lazy(() => import('./pages/Admin/AdminLayout'));
+const AdminUsers = React.lazy(() => import('./pages/Admin/AdminUsers'));
+const AdminSettings = React.lazy(() => import('./pages/Admin/AdminSettings'));
+const AdminLogin = React.lazy(() => import('./pages/Admin/AdminLogin'));
+const AdminCMS = React.lazy(() => import('./pages/Admin/AdminCMS'));
+const OwnerLogin = React.lazy(() => import('./pages/OwnerLogin'));
+const OwnerDashboard = React.lazy(() => import('./pages/OwnerDashboard'));
+const OwnerChangePassword = React.lazy(() => import('./pages/OwnerChangePassword'));
+const CoursesPage = React.lazy(() => import('./pages/CoursesPage'));
+const SummariesPage = React.lazy(() => import('./pages/SummariesPage'));
+const ModulesPage = React.lazy(() => import('./pages/ModulesPage'));
+const CasesPage = React.lazy(() => import('./pages/CasesPage'));
+const NewsPage = React.lazy(() => import('./pages/NewsPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
+// import AboutMimi from './pages/AboutMimi'
+const AboutMimiDonation = React.lazy(() => import('./pages/AboutMimiDonation'));
+const PaymentDZD = React.lazy(() => import('./pages/PaymentDZD'));
+const AITutor = React.lazy(() => import('./components/AITutor'));
+const StudentAnalyticsDashboard = React.lazy(() => import('./pages/StudentAnalyticsDashboard'));
+const AdminAnalyticsDashboard = React.lazy(() => import('./pages/AdminAnalyticsDashboard'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+
+// Import XXL Components - Lazy Load
+const AdminDashboardAdvanced = React.lazy(() => import('./components/dashboard/AdminDashboardAdvanced').then(module => ({ default: module.AdminDashboardAdvanced })));
+const VirtualLab3DWrapper = React.lazy(() => import('./components/VirtualLab3DWrapper').then(module => ({ default: module.VirtualLab3DWrapper })));
+const CollaborativePlatform = React.lazy(() => import('./components/CollaborativePlatform').then(module => ({ default: module.CollaborativePlatform })));
+const EducationalMarketplace = React.lazy(() => import('./components/marketplace/EducationalMarketplace').then(module => ({ default: module.EducationalMarketplace })));
+const AdvancedGamification = React.lazy(() => import('./components/gamification/AdvancedGamification').then(module => ({ default: module.AdvancedGamification })));
+const FeaturesXXLPage = React.lazy(() => import('./pages/FeaturesXXLPage'));
+const ErrorBoundary = React.lazy(() => import('./components/ErrorBoundary').then(module => ({ default: module.ErrorBoundary })));
 
 // Create query client for API calls
 const queryClient = new QueryClient();
@@ -149,106 +152,108 @@ function AppContent() {
 
       {/* Main Content - no padding needed with sticky header */}
       <main>
-        <AnimatePresence mode="wait">
-          {/* Allow admin/owner/auth/quiz/analytics/XXL routes to bypass level selector */}
-          {location.pathname.startsWith('/admin') ||
-            location.pathname.startsWith('/owner') ||
-            location.pathname.startsWith('/login') ||
-            location.pathname.startsWith('/register') ||
-            location.pathname.startsWith('/quiz') ||
-            location.pathname.startsWith('/analytics') ||
-            location.pathname.startsWith('/features-xxl') ||
-            location.pathname.startsWith('/lab-3d') ||
-            location.pathname.startsWith('/collaboration') ||
-            location.pathname.startsWith('/marketplace') ||
-            location.pathname.startsWith('/gamification') ? (
-            <Routes location={location} key={location.pathname}>
-              {/* User Authentication Routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <AnimatePresence mode="wait">
+            {/* Allow admin/owner/auth/quiz/analytics/XXL routes to bypass level selector */}
+            {location.pathname.startsWith('/admin') ||
+              location.pathname.startsWith('/owner') ||
+              location.pathname.startsWith('/login') ||
+              location.pathname.startsWith('/register') ||
+              location.pathname.startsWith('/quiz') ||
+              location.pathname.startsWith('/analytics') ||
+              location.pathname.startsWith('/features-xxl') ||
+              location.pathname.startsWith('/lab-3d') ||
+              location.pathname.startsWith('/collaboration') ||
+              location.pathname.startsWith('/marketplace') ||
+              location.pathname.startsWith('/gamification') ? (
+              <Routes location={location} key={location.pathname}>
+                {/* User Authentication Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-              {/* Analytics Routes */}
-              <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
+                {/* Analytics Routes */}
+                <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboardOptimized />} />
-                <Route path="articles" element={<AdminArticles />} />
-                <Route path="articles/new" element={<AdminArticles />} />
-                <Route path="articles/:id/edit" element={<AdminArticles />} />
-                <Route path="cms" element={<AdminCMS />} />
-                <Route path="analytics" element={<AdminAnalyticsDashboard />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="settings" element={<AdminSettings />} />
-              </Route>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboardOptimized />} />
+                  <Route path="articles" element={<AdminArticles />} />
+                  <Route path="articles/new" element={<AdminArticles />} />
+                  <Route path="articles/:id/edit" element={<AdminArticles />} />
+                  <Route path="cms" element={<AdminCMS />} />
+                  <Route path="analytics" element={<AdminAnalyticsDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
 
-              {/* Owner Routes */}
-              <Route path="/owner" element={<OwnerDashboard />} />
-              <Route path="/owner/login" element={<OwnerLogin />} />
-              <Route path="/owner/change-password" element={<OwnerChangePassword />} />
-              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+                {/* Owner Routes */}
+                <Route path="/owner" element={<OwnerDashboard />} />
+                <Route path="/owner/login" element={<OwnerLogin />} />
+                <Route path="/owner/change-password" element={<OwnerChangePassword />} />
+                <Route path="/owner/dashboard" element={<OwnerDashboard />} />
 
-              {/* Quiz and Games Routes */}
-              <Route path="/quiz" element={<EnhancedQuizPage />} />
-              {/* Games Routes - redirect to quiz with games tab */}
+                {/* Quiz and Games Routes */}
+                <Route path="/quiz" element={<EnhancedQuizPage />} />
+                {/* Games Routes - redirect to quiz with games tab */}
 
-              {/* Routes XXL */}
-              <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
-              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
-              <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
-              <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
-              <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
-              <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
+                {/* Routes XXL */}
+                <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
+                <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
+                <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
+                <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
+                <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
+                <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
 
-              {/* 404 - Must be last */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          ) : showLevelSelector ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="min-h-screen flex items-center justify-center"
-            >
-              <StudyLevelSelector onLevelSelect={handleLevelSelect} />
-            </motion.div>
-          ) : (
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<EnhancedHomePage studyLevel={studyLevel} />} />
-              <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/summaries" element={<SummariesPage />} />
-              <Route path="/modules" element={<ModulesPage />} />
-              <Route path="/quiz" element={<EnhancedQuizPage />} />
-              <Route path="/library" element={<MedicalLibraryPage />} />
-              <Route path="/mimi-library" element={<MimiLibrary />} />
-              <Route path="/cases" element={<CasesPage />} />
-              <Route path="/news" element={<NewsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/chatbot" element={<ChatbotPage />} />
-              <Route path="/a-propos-de-mimi" element={<AboutMimiDonation />} />
-              <Route path="/payment-dzd" element={<PaymentDZD />} />
-              <Route path="/ai-tutor" element={<AITutor />} />
-              <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
+                {/* 404 - Must be last */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            ) : showLevelSelector ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="min-h-screen flex items-center justify-center"
+              >
+                <StudyLevelSelector onLevelSelect={handleLevelSelect} />
+              </motion.div>
+            ) : (
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<EnhancedHomePage studyLevel={studyLevel} />} />
+                <Route path="/courses" element={<CoursesPage />} />
+                <Route path="/summaries" element={<SummariesPage />} />
+                <Route path="/modules" element={<ModulesPage />} />
+                <Route path="/quiz" element={<EnhancedQuizPage />} />
+                <Route path="/library" element={<MedicalLibraryPage />} />
+                <Route path="/mimi-library" element={<MimiLibrary />} />
+                <Route path="/cases" element={<CasesPage />} />
+                <Route path="/news" element={<NewsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/chatbot" element={<ChatbotPage />} />
+                <Route path="/a-propos-de-mimi" element={<AboutMimiDonation />} />
+                <Route path="/payment-dzd" element={<PaymentDZD />} />
+                <Route path="/ai-tutor" element={<AITutor />} />
+                <Route path="/analytics" element={<StudentAnalyticsDashboard />} />
 
-              {/* Routes XXL */}
-              <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
-              <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
-              <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
-              <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
-              <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
-              <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
+                {/* Routes XXL */}
+                <Route path="/features-xxl" element={<ErrorBoundary componentName="Features XXL"><FeaturesXXLPage /></ErrorBoundary>} />
+                <Route path="/admin/dashboard-xxl" element={<ErrorBoundary componentName="Tableau de Bord Avancé"><AdminDashboardAdvanced /></ErrorBoundary>} />
+                <Route path="/lab-3d" element={<VirtualLab3DWrapper />} />
+                <Route path="/collaboration" element={<ErrorBoundary componentName="Plateforme Collaborative"><CollaborativePlatform /></ErrorBoundary>} />
+                <Route path="/marketplace" element={<ErrorBoundary componentName="Marketplace"><EducationalMarketplace /></ErrorBoundary>} />
+                <Route path="/gamification" element={<ErrorBoundary componentName="Gamification"><AdvancedGamification /></ErrorBoundary>} />
 
-              {/* Aliases et routes manquantes */}
-              <Route path="/premium" element={<FeaturesXXLPage />} />
-              <Route path="/a-propos" element={<AboutMimiDonation />} />
-              <Route path="/actualites" element={<NewsPage />} />
+                {/* Aliases et routes manquantes */}
+                <Route path="/premium" element={<FeaturesXXLPage />} />
+                <Route path="/a-propos" element={<AboutMimiDonation />} />
+                <Route path="/actualites" element={<NewsPage />} />
 
-              {/* 404 - Must be last */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          )}
-        </AnimatePresence>
+                {/* 404 - Must be last */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            )}
+          </AnimatePresence>
+        </Suspense>
       </main>
     </div>
   )
@@ -282,14 +287,16 @@ const EnhancedHomePage: React.FC<{ studyLevel: string }> = ({ studyLevel }) => {
             opacity: heroOpacity
           }}
         >
-          <div
-            className="absolute inset-0 parallax"
+          <img
+            src="/images/heroes/medical-hero.png"
+            alt="Medical Hero Background"
+            className="absolute inset-0 w-full h-full object-cover parallax"
             style={{
-              backgroundImage: 'url(/images/heroes/medical-hero.png)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
               filter: 'brightness(0.7)'
             }}
+            // @ts-ignore
+            fetchpriority="high"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
         </motion.div>
