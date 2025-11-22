@@ -24,7 +24,14 @@ export function getApiUrl(path: string): string {
   }
 
   const cleanPath = path.startsWith('/api') ? path : `/api${path}`;
-  return `${baseUrl}${cleanPath}`;
+  const fullUrl = `${baseUrl}${cleanPath}`;
+
+  // Debug log pour tracer les URLs générées (à retirer plus tard)
+  if (!fullUrl.startsWith('http')) {
+    console.warn(`⚠️ getApiUrl generated relative URL: ${fullUrl}. BaseURL: '${baseUrl}', DEV: ${import.meta.env.DEV}`);
+  }
+
+  return fullUrl;
 }
 
 // Cache simple pour les requêtes GET

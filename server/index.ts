@@ -30,10 +30,14 @@ import { WebRTCSignalingServer } from "./webrtc-signaling";
 const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
-if (req.headers['x-no-compression']) return false;
-return compression.filter(req, res);
+
+// 🔄 COMPRESSION - Optimisation des performances
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
   },
-level: 6
+  level: 6
 }));
 
 // 🛡️ RATE LIMITING - Protection anti-spam
@@ -60,6 +64,35 @@ const authLimiter = rateLimit({
 app.use('/api/', generalLimiter);
 app.use('/api/admin/login', authLimiter);
 app.use('/api/auth/login', authLimiter);
+
+// 🌐 CORS CONFIGURATION - Allow Vercel & Replit
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      'http://localhost:5000',
+      'http://localhost:5001',
+      'http://localhost:5173',
+      'https://drmimi-replit.onrender.com',
+      'https://dr-mi-mi-five.vercel.app'
+    ];
+
+    // Check if origin is allowed or matches Vercel preview pattern
+    if (allowedOrigins.indexOf(origin) !== -1 ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.replit.dev')) {
+      callback(null, true);
+    } else {
+      console.warn('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+}));
 
 // 🔒 SECURITY - Configuration Helmet réduite pour éviter blocages
 app.use(helmet({
@@ -185,7 +218,7 @@ async function startServer() {
       await seedSummaries();
       await seedCases();
       console.log('✅ Base de données Dr.MiMi initialisée avec succès');
-    } catch (dbError) {
+    } catch (dbError: any) {
       console.error('⚠️ Erreur lors de l\'initialisation de la DB, mais le serveur continue:', dbError.message);
     }
 
@@ -194,7 +227,7 @@ async function startServer() {
       configureOAuth();
       app.use(passport.initialize());
       console.log('✅ OAuth configuré');
-    } catch (oauthError) {
+    } catch (oauthError: any) {
       console.warn('⚠️ OAuth non configuré:', oauthError.message);
     }
 
@@ -213,7 +246,7 @@ async function startServer() {
       const wsManager = new WebSocketManager(httpServer);
       const webrtcSignaling = new WebRTCSignalingServer(httpServer);
       console.log('✅ WebSocket et WebRTC initialisés');
-    } catch (wsError) {
+    } catch (wsError: any) {
       console.warn('⚠️ Services temps réel non disponibles:', wsError.message);
     }
 
@@ -277,7 +310,7 @@ Support: Merieme BENNAMANE - Boumerdès 🌟
       }, 5000);
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('💥 Échec critique du démarrage Dr.MiMi:', error);
     console.error('Stack:', error.stack);
     process.exit(1);
