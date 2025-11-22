@@ -1,21 +1,4 @@
-// 🌐 CLIENT API ULTIMATE Dr.MiMi - Gestion complète des erreurs, cold starts et retry
-import { useState, useEffect } from 'react';
-
-const API_BASE_URL = import.meta.env.PROD
-  ? import.meta.env.VITE_API_URL || 'https://drmimi-replit.onrender.com'
-  : 'http://localhost:5001';
-
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
-interface RequestConfig extends RequestInit {
-  timeout?: number;
-  retries?: number;
-  skipWarmup?: boolean;
+skipWarmup ?: boolean;
 }
 
 class DrMiMiApiClient {

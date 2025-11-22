@@ -5,22 +5,34 @@
 // Fallback: URL du backend Render pour éviter les erreurs de configuration
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://drmimi-replit.onrender.com';
 
-// Helper pour construire les URLs d'API
-// Helper pour construire les URLs d'API
-export function getApiUrl(path: string): string {
-  // En développement, le proxy Vite gère /api
-  if (import.meta.env.DEV) {
-    return path.startsWith('/api') ? path : `/api${path}`;
-  }
-
-  // En production, on DOIT utiliser l'URL absolue du backend
+// Helper pour obtenir l'URL de base (sans /api)
+export function getBaseUrl(): string {
+  const isVercel = window.location.hostname.includes('vercel.app');
   let baseUrl = API_BASE_URL;
 
   // Sécurité ultime: si baseUrl est vide ou relative en PROD, on force Render
-  if (!baseUrl || baseUrl.startsWith('/')) {
-    console.warn('⚠️ VITE_API_URL manquante ou relative en PROD. Utilisation du fallback Render.');
+  if (!baseUrl || baseUrl.startsWith('/') || isVercel) {
+    if (isVercel && !baseUrl.includes('onrender.com')) {
+      // console.warn('⚠️ Vercel détecté: Forçage de l\'URL backend Render.');
+    }
     baseUrl = 'https://drmimi-replit.onrender.com';
   }
+  return baseUrl;
+}
+
+// Helper pour construire les URLs d'API
+export function getApiUrl(path: string): string {
+  // Détection de l'environnement Vercel via le hostname
+  const isVercel = window.location.hostname.includes('vercel.app');
+
+  // En développement (localhost), le proxy Vite gère /api
+  // MAIS si on est sur Vercel, on force le mode production même si DEV est true (cas rare)
+  if (import.meta.env.DEV && !isVercel) {
+    return path.startsWith('/api') ? path : `/api${path}`;
+  }
+
+  // En production (ou sur Vercel), on DOIT utiliser l'URL absolue du backend
+  let baseUrl = getBaseUrl();
 
   // Nettoyage du path
   const cleanPath = path.startsWith('/api') ? path : `/api${path}`;
