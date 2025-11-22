@@ -6,30 +6,27 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://drmimi-replit.onrender.com';
 
 // Helper pour construire les URLs d'API
+// Helper pour construire les URLs d'API
 export function getApiUrl(path: string): string {
   // En développement, le proxy Vite gère /api
   if (import.meta.env.DEV) {
     return path.startsWith('/api') ? path : `/api${path}`;
   }
 
-  // En production, utilise l'URL complète du backend Render
-  // IMPORTANT: Ne pas utiliser window.location.origin (Vercel) mais le backend (Render)
-  const baseUrl = API_BASE_URL;
+  // En production, on DOIT utiliser l'URL absolue du backend
+  let baseUrl = API_BASE_URL;
 
-  // Si VITE_API_URL n'est pas défini, afficher une erreur claire
-  if (!baseUrl) {
-    console.error('❌ VITE_API_URL not configured! Please set it in Vercel environment variables.');
-    console.error('Expected: https://drmimi-replit.onrender.com');
-    throw new Error('API URL not configured. Please contact administrator.');
+  // Sécurité ultime: si baseUrl est vide ou relative en PROD, on force Render
+  if (!baseUrl || baseUrl.startsWith('/')) {
+    console.warn('⚠️ VITE_API_URL manquante ou relative en PROD. Utilisation du fallback Render.');
+    baseUrl = 'https://drmimi-replit.onrender.com';
   }
 
+  // Nettoyage du path
   const cleanPath = path.startsWith('/api') ? path : `/api${path}`;
-  const fullUrl = `${baseUrl}${cleanPath}`;
 
-  // Debug log pour tracer les URLs générées (à retirer plus tard)
-  if (!fullUrl.startsWith('http')) {
-    console.warn(`⚠️ getApiUrl generated relative URL: ${fullUrl}. BaseURL: '${baseUrl}', DEV: ${import.meta.env.DEV}`);
-  }
+  // Construction de l'URL finale
+  const fullUrl = `${baseUrl}${cleanPath}`;
 
   return fullUrl;
 }

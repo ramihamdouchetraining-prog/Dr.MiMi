@@ -18,7 +18,7 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|ppt|pptx/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -69,7 +69,7 @@ function requireRole(roles: string[]) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
-  
+
   // Import and register admin routes
   const adminRoutes = await import('./adminRoutes');
   adminRoutes.registerAdminRoutes(app);
@@ -93,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const adminDashboardRoutes = await import('./routes/admin-dashboard');
   const oauthRoutes = await import('./routes/oauth');
   const notificationsRoutes = await import('./routes/notifications');
-  
+
   // Import user authentication routes (for students/regular users)
   const userAuthRoutes = await import('./routes/auth');
 
@@ -138,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { firstName, lastName, bio, university, country } = req.body;
-      
+
       const { db } = await import('./db');
       const { users } = await import('../shared/schema');
       const { eq } = await import('drizzle-orm');
@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/users/avatar', isAuthenticated, upload.single('avatar'), async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      
+
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -205,24 +205,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/users/stats', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      
+
       const { db } = await import('./db');
-      const { 
-        users, 
-        courses, 
-        quizzes, 
-        cases, 
-        courseEnrollments, 
-        quizAttempts, 
-        caseCompletions, 
+      const {
+        users,
+        courses,
+        quizzes,
+        cases,
+        courseEnrollments,
+        quizAttempts,
+        caseCompletions,
         summaryDownloads,
-        userBadges 
+        userBadges
       } = await import('../shared/schema');
       const { eq, and, count, avg, sum, sql, desc } = await import('drizzle-orm');
 
       // Get user for study streak calculation
       const [user] = await db.select().from(users).where(eq(users.id, userId));
-      
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId } = req.params;
       const { role } = req.body;
-      
+
       if (!['student', 'creator', 'manager', 'admin'].includes(role)) {
         return res.status(400).json({ message: "Invalid role" });
       }
@@ -354,7 +354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId } = req.params;
       const { reason, scope = 'comments', expiresAt } = req.body;
-      
+
       await storage.blacklistUser(userId, reason, scope, expiresAt ? new Date(expiresAt) : undefined);
       res.json({ message: "User blacklisted successfully" });
     } catch (error) {
@@ -417,11 +417,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { moduleId, language, yearLevels } = req.query;
       const filters: any = {};
-      
+
       if (moduleId) filters.moduleId = moduleId as string;
       if (language) filters.language = language as string;
       if (yearLevels) filters.yearLevels = (yearLevels as string).split(',');
-      
+
       const courses = await storage.getCourses(filters);
       res.json(courses);
     } catch (error) {
@@ -447,7 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const courseData = createCourseSchema.parse(req.body);
-      
+
       const course = await storage.createCourse({
         ...courseData,
         createdBy: userId,
@@ -466,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!['draft', 'review', 'published', 'archived'].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
@@ -484,10 +484,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { moduleId, language } = req.query;
       const filters: any = {};
-      
+
       if (moduleId) filters.moduleId = moduleId as string;
       if (language) filters.language = language as string;
-      
+
       const summaries = await storage.getSummaries(filters);
       res.json(summaries);
     } catch (error) {
@@ -501,10 +501,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { moduleId, difficulty } = req.query;
       const filters: any = {};
-      
+
       if (moduleId) filters.moduleId = moduleId as string;
       if (difficulty) filters.difficulty = difficulty as string;
-      
+
       const quizzes = await storage.getQuizzes(filters);
       res.json(quizzes);
     } catch (error) {
@@ -518,10 +518,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { moduleId, difficulty } = req.query;
       const filters: any = {};
-      
+
       if (moduleId) filters.moduleId = moduleId as string;
       if (difficulty) filters.difficulty = difficulty as string;
-      
+
       const cases = await storage.getCases(filters);
       res.json(cases);
     } catch (error) {
@@ -546,13 +546,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { entityType, entityId, body, parentId } = req.body;
-      
+
       // Check if user is blacklisted
       const user = await storage.getUser(userId);
       if (user?.isBlacklisted) {
         return res.status(403).json({ message: "You are not allowed to comment" });
       }
-      
+
       const comment = await storage.createComment({
         entityType,
         entityId,
@@ -570,17 +570,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===== DONATION ROUTES =====
   app.post('/api/create-donation-session', async (req, res) => {
     const { amount, currency, description, successUrl, cancelUrl } = req.body;
-    
+
     try {
       // In test mode, return a simulated response
       // In production, this would create a real Stripe checkout session
-      res.json({ 
+      res.json({
         success: true,
         message: 'Test mode donation session created',
         amount,
         currency,
         // In production, this would return the actual Stripe checkout session URL
-        url: null 
+        url: null
       });
     } catch (error) {
       console.error('Error creating donation session:', error);
@@ -592,7 +592,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!['visible', 'hidden', 'pending'].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
@@ -633,7 +633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/search', async (req, res) => {
     try {
       const { q: query, types } = req.query;
-      
+
       if (!query || typeof query !== 'string') {
         return res.status(400).json({ message: "Search query required" });
       }
@@ -663,7 +663,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { theme, locale, rtlPreference, reducedMotion } = req.body;
-      
+
       const settings = await storage.upsertUserSettings({
         userId,
         theme,
@@ -679,18 +679,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ===== ADMIN DASHBOARD ROUTES =====
-  
+
   // Check if user is admin (Merieme BENNAMANE)
   app.get('/api/admin/check', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
-      
+
       // Check if user is Merieme BENNAMANE or has admin role
-      const isAdmin = user?.email === 'merieme.bennamane@gmail.com' || 
-                      user?.firstName === 'Merieme' && user?.lastName === 'BENNAMANE' ||
-                      user?.role === 'admin';
-      
+      const isAdmin = user?.email === 'merieme.bennamane@gmail.com' ||
+        user?.firstName === 'Merieme' && user?.lastName === 'BENNAMANE' ||
+        user?.role === 'admin';
+
       res.json({ isAdmin, user });
     } catch (error) {
       console.error("Error checking admin status:", error);
@@ -726,10 +726,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { role, isBlacklisted } = req.query;
       const filters: any = {};
-      
+
       if (role) filters.role = role as string;
       if (isBlacklisted !== undefined) filters.isBlacklisted = isBlacklisted === 'true';
-      
+
       const users = await storage.getAllUsers(filters);
       res.json(users);
     } catch (error) {
@@ -743,11 +743,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category, featured, status } = req.query;
       const filters: any = {};
-      
+
       if (category) filters.category = category as string;
       if (featured !== undefined) filters.featured = featured === 'true';
       if (status) filters.status = status as string;
-      
+
       const posts = await storage.getBlogPosts(filters);
       res.json(posts);
     } catch (error) {
@@ -777,7 +777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: userId,
         slug: req.body.slug || req.body.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
       };
-      
+
       const post = await storage.createBlogPost(postData);
       res.status(201).json(post);
     } catch (error) {
@@ -793,7 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         updatedBy: userId,
       };
-      
+
       const post = await storage.updateBlogPost(req.params.id, updates);
       res.json(post);
     } catch (error) {
@@ -817,10 +817,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { category, moduleId } = req.query;
       const filters: any = {};
-      
+
       if (category) filters.category = category as string;
       if (moduleId) filters.moduleId = moduleId as string;
-      
+
       const files = await storage.getDriveFiles(filters);
       res.json(files);
     } catch (error) {
@@ -832,7 +832,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/files', isAuthenticated, requireRole(['admin', 'manager', 'creator']), upload.single('file'), async (req, res) => {
     try {
       const userId = req.user.claims.sub;
-      
+
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -842,9 +842,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: req.body.description,
         driveUrl: `/uploads/${req.file.filename}`,
         downloadUrl: `/uploads/${req.file.filename}`,
-        fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 
-                  req.file.mimetype.includes('doc') ? 'docx' : 
-                  req.file.mimetype.includes('image') ? 'image' : 'video',
+        fileType: req.file.mimetype.includes('pdf') ? 'pdf' :
+          req.file.mimetype.includes('doc') ? 'docx' :
+            req.file.mimetype.includes('image') ? 'image' : 'video',
         fileSize: `${(req.file.size / 1024 / 1024).toFixed(2)} MB`,
         moduleId: req.body.moduleId,
         category: req.body.category,
@@ -853,7 +853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         tags: req.body.tags ? JSON.parse(req.body.tags) : [],
         createdBy: userId,
       };
-      
+
       const file = await storage.createDriveFile(fileData);
       res.status(201).json(file);
     } catch (error) {
@@ -875,13 +875,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Stripe payment routes
   const { createCheckoutSession, verifyWebhookSignature, handlePaymentSuccess } = await import('./stripe');
-  
+
   // Create Stripe checkout session
   app.post('/api/stripe/create-checkout', isAuthenticated, async (req, res) => {
     try {
       const userId = req.user.claims.sub;
       const { itemType, itemId, itemTitle, priceInDZD, taxRate } = req.body;
-      
+
       const session = await createCheckoutSession({
         userId,
         itemType,
@@ -892,7 +892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         successUrl: `${req.headers.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${req.headers.origin}/payment/cancel`
       });
-      
+
       res.json(session);
     } catch (error) {
       console.error("Error creating checkout session:", error);
@@ -903,10 +903,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe webhook handler
   app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'] as string;
-    
+
     try {
       const event = verifyWebhookSignature(req.body, sig);
-      
+
       if (!event) {
         return res.status(400).send('Webhook signature verification failed');
       }
@@ -916,7 +916,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case 'checkout.session.completed':
           const session = event.data.object;
           const paymentData = await handlePaymentSuccess(session);
-          
+
           // Save purchase to database
           await storage.createPurchase({
             userId: paymentData.userId,
@@ -926,10 +926,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             currency: 'DZD',
             status: 'paid'
           });
-          
+
           console.log('Payment successful:', paymentData);
           break;
-          
+
         default:
           console.log(`Unhandled event type ${event.type}`);
       }
@@ -943,10 +943,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create HTTP server
   const httpServer = createServer(app);
-  
+
   // Initialize WebSocket server for chat
   const { createChatWebSocketServer } = await import('./routes/chat');
   createChatWebSocketServer(httpServer);
-  
+
   return httpServer;
 }
