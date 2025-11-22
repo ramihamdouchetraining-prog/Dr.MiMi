@@ -104,6 +104,21 @@ export async function apiFetch(path: string, options: ApiOptions = {}, retryCoun
         throw new Error(errorText || `HTTP ${response.status}`);
       }
 
+      // Vérifier le type de contenu avant de parser
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        // Si c'est du HTML, c'est probablement une erreur 404/500 déguisée ou une redirection SPA
+        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+          throw new Error(
+            `API Error: Expected JSON but received HTML from ${url}. ` +
+            `Check VITE_API_URL configuration.`
+          );
+        }
+        // Si ce n'est pas du JSON mais pas du HTML évident, on peut essayer de le retourner ou throw
+        throw new Error(`Invalid content-type: ${contentType}. Response: ${text.substring(0, 100)}...`);
+      }
+
       const data = await response.json();
 
       // Mise en cache si succès
