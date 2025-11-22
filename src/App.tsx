@@ -161,7 +161,7 @@ function AppContent() {
               location.pathname.startsWith('/register') ||
               location.pathname.startsWith('/quiz') ||
               location.pathname.startsWith('/analytics') ||
-                location.pathname.startsWith('/news') ) ||
+              location.pathname.startsWith('/news') ||
               location.pathname.startsWith('/features-xxl') ||
               location.pathname.startsWith('/lab-3d') ||
               location.pathname.startsWith('/collaboration') ||
