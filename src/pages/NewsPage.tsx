@@ -203,6 +203,18 @@ const NewsPage: React.FC = () => {
         title={language === 'en' ? 'Medical News' : language === 'ar' ? 'الأخبار الطبية' : 'Actualités Médicales'}
         description={language === 'en' ? 'Latest medical news and research updates' : language === 'ar' ? 'آخر الأخبار الطبية وتحديثات البحث' : 'Dernières actualités médicales et mises à jour de la recherche'}
         keywords={['médecine', 'actualités', 'recherche', 'santé', 'news', 'medical']}
+        schema={{
+          '@type': 'CollectionPage',
+          'mainEntity': {
+            '@type': 'ItemList',
+            'itemListElement': newsArticles.slice(0, 5).map((article, index) => ({
+              '@type': 'ListItem',
+              'position': index + 1,
+              'url': `https://drmimi.netlify.app/news/${article.id}`,
+              'name': language === 'en' ? article.titleEn : language === 'ar' ? article.titleAr : article.title
+            }))
+          }
+        }}
       />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
